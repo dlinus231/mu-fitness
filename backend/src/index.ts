@@ -1,15 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { log } from "console";
+import express from "express";
 
 const prisma = new PrismaClient();
+const app = express();
 
-async function main() {}
+app.use(express.json());
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+const server = app.listen(3000, () =>
+  console.log(`
+🚀 Server ready at: http://localhost:3000
+⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
+);
