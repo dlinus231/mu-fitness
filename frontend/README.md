@@ -24,3 +24,8 @@ Use CTRL+C to stop the development server.
 - `npx expo upgrade` upgrades the Expo SDK, could be useful to run from time to time
 - `expo eject` is what we will run if we decide that we don't want to use expo anymore
     - this is NONREVERSIBLE and will transform our expo project into a vanilla React Native project
+ 
+## Troubleshooting
+If you encounter errors after attempting: `npm install`, atempt deleting the "frontend/node_modules directory" and "frontend/package-lock.json". Next run `npm config set legacy-peer-deps true`.
+
+Then run `npm install` again, and if indicated, `npm audit fix --force`.
