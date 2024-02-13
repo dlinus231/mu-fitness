@@ -4,16 +4,22 @@ import { StyleSheet, Text, View } from 'react-native';
 import { GluestackUIProvider, Button, ButtonText } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 
+import { NavigationContainer } from '@react-navigation/native';
+
+import FooterNavigator from './components/FooterNavigator';
+
 export default function App() {
   return (
-    // <View style={styles.container}>
-    //   <Text>Open up App.js to start working on your app!</Text>
-    //   <StatusBar style="auto" />
-    // </View>
+
     <GluestackUIProvider config={config}>
-      <Button>
-        <ButtonText>Hello world</ButtonText>
-      </Button>
+      <NavigationContainer>
+        {/* <View style={styles.container}>
+          <Text>Open up App.js to start working on your app!</Text>
+          <StatusBar style="auto" />
+        </View> */}
+      
+        <FooterNavigator />
+      </NavigationContainer>
     </GluestackUIProvider>
   );
 }
