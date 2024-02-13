@@ -10,14 +10,8 @@ import FooterNavigator from './components/FooterNavigator';
 
 export default function App() {
   return (
-
     <GluestackUIProvider config={config}>
-      <NavigationContainer>
-        {/* <View style={styles.container}>
-          <Text>Open up App.js to start working on your app!</Text>
-          <StatusBar style="auto" />
-        </View> */}
-      
+      <NavigationContainer>      
         <FooterNavigator />
       </NavigationContainer>
     </GluestackUIProvider>

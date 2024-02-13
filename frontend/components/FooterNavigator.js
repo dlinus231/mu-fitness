@@ -12,9 +12,9 @@ export default function FooterNavigator() {
   return (
     <Tab.Navigator
         // initialRouteName="FriendFeed"
-        // screenOptions={{
-        //   headerShown: false
-        // }}
+        screenOptions={{
+          headerShown: false, 
+        }}
     >
       <Tab.Screen name="FriendFeed" component={FriendFeedScreen} />
       <Tab.Screen name="FitnessPlans" component={FitnessPlansScreen} />
