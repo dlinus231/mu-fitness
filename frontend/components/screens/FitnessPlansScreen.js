@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@gluestack-ui/themed';
-import TopBarMenu from '../TopBarMenu';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import TopBarMenu from '../TopBarMenu';
 import DirectMessagesScreen from './DirectMessagesScreen';
 import SearchScreen from './SearchScreen';
+import WorkoutPlansScreen from './fitnessPlanTabScreens/WorkoutPlansScreen';
+import FitnessPlansScreenNavigator from '../FitnessPlanScreenNavigator';
+
+const Stack = createNativeStackNavigator();
 
 const FitnessPlansScreen = () => {
   // can have values 'friendFeed', 'dms', 'search'
@@ -27,9 +32,10 @@ const FitnessPlansScreen = () => {
       { curPage == 'fitnessPlan' && (
         <>
           <TopBarMenu onSwitchPage={handleSwitchPage}/>
-          <View style={styles.container}>
+          {/* <View style={styles.container}>
             <Text>This is the fitness plan screen</Text>
-          </View>
+          </View> */}
+          <FitnessPlansScreenNavigator />
         </>
       )}
     </>
