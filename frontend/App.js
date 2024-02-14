@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -7,12 +10,23 @@ import { config } from "@gluestack-ui/config";
 import { NavigationContainer } from '@react-navigation/native';
 
 import FooterNavigator from './components/FooterNavigator';
+import LandingPageScreen from './components/authentication/LandingPageScreen';
+
 
 export default function App() {
+  // TODO this should be a state variable once its implemented
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  function handleAuthChange() {
+    setIsLoggedIn(!isLoggedIn);
+  }
+
   return (
     <GluestackUIProvider config={config}>
-      <NavigationContainer>      
-        <FooterNavigator />
+      <NavigationContainer>
+        { isLoggedIn ? <FooterNavigator /> : <LandingPageScreen handleAuthChange={handleAuthChange} />}
+        {/* <LandingPageScreen /> */}
+        {/* <FooterNavigator /> */}
       </NavigationContainer>
     </GluestackUIProvider>
   );
