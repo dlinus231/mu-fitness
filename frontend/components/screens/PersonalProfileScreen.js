@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@gluestack-ui/themed';
 import TopBarMenu from '../TopBarMenu';
 
 import DirectMessagesScreen from './DirectMessagesScreen';
 import SearchScreen from './SearchScreen';
 
-const PersonalProfileScreen = () => {
+const PersonalProfileScreen = ({ handleAuthChange }) => {
   // TODO make this an enum?
   // can have values 'profile', 'dms', 'search'
   const [ curPage, setCurPage ] = useState('profile'); 
@@ -30,6 +30,9 @@ const PersonalProfileScreen = () => {
           <TopBarMenu onSwitchPage={handleSwitchPage}/>
           <View style={styles.container}>
             <Text>This is the personal profile screen</Text>
+            <TouchableOpacity onPress={handleAuthChange}>
+              <Text>Sign out</Text>
+            </TouchableOpacity>
           </View>
         </>
       )}

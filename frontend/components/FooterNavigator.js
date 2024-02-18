@@ -8,7 +8,7 @@ import PersonalProfileScreen from './screens/PersonalProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-export default function FooterNavigator() {
+export default function FooterNavigator({ handleAuthChange }) {
   return (
     <Tab.Navigator
         // initialRouteName="FriendFeed"
@@ -20,7 +20,13 @@ export default function FooterNavigator() {
       <Tab.Screen name="FitnessPlans" component={FitnessPlansScreen} />
       <Tab.Screen name="Upload" component={UploadScreen} />
       <Tab.Screen name="PublicFeed" component={PublicFeedScreen} />
-      <Tab.Screen name="PersonalProfile" component={PersonalProfileScreen} />
+      <Tab.Screen name="PersonalProfile">
+        {props => <PersonalProfileScreen {...props} handleAuthChange={handleAuthChange} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
+
+{/* <Stack.Screen name="signupScreen">
+          {props => <SignupScreen {...props} handleAuthChange={handleAuthChange} />}
+</Stack.Screen> */}
