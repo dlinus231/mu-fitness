@@ -24,7 +24,7 @@ export default function App() {
   return (
     <GluestackUIProvider config={config}>
       <NavigationContainer>
-        { !isLoggedIn ? <FooterNavigator handleAuthChange={handleAuthChange}/> : <LandingPageScreen handleAuthChange={handleAuthChange} />}
+        { isLoggedIn ? <FooterNavigator handleAuthChange={handleAuthChange}/> : <LandingPageScreen handleAuthChange={handleAuthChange} />}
         {/* <LandingPageScreen /> */}
         {/* <FooterNavigator /> */}
       </NavigationContainer>
