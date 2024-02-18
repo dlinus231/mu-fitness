@@ -14,8 +14,11 @@ export default function FooterNavigator({handleAuthChange}) {
             headerShown: false
         }}
     >
-        <Stack.Screen name="landingPageMenu" component={LandingPageMenu} />
+        {/* <Stack.Screen name="landingPageMenu" component={LandingPageMenu} /> */}
         {/* <Stack.Screen name="loginScreen" component={LoginScreen} /> */}
+        <Stack.Screen name="landingPageMenu">
+          {props => <LandingPageMenu {...props} handleAuthChange={handleAuthChange} />}
+        </Stack.Screen>
         <Stack.Screen name="loginScreen">
           {props => <LoginScreen {...props} handleAuthChange={handleAuthChange} />}
         </Stack.Screen>
