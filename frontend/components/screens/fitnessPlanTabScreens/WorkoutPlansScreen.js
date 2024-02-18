@@ -64,6 +64,10 @@ const WorkoutPlansScreen = ({ navigation }) => {
             <Text>Go back</Text>
           </TouchableOpacity>
           
+          <TouchableOpacity style={styles.createNewWorkoutPlanButton} onPress={() => navigation.navigate('CreateNewWorkoutPlan')}>
+            <MaterialIcons name="post-add" size={48} color="black" />
+            <Text> Create new workout plan</Text>
+          </TouchableOpacity>
 
           <FlatList 
             data={dummyData}
@@ -85,6 +89,11 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    createNewWorkoutPlanButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 10,
     },
 });
   
