@@ -12,7 +12,7 @@ import FitnessPlansScreenNavigator from '../FitnessPlanScreenNavigator';
 const Stack = createNativeStackNavigator();
 
 const FitnessPlansScreen = () => {
-  // can have values 'friendFeed', 'dms', 'search'
+  // can have values 'fitnessPlan', 'dms', 'search'
   const [ curPage, setCurPage ] = useState('fitnessPlan');
 
   const handleSwitchPage = (page) => {
