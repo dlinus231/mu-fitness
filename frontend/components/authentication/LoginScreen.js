@@ -1,26 +1,44 @@
-import React, { useState } from 'react';
-import { TextInput, Button, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
+import React, { useState } from "react";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
+import {
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import { Text, View } from "@gluestack-ui/themed";
 
 const LoginScreen = ({ navigation, handleAuthChange }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // makes signin request when signin form is submitted
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http:/PUT_BACKEND_LINK_HERE', {
+      const response = await axios.post(BACKEND_URL + "/user/login", {
         email,
         password,
       });
-      Alert.alert('Log in Successful', 'You can now log in with your credentials.');
-      // TODO SET ISLOGGEDIN TO TRUE (pass in callback function)
+      if (response.status == 200) {
+        handleAuthChange();
+      }
     } catch (error) {
-      console.error('Log in error:', error);
-      // Handle errors, such as showing an alert with a message
-      Alert.alert('Log in Failed', error.response?.data?.error || 'Please try again later.');
+      if (error.response) {
+        if (error.response.status == 401) {
+          Alert.alert("Invalid email or password", "Please try again");
+        } else if (error.response.status == 400) {
+          Alert.alert("Invalid request made");
+        }
+      } else {
+        Alert.alert(
+          "Server Issue: Login Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
     }
-  };  
+  };
 
   return (
     <View style={styles.container}>
@@ -41,7 +59,10 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
         secureTextEntry
       />
       <Button title="Sign Up" onPress={handleLogin} />
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.space}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.space}
+      >
         <Text>Go back</Text>
       </TouchableOpacity>
     </View>
@@ -49,21 +70,21 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: 'gray',
-        padding: 10,
-        marginBottom: 20,
-    },
-    space: {
-        marginTop: 20,
-    },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 10,
+    marginBottom: 20,
+  },
+  space: {
+    marginTop: 20,
+  },
 });
-  
+
 export default LoginScreen;
