@@ -4,14 +4,20 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 const app = express();
+var cors = require("cors");
 
 app.use(express.json());
+app.use(cors());
 
 const server = app.listen(3000, () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
 );
+
+app.get(`/test`, async (req, res) => {
+  res.sendStatus(200);
+});
 
 app.post(`/user/create`, async (req, res) => {
   const { username, email, password } = req.body;
