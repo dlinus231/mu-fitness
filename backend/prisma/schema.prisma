@@ -24,7 +24,9 @@ model Workout {
   difficulty   Difficulty
   description  String
   time_created DateTime   @default(now())
+  muscles Muscle[]
   routines     Routine[]
+  tags Tag[]
   user         User       @relation(fields: [user_id], references: [id])
 }
 
@@ -34,6 +36,7 @@ model Routine {
   repetitions Int
   rest        Int
   workout_id  Int
+  weight_lbs Int
   exercise    Exercise @relation(fields: [exercise_id], references: [id])
   workout     Workout  @relation(fields: [workout_id], references: [id])
 }
@@ -45,6 +48,7 @@ model Exercise {
   description String
   video_path  String
   routines    Routine[]
+  muscles Muscle[]
   tags        Tag[]      @relation("ExerciseToTag")
 }
 
@@ -52,6 +56,22 @@ model Tag {
   id        Int        @id @default(autoincrement())
   name      String     @db.VarChar(255)
   exercises Exercise[] @relation("ExerciseToTag")
+  workouts Workout[]
+}
+
+model Muscle {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255)
+  bodyPart_id Int
+  bodyPart BodyPart @relation(fields: [bodyPart_id], references: [id])
+  workouts Workout[]
+  exercises Exercise[]
+}
+
+model BodyPart {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255)
+  muscles Muscle[]
 }
 
 enum Difficulty {
