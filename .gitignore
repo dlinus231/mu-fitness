@@ -3,3 +3,5 @@ tmp
 
 # ds store
 .DS_Store
+
+node_modules
