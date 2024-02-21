@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
+import BackArrowIcon from "../icons/BackArrowIcon";
 
 const LoginScreen = ({ navigation, handleAuthChange }) => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,14 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
 
   return (
     <View style={styles.container}>
-      <Text>This is the login screen</Text>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.space}
+      >
+        <BackArrowIcon></BackArrowIcon>
+      </TouchableOpacity>
+      <Text>Sign Into Your Account</Text>
+      <View style={styles.space}></View>
       <Text>Email:</Text>
       <TextInput
         style={styles.input}
@@ -58,13 +66,7 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign Up" onPress={handleLogin} />
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.space}
-      >
-        <Text>Go back</Text>
-      </TouchableOpacity>
+      <Button title="Sign In" onPress={handleLogin} />
     </View>
   );
 };
@@ -81,6 +83,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     padding: 10,
     marginBottom: 20,
+    minWidth: 200,
   },
   space: {
     marginTop: 20,
