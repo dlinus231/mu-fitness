@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
+import BackArrowIcon from "../icons/BackArrowIcon";
 
 const SignupScreen = ({ navigation, handleAuthChange }) => {
   const [email, setEmail] = useState("");
@@ -18,8 +19,6 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleSignUp = async () => {
-    // TODO check that the password and password confirmation match
-
     try {
       const response = await axios.post(BACKEND_URL + "/user/create", {
         username,
@@ -27,11 +26,8 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
         password,
       });
       if (response.status == 201) {
+        Alert.alert("Account created.", "You have been logged in.");
         handleAuthChange();
-        Alert.alert(
-          "Sign Up Successful",
-          "You can now log in with your credentials."
-        );
       }
     } catch (error) {
       // Handle errors, such as showing an alert with a message
@@ -55,7 +51,14 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
 
   return (
     <View style={styles.container}>
-      <Text>This is the signup screen</Text>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.space}
+      >
+        <BackArrowIcon></BackArrowIcon>
+      </TouchableOpacity>
+      <Text>Create an Account</Text>
+      <View style={styles.space}></View>
       <Text>Username:</Text>
       <TextInput
         style={styles.input}
@@ -79,12 +82,6 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
         secureTextEntry
       />
       <Button title="Sign Up" onPress={handleSignUp} />
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.space}
-      >
-        <Text>Go back</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -101,6 +98,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     padding: 10,
     marginBottom: 20,
+    minWidth: 200,
   },
   space: {
     marginTop: 20,

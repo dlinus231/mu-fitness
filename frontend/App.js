@@ -27,8 +27,6 @@ export default function App() {
         ) : (
           <LandingPageScreen handleAuthChange={handleAuthChange} />
         )}
-        {/* <LandingPageScreen /> */}
-        {/* <FooterNavigator /> */}
       </NavigationContainer>
     </GluestackUIProvider>
   );
