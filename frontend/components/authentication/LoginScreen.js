@@ -18,7 +18,6 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleLogin = async () => {
-    console.log(BACKEND_URL);
     try {
       const response = await axios.post(BACKEND_URL + "/user/login", {
         email,

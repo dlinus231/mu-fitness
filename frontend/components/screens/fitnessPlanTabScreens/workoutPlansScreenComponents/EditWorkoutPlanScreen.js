@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import { BACKEND_URL } from "@env";
 import { Text, View } from "@gluestack-ui/themed";
@@ -22,11 +23,12 @@ import { useRoute } from "@react-navigation/native";
 
 const EditWorkoutPlanScreen = ({ navigation }) => {
   const route = useRoute();
-  const { workout_id, setEdited } = route.params;
+  const { workout_id } = route.params;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
+  const [loading, setLoading] = useState(true);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -47,6 +49,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
       setName(workout.name);
       setDescription(workout.description);
       setSelected(workout.difficulty);
+      setLoading(false);
     } catch (error) {
       if (error.response) {
         Alert.alert("Could not find this workout");
@@ -68,7 +71,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
         difficulty: selected,
       });
       if (response.status == 200) {
-        setEdited(true);
+        DeviceEventEmitter.emit("editWorkoutEvent");
         Alert.alert("Workout edited successfully", "", [
           {
             text: "Ok",
@@ -98,55 +101,59 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
-        <ScrollView automaticallyAdjustKeyboardInsets={true}>
-          <View style={styles.container}>
-            <Text> Edit Workout Plan </Text>
+        {loading ? (
+          <Text>Loading content...</Text>
+        ) : (
+          <ScrollView automaticallyAdjustKeyboardInsets={true}>
+            <View style={styles.container}>
+              <Text> Edit Workout Plan </Text>
 
-            <Text style={styles.space}>Name: </Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              maxLength={100}
-            ></TextInput>
+              <Text style={styles.space}>Name: </Text>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                maxLength={100}
+              ></TextInput>
 
-            <Text style={styles.space}>Difficulty:</Text>
-            <SelectList
-              setSelected={(val) => setSelected(val)}
-              data={difficulties}
-              save="value"
-              search={false}
-              maxHeight={120}
-              placeholder={selected}
-            ></SelectList>
+              <Text style={styles.space}>Difficulty:</Text>
+              <SelectList
+                setSelected={(val) => setSelected(val)}
+                data={difficulties}
+                save="value"
+                search={false}
+                maxHeight={120}
+                placeholder={selected}
+              ></SelectList>
 
-            <View style={styles.space}></View>
+              <View style={styles.space}></View>
 
-            <Text style={styles.space}>Description: </Text>
-            <TextInput
-              style={styles.input}
-              value={description}
-              onChangeText={setDescription}
-              multiline={true}
-              numberOfLines={10}
-              minHeight={100}
-              maxHeight={100}
-            ></TextInput>
-            <View style={styles.submit_button}>
-              <Button
-                title="Edit Workout"
-                onPress={() => {
-                  if (name.length > 0) {
-                    handleEditWorkout();
-                  } else {
-                    Alert.alert("Workout name cannot be empty");
-                  }
-                }}
-                color="#333333"
-              ></Button>
+              <Text style={styles.space}>Description: </Text>
+              <TextInput
+                style={styles.input}
+                value={description}
+                onChangeText={setDescription}
+                multiline={true}
+                numberOfLines={10}
+                minHeight={100}
+                maxHeight={100}
+              ></TextInput>
+              <View style={styles.submit_button}>
+                <Button
+                  title="Edit Workout"
+                  onPress={() => {
+                    if (name.length > 0) {
+                      handleEditWorkout();
+                    } else {
+                      Alert.alert("Workout name cannot be empty");
+                    }
+                  }}
+                  color="#333333"
+                ></Button>
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        )}
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

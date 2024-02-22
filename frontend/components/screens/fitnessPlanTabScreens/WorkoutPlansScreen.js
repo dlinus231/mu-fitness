@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import axios from "axios";
 import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  DeviceEventEmitter,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import BackArrowIcon from "../../icons/BackArrowIcon";
 const WorkoutPlansScreen = ({ navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [created, setCreated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // TODO set this to be back to null when the user clicks back on individual workout plan page
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
@@ -54,6 +56,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
             return dateB - dateA;
           })
         );
+        setLoading(false);
       }
     } catch (error) {
       if (!error.response) {
@@ -66,10 +69,18 @@ const WorkoutPlansScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchWorkoutPlans();
   }, []);
 
+  //Event listener for when new workout is created so that we update the list of workouts
+  DeviceEventEmitter.addListener("createWorkoutEvent", () => {
+    setCreated(true);
+  });
+
+  //Refetch workout plans when new one is created
   useEffect(() => {
+    setLoading(true);
     fetchWorkoutPlans();
   }, [created]);
 
@@ -95,17 +106,15 @@ const WorkoutPlansScreen = ({ navigation }) => {
             style={styles.createNewWorkoutPlanButton}
             onPress={() => {
               setCreated(false);
-              navigation.navigate("CreateNewWorkoutPlan", { setCreated });
+              navigation.navigate("CreateNewWorkoutPlan");
             }}
           >
             <MaterialIcons name="post-add" size={48} color="black" />
             <Text> Create new workout plan</Text>
           </TouchableOpacity>
-
-          {
-            //Todo: weird thing where when we have >4 plans the last one cant be scrolled to
-          }
-          {workoutPlans.length > 0 ? (
+          {loading ? (
+            <Text>Loading workouts...</Text>
+          ) : workoutPlans.length > 0 ? (
             <FlatList
               style={styles.flatlist}
               data={workoutPlans}

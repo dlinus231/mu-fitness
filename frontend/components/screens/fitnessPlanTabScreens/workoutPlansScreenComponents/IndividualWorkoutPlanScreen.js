@@ -8,6 +8,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
@@ -22,6 +23,10 @@ const IndividualWorkoutPlanScreen = ({
   const [loading, setLoading] = useState(true);
   const [workout, setWorkout] = useState({});
   const [edited, setEdited] = useState(false);
+
+  DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
+    setEdited(true);
+  });
 
   const fetchWorkout = async () => {
     try {
@@ -49,7 +54,6 @@ const IndividualWorkoutPlanScreen = ({
         BACKEND_URL + `/workout/delete/${workout_id}`
       );
       if (result.status == 200) {
-        setEdited(true);
         Alert.alert("Workout deleted successfully", "", [
           {
             text: "Ok",
@@ -73,19 +77,19 @@ const IndividualWorkoutPlanScreen = ({
     setEdited(false);
     navigation.navigate("EditWorkoutPlan", {
       workout_id,
-      setEdited,
     });
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchWorkout();
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     fetchWorkout();
   }, [edited]);
 
-  //TODO when loading still have back arrow
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

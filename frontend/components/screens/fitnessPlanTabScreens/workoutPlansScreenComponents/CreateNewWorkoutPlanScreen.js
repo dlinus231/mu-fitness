@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import { BACKEND_URL } from "@env";
 import { Text, View } from "@gluestack-ui/themed";
@@ -19,13 +20,8 @@ import { Octicons } from "@expo/vector-icons";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SelectList } from "react-native-dropdown-select-list";
-import { useRoute } from "@react-navigation/native";
-
 
 const CreateNewWorkoutPlanScreen = ({ navigation }) => {
-  const route = useRoute();
-  const { setCreated } = route.params;
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
@@ -50,9 +46,8 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         description,
         tags: [], //ToDo - Implement Tags
       });
-      console.log(response.data);
       if (response.status == 201) {
-        setCreated(true);
+        DeviceEventEmitter.emit("createWorkoutEvent");
         Alert.alert("Workout created successfully", "", [
           {
             text: "Ok",
