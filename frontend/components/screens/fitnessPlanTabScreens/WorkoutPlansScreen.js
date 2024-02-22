@@ -17,6 +17,7 @@ import BackArrowIcon from "../../icons/BackArrowIcon";
 
 const WorkoutPlansScreen = ({ navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
+  const [created, setCreated] = useState(false);
 
   // TODO set this to be back to null when the user clicks back on individual workout plan page
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
@@ -45,14 +46,20 @@ const WorkoutPlansScreen = ({ navigation }) => {
     try {
       const response = await axios.get(BACKEND_URL + `/workout/many/${userId}`);
       if (response.status == 200) {
-        setWorkoutPlans(response.data);
+        setWorkoutPlans(
+          response.data.sort((a, b) => {
+            //Sort by recent
+            const dateA = new Date(a.time_created);
+            const dateB = new Date(b.time_created);
+            return dateB - dateA;
+          })
+        );
       }
     } catch (error) {
       if (!error.response) {
         Alert.alert("Server issue", "Please try again later");
       } else {
         setWorkoutPlans([]);
-        console.log(workoutPlans.length);
       }
       console.log(error);
     }
@@ -61,6 +68,10 @@ const WorkoutPlansScreen = ({ navigation }) => {
   useEffect(() => {
     fetchWorkoutPlans();
   }, []);
+
+  useEffect(() => {
+    fetchWorkoutPlans();
+  }, [created]);
 
   // render the infinite scroll list unless the user has clicked a workout plan
   // then render individual page for that workout plan until they click back
@@ -82,7 +93,10 @@ const WorkoutPlansScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.createNewWorkoutPlanButton}
-            onPress={() => navigation.navigate("CreateNewWorkoutPlan")}
+            onPress={() => {
+              setCreated(false);
+              navigation.navigate("CreateNewWorkoutPlan", { setCreated });
+            }}
           >
             <MaterialIcons name="post-add" size={48} color="black" />
             <Text> Create new workout plan</Text>
@@ -93,6 +107,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
           }
           {workoutPlans.length > 0 ? (
             <FlatList
+              style={styles.flatlist}
               data={workoutPlans}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
@@ -130,6 +145,9 @@ const styles = StyleSheet.create({
   },
   space: {
     marginTop: 20,
+  },
+  flatlist: {
+    maxHeight: 550, //Todo - make responsive for diff screen sizes
   },
 });
 

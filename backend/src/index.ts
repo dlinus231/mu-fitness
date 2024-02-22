@@ -111,6 +111,7 @@ app.get(`/workout/one/:workoutId`, async (req, res) => {
 //Get all workouts for a user
 app.get(`/workout/many/:userId`, async (req, res) => {
   const { userId } = req.params;
+
   if (userId == null) {
     res.sendStatus(400);
     return;
@@ -149,6 +150,27 @@ app.post(`/workout/create`, async (req, res) => {
     res.status(201).json(result);
   } catch (e) {
     console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+app.post(`/workout/edit`, async (req, res) => {
+  const { workoutId, name, difficulty, description } = req.body;
+  try {
+    const result = await prisma.workout.update({
+      where: {
+        id: workoutId,
+      },
+      data: {
+        name,
+        difficulty,
+        description,
+      },
+    });
+
+    res.sendStatus(200);
+  } catch (e) {
+    console.error(e);
     res.sendStatus(400);
   }
 });

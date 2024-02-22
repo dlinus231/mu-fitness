@@ -21,9 +21,11 @@ const IndividualWorkoutPlanScreen = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [workout, setWorkout] = useState({});
+  const [edited, setEdited] = useState(false);
 
   const fetchWorkout = async () => {
     try {
+      setLoading(true);
       const result = await axios.get(
         BACKEND_URL + `/workout/one/${workout_id}`
       );
@@ -47,6 +49,7 @@ const IndividualWorkoutPlanScreen = ({
         BACKEND_URL + `/workout/delete/${workout_id}`
       );
       if (result.status == 200) {
+        setEdited(true);
         Alert.alert("Workout deleted successfully", "", [
           {
             text: "Ok",
@@ -66,13 +69,24 @@ const IndividualWorkoutPlanScreen = ({
     }
   };
 
+  const handleEditWorkout = () => {
+    setEdited(false);
+    navigation.navigate("EditWorkoutPlan", {
+      workout_id,
+      setEdited,
+    });
+  };
+
   useEffect(() => {
     fetchWorkout();
   }, []);
+
+  useEffect(() => {
+    fetchWorkout();
+  }, [edited]);
+
   //TODO when loading still have back arrow
-  return loading ? (
-    <Text>Loading...</Text>
-  ) : (
+  return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <TouchableOpacity
@@ -81,26 +95,36 @@ const IndividualWorkoutPlanScreen = ({
         >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
-        <View style={styles.container}>
-          <Text>{workout.name}</Text>
-          <Text>Difficulty: {workout.difficulty}</Text>
-          <Text>Description:</Text>
-          <Text>{workout.description}</Text>
-        </View>
-      </View>
-      <View style={styles.bottomContent}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDeleteWorkout}
-          >
-            <Text style={{ color: "lightcoral" }}>Delete</Text>
-          </TouchableOpacity>
-          <View style={{ width: 20 }}></View>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={{ color: "white" }}>Edit</Text>
-          </TouchableOpacity>
-        </View>
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : (
+          <>
+            <View style={styles.container}>
+              <Text>{workout.name}</Text>
+              <Text>Difficulty: {workout.difficulty}</Text>
+              <Text>Description:</Text>
+              <Text>{workout.description}</Text>
+            </View>
+            <View style={styles.bottomContent}>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  //Todo conditionally render buttons if this workout belongs to this user
+                  style={styles.deleteButton}
+                  onPress={handleDeleteWorkout}
+                >
+                  <Text style={{ color: "lightcoral" }}>Delete</Text>
+                </TouchableOpacity>
+                <View style={{ width: 20 }}></View>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={handleEditWorkout}
+                >
+                  <Text style={{ color: "white" }}>Edit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );

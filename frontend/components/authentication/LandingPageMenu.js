@@ -18,9 +18,8 @@ const LandingPageMenu = ({ navigation, handleAuthChange }) => {
         </Button>
         <Text>
           {" "}
-          Note: The button below is only here so that we can login for now
-          (since actuall loggin in is not implemented) and will be removed once
-          we get auth working
+          Note: Although login works, debug login is kept for testing purposes
+          (workouts will not work properly)
         </Text>
         <Button onPress={handleAuthChange}>
           <ButtonText>Log in (debugging purposes)</ButtonText>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   ScrollView,
@@ -15,16 +15,14 @@ import {
 } from "react-native";
 import { BACKEND_URL } from "@env";
 import { Text, View } from "@gluestack-ui/themed";
-import { Octicons } from "@expo/vector-icons";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SelectList } from "react-native-dropdown-select-list";
 import { useRoute } from "@react-navigation/native";
 
-
-const CreateNewWorkoutPlanScreen = ({ navigation }) => {
+const EditWorkoutPlanScreen = ({ navigation }) => {
   const route = useRoute();
-  const { setCreated } = route.params;
+  const { workout_id, setEdited } = route.params;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -40,20 +38,38 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
     { key: 3, value: "expert" },
   ];
 
-  //callback function when button is pressed, makes call to API and handles response
-  const handleCreateWorkout = async () => {
+  const fetchWorkout = async () => {
     try {
-      const response = await axios.post(BACKEND_URL + "/workout/create", {
-        userId: await AsyncStorage.getItem("user_id"),
+      const result = await axios.get(
+        BACKEND_URL + `/workout/one/${workout_id}`
+      );
+      const workout = result.data;
+      setName(workout.name);
+      setDescription(workout.description);
+      setSelected(workout.difficulty);
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not find this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Fetching Workout Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  };
+
+  const handleEditWorkout = async () => {
+    try {
+      const response = await axios.post(BACKEND_URL + "/workout/edit", {
+        workoutId: workout_id,
         name,
-        difficulty: selected,
         description,
-        tags: [], //ToDo - Implement Tags
+        difficulty: selected,
       });
-      console.log(response.data);
-      if (response.status == 201) {
-        setCreated(true);
-        Alert.alert("Workout created successfully", "", [
+      if (response.status == 200) {
+        setEdited(true);
+        Alert.alert("Workout edited successfully", "", [
           {
             text: "Ok",
             onPress: () => navigation.navigate("WorkoutPlans"),
@@ -62,16 +78,19 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
       }
     } catch (error) {
       if (error.response) {
-        Alert.alert("Invalid request made to server", "Please try again");
+        Alert.alert("Invalid request", "Please try again");
       } else {
         Alert.alert(
-          "Server Issue: Workout Creation Failed",
+          "Server Issue: Workout Edit Failed",
           error.response?.data?.error || "Please try again later."
         );
       }
-      console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchWorkout();
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -81,7 +100,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         </TouchableOpacity>
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>
-            <Text> New Workout Plan </Text>
+            <Text> Edit Workout Plan </Text>
 
             <Text style={styles.space}>Name: </Text>
             <TextInput
@@ -98,7 +117,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               save="value"
               search={false}
               maxHeight={120}
-              placeholder="beginner"
+              placeholder={selected}
             ></SelectList>
 
             <View style={styles.space}></View>
@@ -115,10 +134,10 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
             ></TextInput>
             <View style={styles.submit_button}>
               <Button
-                title="Create Workout"
+                title="Edit Workout"
                 onPress={() => {
                   if (name.length > 0) {
-                    handleCreateWorkout();
+                    handleEditWorkout();
                   } else {
                     Alert.alert("Workout name cannot be empty");
                   }
@@ -158,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateNewWorkoutPlanScreen;
+export default EditWorkoutPlanScreen;
