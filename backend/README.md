@@ -58,3 +58,12 @@ You can access the REST API of the server using the following endpoints:
   - Response:
     - `200`: Created successfully. Returns an object containing the workout data.
     - `400`: Invalid request made
+
+### `Delete`
+
+- `/workout/delete/:workoutId`: Delete a workout
+  - Params:
+    - `workoutId: Integer` (required): The id of the workout to delete
+  - Response:
+    - `200`: Workout deleted successfully
+    - `400`: Invalid request. Missing or invalid workout id
