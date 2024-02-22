@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../icons/BackArrowIcon";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = ({ navigation, handleAuthChange }) => {
   const [email, setEmail] = useState("");
@@ -22,10 +23,17 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
         email,
         password,
       });
+      const data = response.data;
+
       if (response.status == 200) {
+        //Session variables set on login
+        await AsyncStorage.setItem("user_id", "" + data.id);
+        await AsyncStorage.setItem("email", data.email);
+        await AsyncStorage.setItem("username", data.username);
         handleAuthChange();
       }
     } catch (error) {
+      console.log(error);
       if (error.response) {
         if (error.response.status == 401) {
           Alert.alert("Invalid email or password", "Please try again");

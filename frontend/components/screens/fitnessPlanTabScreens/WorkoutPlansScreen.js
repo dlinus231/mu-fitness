@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,27 +8,15 @@ import {
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
+import { BACKEND_URL } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import WorkoutPlan from "./workoutPlansScreenComponents/WorkoutPlan";
 import IndividualWorkoutPlanScreen from "./workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
 import BackArrowIcon from "../../icons/BackArrowIcon";
 
-// temporary for display purposes before we get the backend hooked up
-const dummyData = [
-  { id: "1", title: "Workout Plan 1" },
-  { id: "2", title: "Workout Plan 2" },
-  { id: "3", title: "Workout Plan 3" },
-  { id: "4", title: "Workout Plan 4" },
-  { id: "5", title: "Workout Plan 5" },
-  { id: "6", title: "Workout Plan 6" },
-  { id: "7", title: "Workout Plan 7" },
-  { id: "8", title: "Workout Plan 8" },
-  { id: "9", title: "Workout Plan 9" },
-  { id: "10", title: "Workout Plan 10" },
-];
-
 const WorkoutPlansScreen = ({ navigation }) => {
-  // TODO: once backend implemented, we will fetch workout plans from backend here
+  const [workoutPlans, setWorkoutPlans] = useState([]);
 
   // TODO set this to be back to null when the user clicks back on individual workout plan page
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
@@ -43,12 +32,34 @@ const WorkoutPlansScreen = ({ navigation }) => {
   const renderItem = ({ item }) => {
     return (
       <WorkoutPlan
-        title={item.title}
+        title={item.name}
         id={item.id}
         onEnterWorkoutPlanPage={onEnterWorkoutPlanPage}
       />
     );
   };
+
+  const fetchWorkoutPlans = async () => {
+    const userId = await AsyncStorage.getItem("user_id");
+    try {
+      const response = await axios.get(BACKEND_URL + `/workout/${userId}`);
+      if (response.status == 200) {
+        setWorkoutPlans(response.data);
+      }
+    } catch (error) {
+      if (!error.response) {
+        Alert.alert("Server issue", "Please try again later");
+      } else {
+        setWorkoutPlans([]);
+        console.log(workoutPlans.length);
+      }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkoutPlans();
+  }, []);
 
   // render the infinite scroll list unless the user has clicked a workout plan
   // then render individual page for that workout plan until they click back
@@ -75,13 +86,24 @@ const WorkoutPlansScreen = ({ navigation }) => {
             <Text> Create new workout plan</Text>
           </TouchableOpacity>
 
-          <FlatList
-            data={dummyData}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            onEndReached={() => {}} // TODO in the future this is where we would put logic to fetch more workout plans from the backend
-            onEndReachedThreshold={0.3} // determines how close to end to call the onEndReached function, will probably adjust this later
-          />
+          {workoutPlans.length > 0 ? (
+            <FlatList
+              data={workoutPlans}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              onEndReached={() => {}} // TODO in the future this is where we would put logic to fetch more workout plans from the backend
+              onEndReachedThreshold={0.3} // determines how close to end to call the onEndReached function, will probably adjust this later
+            />
+          ) : (
+            <View style={styles.container}>
+              <Text style={styles.space}>
+                You currently have no workout plans.
+              </Text>
+              <Text style={styles.space}>
+                Click the button to create your first one!
+              </Text>
+            </View>
+          )}
         </>
       )}
     </SafeAreaView>
@@ -90,7 +112,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -98,6 +120,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
+    backgroundColor: "#CCCCCC",
+    marginTop: 20,
+  },
+  space: {
+    marginTop: 20,
   },
 });
 

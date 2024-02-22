@@ -15,6 +15,15 @@ https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relat
 
 You can access the REST API of the server using the following endpoints:
 
+### `GET`
+
+- `/workout/:userId`
+  - Params:
+    - `userId: Integer` (required): The user's id
+  - Response:
+    - `200`: Request successful. Returns an array of the workouts belonging to the user
+    - `400`: Invalid request, likely missing user id
+
 ### `POST`
 
 - `/user/create`: Create a new user
@@ -31,6 +40,16 @@ You can access the REST API of the server using the following endpoints:
     - `email: String` (required): The user's email
     - `password: String` (required): The user's password
   - Response:
-    - `200`: Logged in successfully
+    - `200`: Logged in successfully. Returns an object containing the user profile data.
     - `400`: Invalid request made
     - `401`: Invalid email or password given
+- `/workout/create`: Create a new workout
+  - Body:
+    - `userId: Integer` (required): The id associated with the user creating the workout
+    - `name: String` (required): The name of the workout
+    - `difficulty: String` (required): The difficulty of the workout (beginner, intermediate, advanced)
+    - `description: String` (required): A description of the workout
+    - `tags: Array[Integer]` (required): An array of tag ids for the workout
+  - Response:
+    - `200`: Created successfully. Returns an object containing the workout data.
+    - `400`: Invalid request made
