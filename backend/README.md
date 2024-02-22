@@ -17,12 +17,17 @@ You can access the REST API of the server using the following endpoints:
 
 ### `GET`
 
-- `/workout/:userId`
+- `/workout/many/:userId`
   - Params:
     - `userId: Integer` (required): The user's id
   - Response:
     - `200`: Request successful. Returns an array of the workouts belonging to the user
-    - `400`: Invalid request, likely missing user id
+    - `400`: Invalid request. Missing or invalid user id
+- `/workout/one/:workoutId`
+  - Params:
+    - `workoutId: Integer` (required): The id of the workout requested
+  - `200`: Request successful. Returns workout object as a json
+  - `400`: Invalid request. Missing or invalid workout id
 
 ### `POST`
 

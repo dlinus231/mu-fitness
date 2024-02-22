@@ -1,35 +1,63 @@
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
-import { Octicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  SafeAreaView,
+  Dimensions,
+} from "react-native";
+import { Text, View } from "@gluestack-ui/themed";
+import { Octicons } from "@expo/vector-icons";
+import { BACKEND_URL } from "@env";
+import BackArrowIcon from "../../../icons/BackArrowIcon";
 
-
-const IndividualWorkoutPlanScreen = ({ 
-    navigation,
-    onLeaveWorkoutPlanPage,
-    workout
+const IndividualWorkoutPlanScreen = ({
+  navigation,
+  onLeaveWorkoutPlanPage,
+  workout_id,
 }) => {
-    // TODO once backend is implemented we will fetch additional data about the workout plan from the backend
+  const [loading, setLoading] = useState(true);
+  const [workout, setWorkout] = useState({});
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <TouchableOpacity style={styles.chevron} onPress={onLeaveWorkoutPlanPage}>
-                <Octicons name="chevron-left" size={48} color="black"/>
-            </TouchableOpacity>
-            <Text style={{paddingBottom: '3%'}}> Workout plan page for {workout.title} (id: {workout.id})</Text>
-            <Text> In the future this will contain all of the exercises in the workout, along with stats about the workout and other stuff </Text>
-        </SafeAreaView>
-    );
+  const fetchWorkout = async () => {
+    try {
+      const result = await axios.get(
+        BACKEND_URL + `/workout/one/${workout_id}`
+      );
+      setWorkout(result.data);
+      setLoading(false);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fetchWorkout();
+  }, []);
+  // TODO once backend is implemented we will fetch additional data about the workout plan from the backend
+
+  return loading ? (
+    <Text>Loading...</Text>
+  ) : (
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.chevron} onPress={onLeaveWorkoutPlanPage}>
+        <BackArrowIcon></BackArrowIcon>
+      </TouchableOpacity>
+      <View style={styles.container}>
+        <Text>{workout.name}</Text>
+        <Text>Difficulty: {workout.difficulty}</Text>
+        <Text>{workout.description}</Text>
+      </View>
+    </SafeAreaView>
+  );
 };
-  
 
 const styles = StyleSheet.create({
-    container: {
-        padding: '3%',
-    },
-    chevron: {
-        paddingTop: '6%',
-        paddingLeft: '7%',
-    }
+  container: {
+    padding: "3%",
+  },
+  chevron: {
+    paddingTop: "3%",
+    paddingBottom: "2%",
+  },
 });
 export default IndividualWorkoutPlanScreen;

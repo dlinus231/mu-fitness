@@ -42,7 +42,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
   const fetchWorkoutPlans = async () => {
     const userId = await AsyncStorage.getItem("user_id");
     try {
-      const response = await axios.get(BACKEND_URL + `/workout/${userId}`);
+      const response = await axios.get(BACKEND_URL + `/workout/many/${userId}`);
       if (response.status == 200) {
         setWorkoutPlans(response.data);
       }
@@ -69,7 +69,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
       {selectedWorkoutPlanId !== null ? (
         <IndividualWorkoutPlanScreen
           onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
-          workout={dummyData[selectedWorkoutPlanId - 1]}
+          workout_id={selectedWorkoutPlanId}
         />
       ) : (
         <>

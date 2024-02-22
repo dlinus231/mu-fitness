@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import {
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   FlatList,
@@ -66,45 +67,47 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
+        <ScrollView automaticallyAdjustKeyboardInsets={true}>
+          <View style={styles.container}>
+            <Text> New Workout Plan </Text>
 
-        <View style={styles.container}>
-          <Text> New Workout Plan </Text>
+            <Text style={styles.space}>Name: </Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              maxLength={100}
+            ></TextInput>
 
-          <Text style={styles.space}>Name: </Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            maxLength={100}
-          ></TextInput>
+            <Text style={styles.space}>Difficulty:</Text>
+            <SelectList
+              setSelected={(val) => setSelected(val)}
+              data={difficulties}
+              save="value"
+              search={false}
+              maxHeight={120}
+            ></SelectList>
 
-          <Text style={styles.space}>Difficulty:</Text>
-          <SelectList
-            setSelected={(val) => setSelected(val)}
-            data={difficulties}
-            save="value"
-            search={false}
-            maxHeight={120}
-          ></SelectList>
+            <View style={styles.space}></View>
 
-          <View style={styles.space}></View>
-
-          <Text style={styles.space}>Description: </Text>
-          <TextInput
-            style={styles.input}
-            value={description}
-            onChangeText={setDescription}
-            multiline={true}
-            numberOfLines={4}
-          ></TextInput>
-          <View style={styles.submit_button}>
-            <Button
-              title="Create Workout"
-              onPress={handleCreateWorkout}
-              color="#333333"
-            ></Button>
+            <Text style={styles.space}>Description: </Text>
+            <TextInput
+              style={styles.input}
+              value={description}
+              onChangeText={setDescription}
+              multiline={true}
+              numberOfLines={4}
+              minHeight={100}
+            ></TextInput>
+            <View style={styles.submit_button}>
+              <Button
+                title="Create Workout"
+                onPress={handleCreateWorkout}
+                color="#333333"
+              ></Button>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

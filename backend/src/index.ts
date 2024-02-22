@@ -87,10 +87,29 @@ app.post(`/user/login`, async (req, res) => {
   }
 });
 
-app.get(`/workout/:userId`, async (req, res) => {
-  const { userId } = req.params;
-  console.log(userId);
+//Get single workout by id
+app.get(`/workout/one/:workoutId`, async (req, res) => {
+  const { workoutId } = req.params;
+  if (workoutId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.workout.findUniqueOrThrow({
+      where: {
+        id: parseInt(workoutId),
+      },
+    });
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
 
+//Get all workouts for a user
+app.get(`/workout/many/:userId`, async (req, res) => {
+  const { userId } = req.params;
   if (userId == null) {
     res.sendStatus(400);
     return;
@@ -103,7 +122,7 @@ app.get(`/workout/:userId`, async (req, res) => {
     });
     res.status(200).json(result);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     res.sendStatus(400);
   }
 });
