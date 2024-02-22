@@ -87,9 +87,30 @@ app.post(`/user/login`, async (req, res) => {
   }
 });
 
+app.get(`/workout/:userId`, async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId);
+
+  if (userId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.workout.findMany({
+      where: {
+        user_id: parseInt(userId),
+      },
+    });
+    res.status(200).json(result);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+//Create workout
 app.post(`/workout/create`, async (req, res) => {
   const { userId, name, difficulty, description, tags } = req.body;
-  console.log(difficulty);
 
   try {
     const result = await prisma.workout.create({

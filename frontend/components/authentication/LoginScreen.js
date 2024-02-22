@@ -30,7 +30,6 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
         await AsyncStorage.setItem("user_id", "" + data.id);
         await AsyncStorage.setItem("email", data.email);
         await AsyncStorage.setItem("username", data.username);
-
         handleAuthChange();
       }
     } catch (error) {

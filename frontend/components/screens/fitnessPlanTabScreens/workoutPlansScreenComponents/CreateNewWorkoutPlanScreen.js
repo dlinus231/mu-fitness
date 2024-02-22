@@ -35,7 +35,6 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
   //callback function when button is pressed, makes call to API and handles response
   const handleCreateWorkout = async () => {
-    console.log(AsyncStorage.getItem("user_id"));
     try {
       const response = await axios.post(BACKEND_URL + "/workout/create", {
         userId: await AsyncStorage.getItem("user_id"),
@@ -44,8 +43,19 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         description,
         tags: [], //ToDo - Implement Tags
       });
-      console.log(response.data);
+      if (response.status == 200) {
+        Alert.alert("Workout successfully created!");
+        console.log(response.data);
+      }
     } catch (error) {
+      if (error.response) {
+        Alert.alert("Invalid request made to server", "Please try again");
+      } else {
+        Alert.alert(
+          "Server Issue: Workout Creation Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
       console.log(error);
     }
   };

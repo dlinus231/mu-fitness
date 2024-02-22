@@ -15,6 +15,15 @@ https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relat
 
 You can access the REST API of the server using the following endpoints:
 
+### `GET`
+
+- `/workout/:userId`
+  - Params:
+    - `userId: Integer` (required): The user's id
+  - Response:
+    - `200`: Request successful. Returns an array of the workouts belonging to the user
+    - `400`: Invalid request, likely missing user id
+
 ### `POST`
 
 - `/user/create`: Create a new user

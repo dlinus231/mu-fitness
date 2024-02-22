@@ -19,6 +19,9 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   function handleAuthChange() {
+    if (isLoggedIn) {
+      AsyncStorage.multiRemove(["user_id", "email", "username"]);
+    }
     setIsLoggedIn(!isLoggedIn);
   }
 
