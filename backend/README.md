@@ -11,6 +11,13 @@
 
 https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relational-databases-typescript-postgresql
 
+## Loading static data
+
+- Loading static data for exercises, body parts, muscle groups etc in `/backend/src/load_data`
+- run `node muscle_groups.js` in this directory to populate the database with `BodyParts` and `Muscles`
+- run `node tags.js` in this directory to populate the database with `Tags`
+- run `node exercises.js` in this directory to populate the database with `Exercises`
+
 ## Using the REST API Endpoints
 
 You can access the REST API of the server using the following endpoints:
