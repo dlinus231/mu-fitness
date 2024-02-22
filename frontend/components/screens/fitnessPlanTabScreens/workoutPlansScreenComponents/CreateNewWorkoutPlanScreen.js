@@ -11,6 +11,7 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 import { BACKEND_URL } from "@env";
 import { Text, View } from "@gluestack-ui/themed";
@@ -36,6 +37,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
   //callback function when button is pressed, makes call to API and handles response
   const handleCreateWorkout = async () => {
+    console.log(selected);
     try {
       const response = await axios.post(BACKEND_URL + "/workout/create", {
         userId: await AsyncStorage.getItem("user_id"),
@@ -44,9 +46,10 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         description,
         tags: [], //ToDo - Implement Tags
       });
+      console.log(response.data);
       if (response.status == 200) {
         Alert.alert("Workout successfully created!");
-        console.log(response.data);
+        return true;
       }
     } catch (error) {
       if (error.response) {
@@ -86,6 +89,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               save="value"
               search={false}
               maxHeight={120}
+              placeholder="beginner"
             ></SelectList>
 
             <View style={styles.space}></View>
@@ -96,13 +100,21 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               value={description}
               onChangeText={setDescription}
               multiline={true}
-              numberOfLines={4}
+              numberOfLines={10}
               minHeight={100}
+              maxHeight={100}
             ></TextInput>
             <View style={styles.submit_button}>
               <Button
                 title="Create Workout"
-                onPress={handleCreateWorkout}
+                onPress={() => {
+                  if (name.length > 0) {
+                    handleCreateWorkout();
+                    navigation.navigate("WorkoutPlans");
+                  } else {
+                    Alert.alert("Workout name cannot be empty");
+                  }
+                }}
                 color="#333333"
               ></Button>
             </View>
@@ -130,7 +142,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     padding: 10,
     marginBottom: 20,
-    minWidth: 300,
+    width: 300,
   },
   space: {
     marginTop: 20,

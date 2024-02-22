@@ -6,6 +6,8 @@ import {
   FlatList,
   SafeAreaView,
   Dimensions,
+  ScrollView,
+  Alert,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
@@ -27,37 +29,118 @@ const IndividualWorkoutPlanScreen = ({
       );
       setWorkout(result.data);
       setLoading(false);
-    } catch (error) {}
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not find this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Fetching Workout Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    try {
+      const result = await axios.delete(
+        BACKEND_URL + `/workout/delete/${workout_id}`
+      );
+      if (result.status == 200) {
+        Alert.alert("Workout deleted successfully", "", [
+          {
+            text: "Ok",
+            onPress: onLeaveWorkoutPlanPage,
+          },
+        ]);
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not find this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Deleting Workout Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
   };
 
   useEffect(() => {
     fetchWorkout();
   }, []);
-  // TODO once backend is implemented we will fetch additional data about the workout plan from the backend
-
+  //TODO when loading still have back arrow
   return loading ? (
     <Text>Loading...</Text>
   ) : (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.chevron} onPress={onLeaveWorkoutPlanPage}>
-        <BackArrowIcon></BackArrowIcon>
-      </TouchableOpacity>
-      <View style={styles.container}>
-        <Text>{workout.name}</Text>
-        <Text>Difficulty: {workout.difficulty}</Text>
-        <Text>{workout.description}</Text>
+      <View style={styles.content}>
+        <TouchableOpacity
+          style={styles.chevron}
+          onPress={onLeaveWorkoutPlanPage}
+        >
+          <BackArrowIcon></BackArrowIcon>
+        </TouchableOpacity>
+        <View style={styles.container}>
+          <Text>{workout.name}</Text>
+          <Text>Difficulty: {workout.difficulty}</Text>
+          <Text>Description:</Text>
+          <Text>{workout.description}</Text>
+        </View>
+      </View>
+      <View style={styles.bottomContent}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDeleteWorkout}
+          >
+            <Text style={{ color: "lightcoral" }}>Delete</Text>
+          </TouchableOpacity>
+          <View style={{ width: 20 }}></View>
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={{ color: "white" }}>Edit</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  bottomContent: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: 30,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+  },
   container: {
     padding: "3%",
   },
   chevron: {
     paddingTop: "3%",
     paddingBottom: "2%",
+  },
+  content: {
+    marginTop: 20,
+  },
+  deleteButton: {
+    borderWidth: 2,
+    borderColor: "lightcoral",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: "center",
+  },
+  editButton: {
+    borderWidth: 2,
+    borderColor: "#6A5ACD",
+    borderRadius: 10,
+    backgroundColor: "#6A5ACD",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: "center",
   },
 });
 export default IndividualWorkoutPlanScreen;

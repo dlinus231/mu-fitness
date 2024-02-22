@@ -27,6 +27,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
 
   const onLeaveWorkoutPlanPage = () => {
     setSelectedWorkoutPlanId(null);
+    fetchWorkoutPlans();
   };
 
   const renderItem = ({ item }) => {
@@ -70,6 +71,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
         <IndividualWorkoutPlanScreen
           onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
           workout_id={selectedWorkoutPlanId}
+          navigation={navigation}
         />
       ) : (
         <>
@@ -86,6 +88,9 @@ const WorkoutPlansScreen = ({ navigation }) => {
             <Text> Create new workout plan</Text>
           </TouchableOpacity>
 
+          {
+            //Todo: weird thing where when we have >4 plans the last one cant be scrolled to
+          }
           {workoutPlans.length > 0 ? (
             <FlatList
               data={workoutPlans}

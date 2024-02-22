@@ -20,6 +20,7 @@ app.get(`/test`, async (req, res) => {
   res.sendStatus(200);
 });
 
+//User signup
 app.post(`/user/create`, async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -148,6 +149,26 @@ app.post(`/workout/create`, async (req, res) => {
     res.status(201).json(result);
   } catch (e) {
     console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+//Delete a workout - TODO authenticate whether user has permissions to delete
+app.delete(`/workout/delete/:workoutId`, async (req, res) => {
+  const { workoutId } = req.params;
+  if (workoutId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.workout.delete({
+      where: {
+        id: parseInt(workoutId),
+      },
+    });
+    res.sendStatus(200);
+  } catch (e) {
+    console.error(e);
     res.sendStatus(400);
   }
 });
