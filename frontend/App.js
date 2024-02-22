@@ -11,6 +11,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import FooterNavigator from "./components/FooterNavigator";
 import LandingPageScreen from "./components/authentication/LandingPageScreen";
 
+//Session variables
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function App() {
   // TODO this should be a state variable once its implemented
   const [isLoggedIn, setIsLoggedIn] = useState(false);

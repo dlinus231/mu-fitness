@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../icons/BackArrowIcon";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignupScreen = ({ navigation, handleAuthChange }) => {
   const [email, setEmail] = useState("");
@@ -26,6 +27,10 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
         password,
       });
       if (response.status == 201) {
+        const data = response.data;
+        AsyncStorage.setItem("id", data.id);
+        AsyncStorage.setItem("email", data.email);
+        AsyncStorage.setItem("username", data.username);
         Alert.alert("Account created.", "You have been logged in.");
         handleAuthChange();
       }

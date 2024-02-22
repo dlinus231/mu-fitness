@@ -24,9 +24,9 @@ model Workout {
   difficulty   Difficulty
   description  String
   time_created DateTime   @default(now())
-  muscles Muscle[]
+  muscles      Muscle[]//Idea: autogenerate the muscle groups hit and have them displayed with the workout in order of intensity for that muscle group, and fading in color as it goes to less-worked muscles
   routines     Routine[]
-  tags Tag[]
+  tags         Tag[]
   user         User       @relation(fields: [user_id], references: [id])
 }
 
@@ -36,7 +36,7 @@ model Routine {
   repetitions Int
   rest        Int
   workout_id  Int
-  weight_lbs Int
+  weight_lbs  Int
   exercise    Exercise @relation(fields: [exercise_id], references: [id])
   workout     Workout  @relation(fields: [workout_id], references: [id])
 }
@@ -48,7 +48,7 @@ model Exercise {
   description String
   video_path  String
   routines    Routine[]
-  muscles Muscle[]
+  muscles     Muscle[]
   tags        Tag[]      @relation("ExerciseToTag")
 }
 
@@ -56,12 +56,12 @@ model Tag {
   id        Int        @id @default(autoincrement())
   name      String     @db.VarChar(255)
   exercises Exercise[] @relation("ExerciseToTag")
-  workouts Workout[]
+  workouts  Workout[]
 }
 
 model Muscle {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(255)
+  id        Int @id @default(autoincrement())
+  name      String @db.VarChar(255)
   bodyPart_id Int
   bodyPart BodyPart @relation(fields: [bodyPart_id], references: [id])
   workouts Workout[]

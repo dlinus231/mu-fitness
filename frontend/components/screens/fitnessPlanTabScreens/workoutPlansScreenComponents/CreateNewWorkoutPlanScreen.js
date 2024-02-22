@@ -1,22 +1,128 @@
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
-import { Octicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import axios from "axios";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  SafeAreaView,
+  Button,
+  Dimensions,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import { BACKEND_URL } from "@env";
+import { Text, View } from "@gluestack-ui/themed";
+import { Octicons } from "@expo/vector-icons";
+import BackArrowIcon from "../../../icons/BackArrowIcon";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectList } from "react-native-dropdown-select-list";
 
+const CreateNewWorkoutPlanScreen = ({ navigation }) => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selected, setSelected] = useState("beginner");
 
-const CreateNewWorkoutPlanScreen = ({ 
-    navigation,
-}) => {
-    // TODO once backend is implemented we will fetch additional data about the workout plan from the backend
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
-    return (
-        <SafeAreaView>
-            <Text> this is the create new workout plans screen </Text>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text>Go back</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-    );
+  const difficulties = [
+    { key: 1, value: "beginner" },
+    { key: 2, value: "intermediate" },
+    { key: 3, value: "expert" },
+  ];
+
+  //callback function when button is pressed, makes call to API and handles response
+  const handleCreateWorkout = async () => {
+    console.log(AsyncStorage.getItem("user_id"));
+    try {
+      const response = await axios.post(BACKEND_URL + "/workout/create", {
+        userId: await AsyncStorage.getItem("user_id"),
+        name,
+        difficulty: selected,
+        description,
+        tags: [], //ToDo - Implement Tags
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <BackArrowIcon></BackArrowIcon>
+        </TouchableOpacity>
+
+        <View style={styles.container}>
+          <Text> New Workout Plan </Text>
+
+          <Text style={styles.space}>Name: </Text>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+            maxLength={100}
+          ></TextInput>
+
+          <Text style={styles.space}>Difficulty:</Text>
+          <SelectList
+            setSelected={(val) => setSelected(val)}
+            data={difficulties}
+            save="value"
+            search={false}
+            maxHeight={120}
+          ></SelectList>
+
+          <View style={styles.space}></View>
+
+          <Text style={styles.space}>Description: </Text>
+          <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={setDescription}
+            multiline={true}
+            numberOfLines={4}
+          ></TextInput>
+          <View style={styles.submit_button}>
+            <Button
+              title="Create Workout"
+              onPress={handleCreateWorkout}
+              color="#333333"
+            ></Button>
+          </View>
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
+  );
 };
-  
+
+const styles = StyleSheet.create({
+  submit_button: {
+    backgroundColor: "#B0E0E6",
+    border: "none",
+    marginTop: 20,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 10,
+    marginBottom: 20,
+    minWidth: 300,
+  },
+  space: {
+    marginTop: 20,
+    minWidth: 300,
+  },
+});
+
 export default CreateNewWorkoutPlanScreen;
