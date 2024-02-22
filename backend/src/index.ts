@@ -156,6 +156,11 @@ app.post(`/workout/create`, async (req, res) => {
 
 app.post(`/workout/edit`, async (req, res) => {
   const { workoutId, name, difficulty, description } = req.body;
+  if (workoutId == null) {
+    res.sendStatus(400);
+    return;
+  }
+
   try {
     const result = await prisma.workout.update({
       where: {
@@ -195,6 +200,7 @@ app.delete(`/workout/delete/:workoutId`, async (req, res) => {
   }
 });
 
+//Hash and salt password
 async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10); // 10 is the number of salt rounds
 

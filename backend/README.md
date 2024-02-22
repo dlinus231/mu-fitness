@@ -40,7 +40,7 @@ You can access the REST API of the server using the following endpoints:
     - `201`: Account created successfully
     - `400`: Invalid request made
     - `409`: Duplicate email used
-- `/user/create`: Create a new user
+- `/user/login`: Sign into an existing user
   - Body:
     - `email: String` (required): The user's email
     - `password: String` (required): The user's password
@@ -58,6 +58,15 @@ You can access the REST API of the server using the following endpoints:
   - Response:
     - `200`: Created successfully. Returns an object containing the workout data.
     - `400`: Invalid request made
+- `/workout/edit`: Edit an existing workout
+  - Body:
+    - `workoutId: Integer` (required): The id associated with the workout
+    - `name: String` (required): The updated name of the workout
+    - `difficulty: String` (required): The updated difficulty of the workout
+    - `description: String`: The updated description of the workout
+  - Response:
+    - `200`: Edited successfully
+    - `400`: Invalid request made. Missing or invalid workout id
 
 ### `Delete`
 
