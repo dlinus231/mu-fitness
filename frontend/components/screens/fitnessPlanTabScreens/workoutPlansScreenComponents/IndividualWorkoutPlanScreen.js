@@ -108,6 +108,9 @@ const IndividualWorkoutPlanScreen = ({
               <Text>Difficulty: {workout.difficulty}</Text>
               <Text>Description:</Text>
               <Text>{workout.description}</Text>
+              <Text>Routines:</Text>
+              <Text>{String(workout.routines)}</Text>
+
             </View>
             <View style={styles.bottomContent}>
               <View style={styles.buttonContainer}>

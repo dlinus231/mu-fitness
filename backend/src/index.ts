@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, Routine} from "@prisma/client";
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 const cors = require("cors");
@@ -90,6 +90,24 @@ app.post(`/user/login`, async (req, res) => {
   }
 });
 
+// Get all exercise names
+// FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
+app.get(`/exercises/names`, async (req, res) => {
+  try {
+    const exerciseNames = await prisma.exercise.findMany({
+        select: {
+          id: true, 
+          name: true,
+        },
+    }); 
+    const first10ExerciseNames = exerciseNames.slice(0, 100);
+    res.status(200).json(first10ExerciseNames);
+  } catch (error) {
+    console.error("Error fetching exercises:", error);
+    res.sendStatus(500);
+  }
+});
+
 //Get single workout by id
 app.get(`/workout/one/:workoutId`, async (req, res) => {
   const { workoutId } = req.params;
@@ -134,7 +152,6 @@ app.get(`/workout/many/:userId`, async (req, res) => {
 //Create workout
 app.post(`/workout/create`, async (req, res) => {
   const { userId, name, difficulty, description, tags } = req.body;
-
   try {
     const result = await prisma.workout.create({
       data: {
@@ -156,12 +173,38 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
+// create routine
+app.post(`/routine/create`, async (req, res) => {
+  const { workoutId, exerciseId, repetitions, rest, weightLbs} = req.body;
+  // console.log("In routine/create: " + workoutId + " " + exerciseId + " " 
+  //  + repetitions + " " + rest + " " + weightLbs)
+
+  try {
+    const result = await prisma.routine.create({
+      data: {
+        //exercise_id: exerciseId,
+        repetitions: repetitions,
+        rest: rest,
+        weight_lbs: weightLbs,
+        workout: { connect: { id: workoutId } },
+        exercise: { connect: {id: exerciseId} }
+      },
+    });
+    res.status(201).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
+
+
 app.post(`/workout/edit`, async (req, res) => {
-  const { workoutId, name, difficulty, description } = req.body;
+  const { workoutId, name, difficulty, description, routineIds} = req.body;
   if (workoutId == null) {
     res.sendStatus(400);
     return;
   }
+  console.log("routineIds: " + routineIds)
 
   try {
     const result = await prisma.workout.update({
@@ -172,7 +215,13 @@ app.post(`/workout/edit`, async (req, res) => {
         name,
         difficulty,
         description,
-      },
+        routines: {
+          connect: routineIds.map((routineId: number) => ({id: routineId}))
+        },
+      }, 
+      include: {
+        routines: true
+      }
     });
 
     res.sendStatus(200);
