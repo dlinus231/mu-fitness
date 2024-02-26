@@ -41,6 +41,7 @@ const IndividualWorkoutPlanScreen = ({
   const [reps, setReps] = useState(8);
   const [rest, setRest] = useState(60);
   const [weight, setWeight] = useState(0);
+  // const [updatingRoutineState, setUpdateRoutineState] = useState({});
 
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
@@ -175,6 +176,33 @@ const IndividualWorkoutPlanScreen = ({
     }
   };
 
+  const onUpdateRoutine = async (routineId, updatedRoutineData) => {
+    // updatedRoutineData should have the form {repetitions: reps, rest: rest, weight_lbs: weight}
+    console.log('bm - updating routine with id: ', routineId, ' and data: ', updatedRoutineData)
+    try {
+      const response = await axios.patch(
+        BACKEND_URL + `/workout/routine/update/${routineId}`,
+        updatedRoutineData // TODO is this correct format / syntax ?
+      );
+
+      if (response.status === 201) {
+        // TODO this is never being called
+        Alert.alert("Exercise updated successfully");
+        // re-fetch workouts to re-render list w updated data
+        fetchWorkout();
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not update this exercise in this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Updating Exercise Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  }
+
   useEffect(() => {
     setLoading(true);
     fetchWorkout();
@@ -221,7 +249,11 @@ const IndividualWorkoutPlanScreen = ({
 
               <View>
                 {routines.map((routine) => {
-                  return <Routine routine={routine} onDeleteRoutine={() => onDeleteRoutine(routine.id)} key={routine.id}/>;
+                  return <Routine 
+                    routine={routine} 
+                    onDeleteRoutine={() => onDeleteRoutine(routine.id)} 
+                    onUpdateRoutine={onUpdateRoutine}
+                    key={routine.id}/>;
                 })}
               </View>
 

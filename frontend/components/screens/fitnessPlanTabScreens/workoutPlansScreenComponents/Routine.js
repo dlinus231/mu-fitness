@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, TextInput } from "react-native";
 import axios from "axios";
 import { Text, View, Button, ButtonText } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
 
-const Routine = ({ routine, onDeleteRoutine }) => {
+const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [exercise, setExercise] = useState("");
 
@@ -54,6 +54,7 @@ const Routine = ({ routine, onDeleteRoutine }) => {
   };
 
   const _handleSave = async () => {
+    console.log('bm - handleSave called with reps:', reps, 'rest:', rest, 'weight:', weight)
     const updatedRoutineData = {
       repetitions: reps,
       rest: rest,
@@ -66,15 +67,10 @@ const Routine = ({ routine, onDeleteRoutine }) => {
       // await the put request so that it saves the new routine before continuing
 
     console.log("updating routine", updatedRoutineData);
-    await updateRoutine();
-    console.log("bm - routine updated successfully")
+    await onUpdateRoutine(routine.id, updatedRoutineData);
+    console.log("bm - onUpdateRoutine returned")
     // TODO I don't think we have to fetch again, we can just update the state with the new routine
     // await fetchExercise();
-
-    // update the state with the new routine
-    setRepetitions(reps);
-    setRest(rest);
-    setWeight(weight);
   };
 
   const _renderEditingView = () => {
@@ -84,21 +80,25 @@ const Routine = ({ routine, onDeleteRoutine }) => {
         <TextInput value={String(reps)} onChangeText={setRepetitions} keyboardType="numeric" />
         <TextInput value={String(rest)} onChangeText={setRest} keyboardType="numeric" />
         <TextInput value={String(weight)} onChangeText={setWeight} keyboardType="numeric" />
-        <Button title="Save" onPress={_handleSave}/>
-        <Button title="Cancel" onPress={_handleEditButtonClick}/>
+        <Button onPress={_handleSave}>
+          <ButtonText> Save </ButtonText>
+        </Button>
+        <Button onPress={_handleEditButtonClick}>
+          <ButtonText> Cancel </ButtonText>
+        </Button>
       </View>
     );
   }
 
-  return isEditing ? _renderEditingView : (
+  return isEditing ? _renderEditingView() : (
     <View style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}>
       <Text>{exercise.name}</Text>
       <Text>Repetitions: {routine.repetitions}</Text>
       <Text>Rest: {routine.rest} seconds</Text>
       <Text>Weight: {routine.weight_lbs}</Text>
-      {/* <Button onPress={_handleEditButtonClick}>
+      <Button onPress={_handleEditButtonClick}>
         <ButtonText> Edit </ButtonText>
-      </Button> */}
+      </Button>
       <Button onPress={onDeleteRoutine}>
         <ButtonText> Delete </ButtonText>
       </Button>

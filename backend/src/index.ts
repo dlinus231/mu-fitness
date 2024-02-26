@@ -220,7 +220,13 @@ app.post(`/workout/routine/add`, async (req, res) => {
 // update a routine
 app.patch('/workout/routine/update/:routineId', async (req, res) => {
   const { routineId } = req.params;
-  const { reps, rest, weight } = req.body;
+
+  console.log('bm - request body: ' + JSON.stringify(req.body))
+
+  const { repetitions, rest, weight_lbs } = req.body;
+
+  console.log('bm - in update routine endpoint')
+  console.log('bm - routineId: ' + routineId + ' reps: ' + repetitions + ' rest: ' + rest + ' weight: ' + weight_lbs)
 
   try {
     const result = await prisma.routine.update({
@@ -228,9 +234,9 @@ app.patch('/workout/routine/update/:routineId', async (req, res) => {
         id: parseInt(routineId),
       },
       data: {
-        repetitions: parseInt(reps),
+        repetitions: parseInt(repetitions),
         rest: parseInt(rest),
-        weight_lbs: parseInt(weight),
+        weight_lbs: parseInt(weight_lbs),
       },
     });
     res.status(201).json(result);
