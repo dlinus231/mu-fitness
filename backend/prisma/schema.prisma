@@ -39,8 +39,8 @@ model Routine {
   rest        Int
   workout_id  Int
   weight_lbs  Int
-  exercise    Exercise @relation(fields: [exercise_id], references: [id])
-  workout     Workout  @relation(fields: [workout_id], references: [id])
+  exercise    Exercise @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  workout     Workout  @relation(fields: [workout_id], references: [id], onDelete: Cascade)
 }
 
 model Exercise {

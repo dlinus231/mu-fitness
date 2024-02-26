@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Routine} from "@prisma/client";
+import { Prisma, PrismaClient, Routine } from "@prisma/client";
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 const cors = require("cors");
@@ -95,16 +95,36 @@ app.post(`/user/login`, async (req, res) => {
 app.get(`/exercises/names`, async (req, res) => {
   try {
     const exerciseNames = await prisma.exercise.findMany({
-        select: {
-          id: true, 
-          name: true,
-        },
-    }); 
+      select: {
+        id: true,
+        name: true,
+      },
+    });
     const first10ExerciseNames = exerciseNames.slice(0, 100);
     res.status(200).json(first10ExerciseNames);
   } catch (error) {
     console.error("Error fetching exercises:", error);
     res.sendStatus(500);
+  }
+});
+
+app.get(`/exercises/one/:exerciseId`, async (req, res) => {
+  const { exerciseId } = req.params;
+
+  if (exerciseId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.exercise.findUniqueOrThrow({
+      where: {
+        id: parseInt(exerciseId),
+      },
+    });
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
   }
 });
 
@@ -119,6 +139,9 @@ app.get(`/workout/one/:workoutId`, async (req, res) => {
     const result = await prisma.workout.findUniqueOrThrow({
       where: {
         id: parseInt(workoutId),
+      },
+      include: {
+        routines: true,
       },
     });
     res.status(200).json(result);
@@ -152,6 +175,7 @@ app.get(`/workout/many/:userId`, async (req, res) => {
 //Create workout
 app.post(`/workout/create`, async (req, res) => {
   const { userId, name, difficulty, description, tags } = req.body;
+
   try {
     const result = await prisma.workout.create({
       data: {
@@ -166,6 +190,7 @@ app.post(`/workout/create`, async (req, res) => {
         user: { connect: { id: parseInt(userId) } },
       },
     });
+
     res.status(201).json(result);
   } catch (e) {
     console.log(e);
@@ -173,38 +198,54 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
-// create routine
-app.post(`/routine/create`, async (req, res) => {
-  const { workoutId, exerciseId, repetitions, rest, weightLbs} = req.body;
-  // console.log("In routine/create: " + workoutId + " " + exerciseId + " " 
-  //  + repetitions + " " + rest + " " + weightLbs)
-
+app.post(`/workout/routine/add`, async (req, res) => {
+  const { workout_id, exercise_id, reps, rest, weight } = req.body;
   try {
     const result = await prisma.routine.create({
       data: {
-        //exercise_id: exerciseId,
-        repetitions: repetitions,
-        rest: rest,
-        weight_lbs: weightLbs,
-        workout: { connect: { id: workoutId } },
-        exercise: { connect: {id: exerciseId} }
+        workout_id,
+        exercise_id,
+        repetitions: parseInt(reps),
+        rest: parseInt(reps),
+        weight_lbs: parseInt(weight),
       },
     });
     res.status(201).json(result);
   } catch (e) {
-    console.error(e);
-    res.sendStatus(400);
+    console.log(e);
   }
 });
 
+// // create routine
+// app.post(`/routine/create`, async (req, res) => {
+//   const { workoutId, exerciseId, repetitions, rest, weightLbs} = req.body;
+//   // console.log("In routine/create: " + workoutId + " " + exerciseId + " "
+//   //  + repetitions + " " + rest + " " + weightLbs)
+
+//   try {
+//     const result = await prisma.routine.create({
+//       data: {
+//         //exercise_id: exerciseId,
+//         repetitions: repetitions,
+//         rest: rest,
+//         weight_lbs: weightLbs,
+//         workout: { connect: { id: workoutId } },
+//         exercise: { connect: {id: exerciseId} }
+//       },
+//     });
+//     res.status(201).json(result);
+//   } catch (e) {
+//     console.error(e);
+//     res.sendStatus(400);
+//   }
+// });
 
 app.post(`/workout/edit`, async (req, res) => {
-  const { workoutId, name, difficulty, description, routineIds} = req.body;
+  const { workoutId, name, difficulty, description, routineIds } = req.body;
   if (workoutId == null) {
     res.sendStatus(400);
     return;
   }
-  console.log("routineIds: " + routineIds)
 
   try {
     const result = await prisma.workout.update({
@@ -216,12 +257,12 @@ app.post(`/workout/edit`, async (req, res) => {
         difficulty,
         description,
         routines: {
-          connect: routineIds.map((routineId: number) => ({id: routineId}))
+          connect: routineIds.map((routineId: number) => ({ id: routineId })),
         },
-      }, 
+      },
       include: {
-        routines: true
-      }
+        routines: true,
+      },
     });
 
     res.sendStatus(200);
@@ -242,6 +283,9 @@ app.delete(`/workout/delete/:workoutId`, async (req, res) => {
     const result = await prisma.workout.delete({
       where: {
         id: parseInt(workoutId),
+      },
+      include: {
+        routines: true,
       },
     });
     res.sendStatus(200);
