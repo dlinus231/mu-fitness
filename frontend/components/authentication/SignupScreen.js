@@ -29,7 +29,7 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
       });
       if (response.status == 201) {
         const data = response.data;
-        AsyncStorage.setItem("id", data.id);
+        AsyncStorage.setItem("id", String(data.id));
         AsyncStorage.setItem("email", data.email);
         AsyncStorage.setItem("username", data.username);
         Alert.alert("Account created.", "You have been logged in.");
