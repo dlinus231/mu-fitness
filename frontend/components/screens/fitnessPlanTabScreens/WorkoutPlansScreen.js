@@ -131,6 +131,12 @@ const WorkoutPlansScreen = ({ navigation }) => {
                 You currently have no workout plans.
               </Text>
               <Text style={styles.space}>
+                Workout plans are lists of exercises (sets) that you can create and track your progress with.
+              </Text>
+              <Text style={styles.space}>
+                You can also share your workout plans with others, or use workout plans that others have shared with you.
+              </Text>
+              <Text style={styles.space}>
                 Click the button to create your first one!
               </Text>
             </View>
@@ -156,6 +162,8 @@ const styles = StyleSheet.create({
   },
   space: {
     marginTop: 20,
+    paddingHorizontal: '10%',
+    textAlign: 'center',
   },
   flatlist: {
     maxHeight: 550, //Todo - make responsive for diff screen sizes

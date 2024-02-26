@@ -248,6 +248,15 @@ const IndividualWorkoutPlanScreen = ({
               <Text>Exercises:</Text>
 
               <View>
+                {routines.length === 0 && (
+                  <>
+                    <Text style={styles.no_exercises_text}>You haven't added any exercises to this workout yet.</Text>
+                    <Text style={styles.no_exercises_text}>Add a set by clicking the button below.</Text>
+                  </>
+                )}
+              </View>
+              
+              <View>
                 {routines.map((routine) => {
                   return <Routine 
                     routine={routine} 
@@ -431,5 +440,9 @@ const styles = StyleSheet.create({
     border: "none",
     marginTop: 20,
   },
+  no_exercises_text: {
+    textAlign: 'center',
+    paddingHorizontal: '3%',
+  }
 });
 export default IndividualWorkoutPlanScreen;
