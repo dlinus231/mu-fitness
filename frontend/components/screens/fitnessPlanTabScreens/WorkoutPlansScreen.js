@@ -46,6 +46,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
   const fetchWorkoutPlans = async () => {
     const userId = await AsyncStorage.getItem("user_id");
     try {
+      console.log("bm - fetching workout plans")
       const response = await axios.get(BACKEND_URL + `/workout/many/${userId}`);
       if (response.status == 200) {
         setWorkoutPlans(
@@ -56,6 +57,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
             return dateB - dateA;
           })
         );
+        console.log("bm - workout plans fetched successfully, setting loading to false")
         setLoading(false);
       }
     } catch (error) {

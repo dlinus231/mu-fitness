@@ -20,6 +20,7 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleSignUp = async () => {
+    console.log('bm - entering handle sign up function, about to make request')
     try {
       const response = await axios.post(BACKEND_URL + "/user/create", {
         username,
@@ -35,6 +36,7 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
         handleAuthChange();
       }
     } catch (error) {
+      console.log("bm - error occurred in handleSignUp function: ", error.response?.data?.error)
       // Handle errors, such as showing an alert with a message
       if (error.response) {
         if (error.response.status == 409) {

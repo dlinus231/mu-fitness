@@ -31,12 +31,15 @@ const IndividualWorkoutPlanScreen = ({
   const fetchWorkout = async () => {
     try {
       setLoading(true);
+      console.log('making call to backend to fetch workout')
       const result = await axios.get(
         BACKEND_URL + `/workout/one/${workout_id}`
       );
+      console.log('bm - response from fetch workout request: ', result.data)
       setWorkout(result.data);
       setLoading(false);
     } catch (error) {
+      console.log('bm - error occurred in fetchWorkout function: ', error)
       if (error.response) {
         Alert.alert("Could not find this workout");
       } else {
