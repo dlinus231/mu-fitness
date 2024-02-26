@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, TextInput } from "react-native";
+import { SafeAreaView, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import axios from "axios";
 import { Text, View, Button, ButtonText } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
@@ -69,8 +69,6 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
     console.log("updating routine", updatedRoutineData);
     await onUpdateRoutine(routine.id, updatedRoutineData);
     console.log("bm - onUpdateRoutine returned")
-    // TODO I don't think we have to fetch again, we can just update the state with the new routine
-    // await fetchExercise();
   };
 
   const _renderEditingView = () => {
@@ -96,14 +94,62 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
       <Text>Repetitions: {routine.repetitions}</Text>
       <Text>Rest: {routine.rest} seconds</Text>
       <Text>Weight: {routine.weight_lbs}</Text>
-      <Button onPress={_handleEditButtonClick}>
+      {/* <Button onPress={_handleEditButtonClick}>
         <ButtonText> Edit </ButtonText>
       </Button>
       <Button onPress={onDeleteRoutine}>
         <ButtonText> Delete </ButtonText>
-      </Button>
+      </Button> */}
+      <View style={styles.bottomContent}>
+        <View style={styles.buttonContainer}>
+          
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={_handleEditButtonClick}
+          >
+            <Text style={{ color: "white" }}>Edit</Text>
+          </TouchableOpacity>
+          <View style={{ width: 10 }}></View>
+          <TouchableOpacity
+            //Todo conditionally render buttons if this workout belongs to this user
+            style={styles.deleteButton}
+            onPress={onDeleteRoutine}
+          >
+            <Text style={{ color: "lightcoral" }}>Delete</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  bottomContent: {
+    display: 'flex',
+    alignItems: "flex-start",
+    paddingTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+  },
+  deleteButton: {
+    borderWidth: 2,
+    borderColor: "lightcoral",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: "center",
+  },
+  editButton: {
+    borderWidth: 2,
+    borderColor: "#6A5ACD",
+    borderRadius: 10,
+    backgroundColor: "#6A5ACD",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: "center",
+  },
+});
 
 export default Routine;
