@@ -9,11 +9,22 @@ import {
   ScrollView,
   Alert,
   DeviceEventEmitter,
+  TextInput,
+  Keyboard,
+  Button,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
 import { BACKEND_URL } from "@env";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
+import { MaterialIcons } from "@expo/vector-icons";
+import Routine from "./Routine";
+import {
+  SelectList,
+  MultipleSelectList,
+} from "react-native-dropdown-select-list";
 
 const IndividualWorkoutPlanScreen = ({
   navigation,
@@ -23,6 +34,12 @@ const IndividualWorkoutPlanScreen = ({
   const [loading, setLoading] = useState(true);
   const [workout, setWorkout] = useState({});
   const [edited, setEdited] = useState(false);
+  const [addingWorkout, setAddingWorkout] = useState(false);
+  const [exercises, setExercises] = useState(false);
+  const [selected, setSelected] = useState("");
+  const [reps, setReps] = useState(8);
+  const [rest, setRest] = useState(60);
+  const [weight, setWeight] = useState(0);
 
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
@@ -83,10 +100,68 @@ const IndividualWorkoutPlanScreen = ({
     });
   };
 
+  const fetchExercises = async () => {
+    try {
+      const response = await axios.get(BACKEND_URL + "/exercises/names");
+      if (response.status === 200) {
+        const exerciseIdNames = [];
+
+        response.data.forEach((exercise) => {
+          exerciseIdNames.push({
+            key: exercise.id,
+            value: exercise.name,
+          });
+        });
+
+        setExercises(exerciseIdNames);
+      }
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+    }
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const handleAddExercise = async () => {
+    try {
+      const response = await axios.post(BACKEND_URL + `/workout/routine/add`, {
+        workout_id,
+        exercise_id: selected,
+        reps,
+        rest,
+        weight,
+      });
+      if (response.status == 201) {
+        Alert.alert("Exercise added successfully");
+        setAddingWorkout(false);
+        fetchWorkout();
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not add this exercise to this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Adding Exercise Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchWorkout();
+    fetchExercises();
   }, []);
+
+  useEffect(() => {
+    setReps(8);
+    setRest(60);
+    setWeight(0);
+    setSelected("");
+  }, [addingWorkout]);
 
   useEffect(() => {
     setLoading(true);
@@ -94,8 +169,12 @@ const IndividualWorkoutPlanScreen = ({
   }, [edited]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <TouchableWithoutFeedback
+      style={styles.container}
+      onPress={dismissKeyboard}
+    >
+      <ScrollView style={styles.content}>
+        {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
         <TouchableOpacity
           style={styles.chevron}
           onPress={onLeaveWorkoutPlanPage}
@@ -111,33 +190,126 @@ const IndividualWorkoutPlanScreen = ({
               <Text>Difficulty: {workout.difficulty}</Text>
               <Text>Description:</Text>
               <Text>{workout.description}</Text>
-            </View>
-            <View style={styles.bottomContent}>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  //Todo conditionally render buttons if this workout belongs to this user
-                  style={styles.deleteButton}
-                  onPress={handleDeleteWorkout}
-                >
-                  <Text style={{ color: "lightcoral" }}>Delete</Text>
-                </TouchableOpacity>
-                <View style={{ width: 20 }}></View>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={handleEditWorkout}
-                >
-                  <Text style={{ color: "white" }}>Edit</Text>
-                </TouchableOpacity>
+              <Text>Exercises:</Text>
+
+              <View>
+                {workout.routines.map((routine) => {
+                  return <Routine routine={routine} key={routine.id}></Routine>;
+                })}
               </View>
+
+              {addingWorkout ? (
+                <View style={styles.space}>
+                  <Text>New Exercise:</Text>
+                  <SelectList
+                    setSelected={(val) => setSelected(val)}
+                    data={exercises}
+                    save="key"
+                    search={true}
+                    maxHeight={240}
+                    placeholder="Select exercises"
+                  />
+                  <View style={styles.inputContainer}>
+                    <Text style={{ flex: 1 }}>Repetitions:</Text>
+                    <TextInput
+                      keyboardType="numeric"
+                      style={[styles.input, { flex: 1 }]}
+                      value={reps.toString()}
+                      onChangeText={setReps}
+                    ></TextInput>
+                  </View>
+                  <View style={styles.inputContainer}>
+                    <Text style={{ flex: 1 }}>Rest Time (s):</Text>
+                    <TextInput
+                      keyboardType="numeric"
+                      style={[styles.input, { flex: 1 }]}
+                      value={rest.toString()}
+                      onChangeText={setRest}
+                    ></TextInput>
+                  </View>
+                  <View style={styles.inputContainer}>
+                    <Text style={{ flex: 1 }}>Weight (lbs):</Text>
+                    <TextInput
+                      keyboardType="numeric"
+                      style={[styles.input, { flex: 1 }]}
+                      value={weight.toString()}
+                      onChangeText={setWeight}
+                    ></TextInput>
+                  </View>
+                  <View style={styles.submit_button}>
+                    <Button
+                      title="Add Exercise"
+                      onPress={() => {
+                        if (selected != "") {
+                          handleAddExercise();
+                        } else {
+                          Alert.alert("Fields cannot be empty.");
+                        }
+                      }}
+                      color="#333333"
+                    ></Button>
+                  </View>
+                  <View style={styles.cancel_button}>
+                    <Button
+                      title="Cancel"
+                      onPress={() => {
+                        setAddingWorkout(false);
+                      }}
+                      color="#333333"
+                    ></Button>
+                  </View>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.addNewButton}
+                  onPress={() => {
+                    setAddingWorkout(true);
+                  }}
+                >
+                  <MaterialIcons name="post-add" size={48} color="black" />
+                  <Text>Add an exercise</Text>
+                </TouchableOpacity>
+              )}
             </View>
+
+            {addingWorkout ? (
+              <></>
+            ) : (
+              <View style={styles.bottomContent}>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    //Todo conditionally render buttons if this workout belongs to this user
+                    style={styles.deleteButton}
+                    onPress={handleDeleteWorkout}
+                  >
+                    <Text style={{ color: "lightcoral" }}>Delete</Text>
+                  </TouchableOpacity>
+                  <View style={{ width: 20 }}></View>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={handleEditWorkout}
+                  >
+                    <Text style={{ color: "white" }}>Edit</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </>
         )}
-      </View>
-    </SafeAreaView>
+        {/* </KeyboardAvoidingView> */}
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
+  addNewButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#CCCCCC",
+    marginTop: 20,
+  },
   bottomContent: {
     justifyContent: "center",
     alignItems: "flex-end",
@@ -172,6 +344,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 10,
+    minWidth: 150,
+    marginLeft: 10,
+  },
+  inputContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  space: {
+    marginTop: 20,
+    minWidth: 300,
+  },
+  submit_button: {
+    backgroundColor: "#B0E0E6",
+    border: "none",
+    marginTop: 20,
+  },
+  cancel_button: {
+    backgroundColor: "#FFCCCC",
+    border: "none",
+    marginTop: 20,
   },
 });
 export default IndividualWorkoutPlanScreen;
