@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   ScrollView,
@@ -19,12 +19,17 @@ import { Text, View } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SelectList } from "react-native-dropdown-select-list";
+import {
+  SelectList,
+  MultipleSelectList,
+} from "react-native-dropdown-select-list";
 
 const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
+  // const [exercises, setExercises] = useState([]);
+  // const [selectedExercises, setSelectedExercises] = useState([]);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -45,6 +50,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         difficulty: selected,
         description,
         tags: [], //ToDo - Implement Tags
+        // exercises: selectedExercises,
       });
       if (response.status == 201) {
         DeviceEventEmitter.emit("createWorkoutEvent");
@@ -71,10 +77,13 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          // style={styles.space}
+        >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
-        <ScrollView automaticallyAdjustKeyboardInsets={true}>
+        <View automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>
             <Text> New Workout Plan </Text>
 
@@ -108,6 +117,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               minHeight={100}
               maxHeight={100}
             ></TextInput>
+
             <View style={styles.submit_button}>
               <Button
                 title="Create Workout"
@@ -122,7 +132,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               ></Button>
             </View>
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -139,6 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    marginTop: 20,
   },
   input: {
     borderWidth: 1,
@@ -150,6 +161,9 @@ const styles = StyleSheet.create({
   space: {
     marginTop: 20,
     minWidth: 300,
+  },
+  flatlist: {
+    maxHeight: 550, //Todo - make responsive for diff screen sizes
   },
 });
 

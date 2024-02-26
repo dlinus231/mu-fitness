@@ -29,6 +29,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
   const [loading, setLoading] = useState(true);
+  const [routines, setRoutines] = useState([]);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -50,6 +51,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
       setDescription(workout.description);
       setSelected(workout.difficulty);
       setLoading(false);
+      setRoutines(workout.routines);
     } catch (error) {
       if (error.response) {
         Alert.alert("Could not find this workout");
