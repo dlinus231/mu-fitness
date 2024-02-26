@@ -75,15 +75,54 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
     return (
       <View style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}>
         <Text>Editing Routine</Text>
-        <TextInput value={String(reps)} onChangeText={setRepetitions} keyboardType="numeric" />
-        <TextInput value={String(rest)} onChangeText={setRest} keyboardType="numeric" />
-        <TextInput value={String(weight)} onChangeText={setWeight} keyboardType="numeric" />
-        <Button onPress={_handleSave}>
-          <ButtonText> Save </ButtonText>
-        </Button>
-        <Button onPress={_handleEditButtonClick}>
-          <ButtonText> Cancel </ButtonText>
-        </Button>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Reps</Text>
+          <TextInput
+            style={styles.input}
+            value={String(reps)}
+            onChangeText={setRepetitions}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Rest (s)</Text>
+          <TextInput
+            style={styles.input}
+            value={String(rest)}
+            onChangeText={setRest}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Weight</Text>
+          <TextInput
+            style={styles.input}
+            value={String(weight)}
+            onChangeText={setWeight}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.bottomContent}>
+          <View style={styles.buttonContainer}>
+            
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={_handleEditButtonClick}
+            >
+              <Text style={{ color: "lightcoral" }}>Cancel</Text>
+            </TouchableOpacity>
+            <View style={{ width: 10 }}></View>
+            <TouchableOpacity
+              //Todo conditionally render buttons if this workout belongs to this user
+              style={styles.editButton}
+              onPress={_handleSave}
+            >
+              <Text style={{ color: "white" }}>Update</Text>
+            </TouchableOpacity>
+
+          </View>
+        </View>
       </View>
     );
   }
@@ -127,7 +166,7 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
 const styles = StyleSheet.create({
   bottomContent: {
     display: 'flex',
-    alignItems: "flex-start",
+    alignItems: "flex-end",
     paddingTop: 10,
   },
   buttonContainer: {
@@ -149,6 +188,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
+  },
+  container: {
+    // Container styling if needed
+    padding: 10,
+  },
+  inputContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 10, 
+  },
+  label: {
+    marginRight: 10,
+    width: 60, 
+  },
+  input: {
+    flex: 1, // Take up remaining space
+    height: 40,
+    borderWidth: 1,
+    padding: 10,
+    // Input styling
   },
 });
 
