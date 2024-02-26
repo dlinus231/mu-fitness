@@ -198,6 +198,7 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
+// add new routine
 app.post(`/workout/routine/add`, async (req, res) => {
   const { workout_id, exercise_id, reps, rest, weight } = req.body;
   try {
@@ -213,6 +214,45 @@ app.post(`/workout/routine/add`, async (req, res) => {
     res.status(201).json(result);
   } catch (e) {
     console.log(e);
+  }
+});
+
+// update a routine
+app.patch('/workout/routine/update/:routineId', async (req, res) => {
+  const { routineId } = req.params;
+  const { reps, rest, weight } = req.body;
+
+  try {
+    const result = await prisma.routine.update({
+      where: {
+        id: parseInt(routineId),
+      },
+      data: {
+        repetitions: parseInt(reps),
+        rest: parseInt(rest),
+        weight_lbs: parseInt(weight),
+      },
+    });
+    res.status(201).json(result);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+// delete a routine
+app.delete('/workout/routine/delete/:routineId', async (req, res) => {
+  const { routineId } = req.params;
+  try {
+    const result = await prisma.routine.delete({
+      where: {
+        id: parseInt(routineId),
+      },
+    });
+    res.status(200).json(result);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
   }
 });
 

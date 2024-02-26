@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
 } from "react-native";
-import { Text, View } from "@gluestack-ui/themed";
+import { Text, View, set } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
 import { BACKEND_URL } from "@env";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
@@ -33,6 +33,7 @@ const IndividualWorkoutPlanScreen = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [workout, setWorkout] = useState({});
+  const [routines, setRoutines] = useState([]);
   const [edited, setEdited] = useState(false);
   const [addingWorkout, setAddingWorkout] = useState(false);
   const [exercises, setExercises] = useState(false);
@@ -54,6 +55,7 @@ const IndividualWorkoutPlanScreen = ({
       );
       console.log('bm - response from fetch workout request: ', result.data)
       setWorkout(result.data);
+      setRoutines(result.data.routines);
       setLoading(false);
     } catch (error) {
       console.log('bm - error occurred in fetchWorkout function: ', error)
@@ -150,6 +152,29 @@ const IndividualWorkoutPlanScreen = ({
     }
   };
 
+  const onDeleteRoutine = async (routineId) => {
+    console.log('bm - deleting routine with id: ', routineId)
+    try {
+      const response = await axios.delete(
+        BACKEND_URL + `/workout/routine/delete/${routineId}`
+      );
+      if (response.status === 200) {
+        Alert.alert("Exercise deleted successfully");
+        // re-fetch workouts to re-render list
+        fetchWorkout();
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not delete this exercise from this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Deleting Exercise Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchWorkout();
@@ -168,6 +193,8 @@ const IndividualWorkoutPlanScreen = ({
     fetchWorkout();
   }, [edited]);
 
+
+  console.log('bm - rendering routines: ', routines)
   return (
     <TouchableWithoutFeedback
       style={styles.container}
@@ -193,8 +220,8 @@ const IndividualWorkoutPlanScreen = ({
               <Text>Exercises:</Text>
 
               <View>
-                {workout.routines.map((routine) => {
-                  return <Routine routine={routine} key={routine.id}></Routine>;
+                {routines.map((routine) => {
+                  return <Routine routine={routine} onDeleteRoutine={() => onDeleteRoutine(routine.id)} key={routine.id}/>;
                 })}
               </View>
 
