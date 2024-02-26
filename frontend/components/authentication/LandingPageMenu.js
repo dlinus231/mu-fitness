@@ -16,14 +16,15 @@ const LandingPageMenu = ({ navigation, handleAuthChange }) => {
         <Button onPress={() => navigation.navigate("loginScreen")}>
           <ButtonText>Log in</ButtonText>
         </Button>
-        <Text>
+        {/* Comment this button and text out if you need a way to "login" without having a working account */}
+        {/* <Text>
           {" "}
           Note: Although login works, debug login is kept for testing purposes
           (workouts will not work properly)
         </Text>
         <Button onPress={handleAuthChange}>
           <ButtonText>Log in (debugging purposes)</ButtonText>
-        </Button>
+        </Button> */}
       </VStack>
     </SafeAreaView>
   );
