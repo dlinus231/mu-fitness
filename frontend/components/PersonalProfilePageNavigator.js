@@ -4,6 +4,7 @@ const Stack = createNativeStackNavigator();
 
 import JournalScreen from "./screens/personalProfileTabSreens/JournalScreen";
 import PersonalProfileMenuScreen from "./screens/personalProfileTabSreens/PersonalProfileMenuScreen";
+import FollowingScreen from "./screens/personalProfileTabSreens/FollowingScreen";
 
 export default function PersonalProfilePageNagivator({handleAuthChange}) {
   return (
@@ -19,6 +20,7 @@ export default function PersonalProfilePageNagivator({handleAuthChange}) {
         {props => <PersonalProfileMenuScreen {...props} handleAuthChange={handleAuthChange} />}
       </Stack.Screen>
       <Stack.Screen name="journal" component={JournalScreen} />
+      <Stack.Screen name="followingList" component={FollowingScreen} />
     </Stack.Navigator>
   );
 }

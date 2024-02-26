@@ -15,6 +15,12 @@ const PersonalProfileMenuScreen = ({ navigation, handleAuthChange }) => {
             </Button>
 
             <Button
+                onPress={() => navigation.navigate('followingList')}
+            >
+                <ButtonText>Following</ButtonText>
+            </Button>
+
+            <Button
                 onPress={handleAuthChange}
             >
                 <ButtonText>Sign out</ButtonText>

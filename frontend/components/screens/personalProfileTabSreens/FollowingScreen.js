@@ -2,11 +2,11 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@gluestack-ui/themed';
 
-const JournalScreen = ({navigation}) => {
+const FollowingScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Text>This is the Journal screen</Text>
-      <Text style={styles.align}>In the future, there will be a list of workouts you have completed here, as well as stats like calories burned, time spent, heart rate, etc.</Text>
+      <Text>This is the Following screen</Text>
+      <Text style={styles.align}>A list of all of the users that you follow will go here in the future</Text>
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text>Go back</Text>
       </TouchableOpacity>
@@ -27,4 +27,4 @@ const styles = StyleSheet.create({
     }
 });
   
-export default JournalScreen;
+export default FollowingScreen;
