@@ -6,6 +6,8 @@ import TopBarMenu from '../TopBarMenu';
 import DirectMessagesScreen from './DirectMessagesScreen';
 import SearchScreen from './SearchScreen';
 
+import PersonalProfilePageNagivator from '../PersonalProfilePageNavigator';
+
 const PersonalProfileScreen = ({ handleAuthChange }) => {
   // TODO make this an enum?
   // can have values 'profile', 'dms', 'search'
@@ -28,12 +30,7 @@ const PersonalProfileScreen = ({ handleAuthChange }) => {
       { curPage == 'profile' && (
         <>
           <TopBarMenu onSwitchPage={handleSwitchPage}/>
-          <View style={styles.container}>
-            <Text>This is the personal profile screen</Text>
-            <TouchableOpacity onPress={handleAuthChange}>
-              <Text>Sign out</Text>
-            </TouchableOpacity>
-          </View>
+          <PersonalProfilePageNagivator handleAuthChange={handleAuthChange}/>
         </>
       )}
     </>
