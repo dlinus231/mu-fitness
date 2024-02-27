@@ -114,7 +114,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
             <View style={styles.space}></View>
 
-            <Text style={styles.space}>Description: </Text>
+            <Text style={styles.space}>Notes: </Text>
             <TextInput
               style={styles.input}
               value={description}

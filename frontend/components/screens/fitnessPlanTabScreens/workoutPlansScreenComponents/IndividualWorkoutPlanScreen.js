@@ -243,7 +243,7 @@ const IndividualWorkoutPlanScreen = ({
             <View style={styles.container}>
               <Text>{workout.name}</Text>
               <Text>Difficulty: {workout.difficulty}</Text>
-              <Text>Description:</Text>
+              <Text>Notes:</Text>
               <Text>{workout.description}</Text>
               <Text>Exercises:</Text>
 
