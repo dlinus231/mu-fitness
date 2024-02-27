@@ -65,9 +65,7 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
     // TODO make a put request to update the routine
       // await the put request so that it saves the new routine before continuing
 
-    console.log("updating routine", updatedRoutineData);
     await onUpdateRoutine(routine.id, updatedRoutineData);
-    console.log("bm - onUpdateRoutine returned")
   };
 
   const _renderEditingView = () => {

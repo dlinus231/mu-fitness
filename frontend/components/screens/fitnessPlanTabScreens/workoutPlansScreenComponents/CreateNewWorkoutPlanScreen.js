@@ -54,7 +54,6 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         tags: [], //ToDo - Implement Tags
         // exercises: selectedExercises,
       });
-      console.log("bm - response returned from create workout request: ");
       if (response.status == 201) {
         DeviceEventEmitter.emit("createWorkoutEvent");
         Alert.alert("Workout created successfully", "", [

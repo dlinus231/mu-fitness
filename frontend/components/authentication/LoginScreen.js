@@ -18,8 +18,6 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleLogin = async () => {
-    console.log("bm - entering handle login function, about to make request");
-
     if (email == "" || password == "") {
       Alert.alert("All fields must be filled out");
       return;
