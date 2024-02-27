@@ -22,28 +22,28 @@ export default function FooterNavigator({ handleAuthChange }) {
     >
       <Tab.Screen name="FriendFeed" component={FriendFeedScreen} options={{
         tabBarIcon: ({ focused }) => (
-          <Ionicons name="people-sharp" size={24} color={focused ? 'blue' : 'grey'} />
+          <Ionicons name="people-sharp" size={24} color={focused ? '#6A5ACD' : 'grey'} />
         ),
       }}/>
       <Tab.Screen name="FitnessPlans" component={FitnessPlansScreen} options={{
         tabBarIcon: ({ focused }) => (
-          <MaterialCommunityIcons name="weight-lifter" size={24} color={focused ? 'blue' : 'grey'} />
+          <MaterialCommunityIcons name="weight-lifter" size={24} color={focused ? '#6A5ACD' : 'grey'} />
         ),
       }}/>
       <Tab.Screen name="Upload" component={UploadScreen} options={{
         tabBarIcon: ({ focused }) => (
-          <Feather name="upload" size={24} color={focused ? 'blue' : 'grey'} />
+          <Feather name="upload" size={24} color={focused ? '#6A5ACD' : 'grey'} />
         ),
       }}/>
       <Tab.Screen name="PublicFeed" component={PublicFeedScreen} options={{
         tabBarIcon: ({ color, size, focused }) => (
-          <SimpleLineIcons name="layers" size={24} color={focused ? 'blue' : 'grey'} />
+          <SimpleLineIcons name="layers" size={24} color={focused ? '#6A5ACD' : 'grey'} />
           // <MaterialCommunityIcons name="layers-triple-outline" size={24} color={focused ? 'blue' : 'grey'} />
         ),
       }}/>
       <Tab.Screen name="PersonalProfile" options={{
         tabBarIcon: ({ color, size, focused }) => (
-          <Ionicons name="person-circle-sharp" size={24} color={focused ? 'blue' : 'grey'} />
+          <Ionicons name="person-circle-sharp" size={24} color={focused ? '#6A5ACD' : 'grey'} />
         ),
       }}>
         {props => <PersonalProfileScreen {...props} handleAuthChange={handleAuthChange} />}
