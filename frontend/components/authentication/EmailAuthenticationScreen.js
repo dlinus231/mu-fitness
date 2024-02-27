@@ -63,7 +63,7 @@ const EmailAuthenticationScreen = ({ navigation, handleAuthChange }) => {
           account.
         </Text>
         <View style={styles.space}></View>
-        <Text>Enter the 6-digit code you recieved via email:</Text>
+        <Text>Enter the code you recieved via email:</Text>
         <TextInput
           keyboardType="numeric"
           maxLength={6}
