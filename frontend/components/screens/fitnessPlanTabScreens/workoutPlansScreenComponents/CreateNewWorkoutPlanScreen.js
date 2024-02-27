@@ -135,7 +135,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
                     Alert.alert("Workout name cannot be empty");
                   }
                 }}
-                color="#333333"
+                color="#6A5ACD"
               ></Button>
             </View>
           </View>

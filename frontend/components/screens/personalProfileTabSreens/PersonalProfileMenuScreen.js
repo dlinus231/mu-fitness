@@ -8,25 +8,25 @@ const PersonalProfileMenuScreen = ({ navigation, handleAuthChange }) => {
     <SafeAreaView style={styles.container}>
         <Text style={styles.top_text}>This is the personal profile screen</Text>
         <VStack space="md" style={styles.buttonContainer}>
-            <Button
+            <TouchableOpacity
+                style={styles.button}
                 onPress={() => navigation.navigate('journal')}
             >
-                <ButtonText>Journal</ButtonText>
-            </Button>
-
-            <Button
+                <Text style={styles.text}>Journal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
                 onPress={() => navigation.navigate('followingList')}
             >
-                <ButtonText>Following</ButtonText>
-            </Button>
-
-            <Button
+                <Text style={styles.text}>Following</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
                 onPress={handleAuthChange}
             >
-                <ButtonText>Sign out</ButtonText>
-            </Button>
-        </VStack>
-        
+                <Text style={styles.text}>Sign Out</Text>
+            </TouchableOpacity>
+        </VStack>  
     </SafeAreaView>
   );
 };
@@ -45,6 +45,22 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingHorizontal: '3%',
         paddingBottom: '10%',
+    },
+    button: {
+        borderColor: '#6A5ACD',
+        backgroundColor: '#6A5ACD',
+        padding: 10,
+        borderRadius: 5,
+        // height: '17%',
+        // display: 'flex',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+    },
+    text: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     }
 });
 
