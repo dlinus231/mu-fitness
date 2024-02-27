@@ -20,23 +20,34 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleSignUp = async () => {
-    console.log('bm - entering handle sign up function, about to make request')
+    // console.log("bm - entering handle sign up function, about to make request");
     try {
       const response = await axios.post(BACKEND_URL + "/user/create", {
         username,
         email,
         password,
       });
+
       if (response.status == 201) {
         const data = response.data;
-        AsyncStorage.setItem("id", data.id);
-        AsyncStorage.setItem("email", data.email);
-        AsyncStorage.setItem("username", data.username);
-        Alert.alert("Account created.", "You have been logged in.");
-        handleAuthChange();
+        await AsyncStorage.setItem("user_id", "" + data.id);
+        await AsyncStorage.setItem("email", data.email);
+        await AsyncStorage.setItem("username", data.username);
+
+        const tokenResponse = await axios.post(
+          BACKEND_URL + `/user/createauth`,
+          {
+            user_id: data.id,
+          }
+        );
+
+        navigation.navigate("emailAuthScreen");
       }
     } catch (error) {
-      console.log("bm - error occurred in handleSignUp function: ", error.response?.data?.error)
+      console.log(
+        "bm - error occurred in handleSignUp function: ",
+        error.response?.data?.error
+      );
       // Handle errors, such as showing an alert with a message
       if (error.response) {
         if (error.response.status == 409) {

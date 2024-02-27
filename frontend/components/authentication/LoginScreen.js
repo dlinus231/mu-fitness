@@ -18,7 +18,7 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
 
   // makes signin request when signin form is submitted
   const handleLogin = async () => {
-    console.log("bm - entering handle login function, about to make request")
+    console.log("bm - entering handle login function, about to make request");
     try {
       const response = await axios.post(BACKEND_URL + "/user/login", {
         email,
@@ -26,18 +26,29 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
       });
       const data = response.data;
 
-      console.log('bm - response from login request: ', response)
-      console.log(response.data)
+      // console.log("bm - response from login request: ", response);
+      // console.log(response.data);
 
       if (response.status == 200) {
         //Session variables set on login
-        await AsyncStorage.setItem("user_id", "" + data.id);
-        await AsyncStorage.setItem("email", data.email);
-        await AsyncStorage.setItem("username", data.username);
-        handleAuthChange();
+        AsyncStorage.setItem("user_id", "" + data.id);
+        AsyncStorage.setItem("email", data.email);
+        AsyncStorage.setItem("username", data.username);
+        if (data.active) {
+          handleAuthChange();
+        } else {
+          const response = await axios.post(BACKEND_URL + `/user/createauth`, {
+            user_id: data.id,
+          });
+
+          navigation.navigate("emailAuthScreen");
+        }
       }
     } catch (error) {
-      console.log("bm - error occurred in handleLogin function: ", error.response?.data?.error)
+      console.log(
+        "bm - error occurred in handleLogin function: ",
+        error.response?.data?.error
+      );
       console.log(error);
       if (error.response) {
         if (error.response.status == 401) {

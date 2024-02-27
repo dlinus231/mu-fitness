@@ -28,8 +28,6 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
-  // const [exercises, setExercises] = useState([]);
-  // const [selectedExercises, setSelectedExercises] = useState([]);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -43,17 +41,20 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
   //callback function when button is pressed, makes call to API and handles response
   const handleCreateWorkout = async () => {
-    console.log("bm - entering handle create workout function, about to make request")
+    console.log(
+      "bm - entering handle create workout function, about to make request"
+    );
     try {
+      const userId = await AsyncStorage.getItem("user_id");
       const response = await axios.post(BACKEND_URL + "/workout/create", {
-        userId: await AsyncStorage.getItem("user_id"),
+        userId,
         name,
         difficulty: selected,
         description,
         tags: [], //ToDo - Implement Tags
         // exercises: selectedExercises,
       });
-      console.log("bm - response returned from create workout request: ")
+      console.log("bm - response returned from create workout request: ");
       if (response.status == 201) {
         DeviceEventEmitter.emit("createWorkoutEvent");
         Alert.alert("Workout created successfully", "", [
@@ -64,7 +65,10 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         ]);
       }
     } catch (error) {
-      console.log("bm - error occurred in handleCreateWorkout function: ", error.response?.data?.error)
+      console.log(
+        "bm - error occurred in handleCreateWorkout function: ",
+        error.response?.data?.error
+      );
       if (error.response) {
         Alert.alert("Invalid request made to server", "Please try again");
       } else {
