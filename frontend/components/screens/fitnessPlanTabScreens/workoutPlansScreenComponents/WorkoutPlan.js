@@ -12,7 +12,7 @@ const WorkoutPlan = ({
 }) => {    
     return (
         <SafeAreaView style={(id % 2 === 0) ? styles.itemContainerEven : styles.itemContainerOdd}>
-            <Text> {title} </Text>
+            <Text style={styles.titleText}> {title} </Text>
             <TouchableOpacity style={styles.chevron} onPress={() => onEnterWorkoutPlanPage(id)}>
                 <Octicons name="chevron-right" size={48} color="black"/>
             </TouchableOpacity>
@@ -46,6 +46,12 @@ const styles = StyleSheet.create({
     chevron: {
         paddingTop: '6%',
         paddingRight: '7%',
+    },
+    titleText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'left',
+        paddingTop: '2%',
     }
 });
 export default WorkoutPlan;

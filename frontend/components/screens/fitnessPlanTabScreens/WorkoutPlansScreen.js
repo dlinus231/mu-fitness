@@ -102,7 +102,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackArrowIcon></BackArrowIcon>
           </TouchableOpacity>
-          <Text>Your Workout Plans</Text>
+          <Text style={styles.text}>Your Workout Plans</Text>
 
           <TouchableOpacity
             style={styles.createNewWorkoutPlanButton}
@@ -168,6 +168,12 @@ const styles = StyleSheet.create({
   flatlist: {
     maxHeight: 550, //Todo - make responsive for diff screen sizes
   },
+  text: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+  }
 });
 
 export default WorkoutPlansScreen;
