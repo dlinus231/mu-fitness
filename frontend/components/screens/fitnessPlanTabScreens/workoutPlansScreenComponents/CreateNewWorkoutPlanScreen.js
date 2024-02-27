@@ -84,14 +84,14 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <View automaticallyAdjustKeyboardInsets={true}>
+        <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            // style={styles.space}
+          >
+            <BackArrowIcon></BackArrowIcon>
+        </TouchableOpacity>
+        <ScrollView automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              // style={styles.space}
-            >
-              <BackArrowIcon></BackArrowIcon>
-            </TouchableOpacity>
             <Text> New Workout Plan </Text>
 
             <Text style={styles.space}>Name: </Text>
@@ -139,7 +139,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
               ></Button>
             </View>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
