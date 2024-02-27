@@ -84,14 +84,14 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          // style={styles.space}
-        >
-          <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity>
         <View automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              // style={styles.space}
+            >
+              <BackArrowIcon></BackArrowIcon>
+            </TouchableOpacity>
             <Text> New Workout Plan </Text>
 
             <Text style={styles.space}>Name: </Text>
