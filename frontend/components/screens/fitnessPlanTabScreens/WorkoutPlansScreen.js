@@ -100,7 +100,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackArrowIcon></BackArrowIcon>
           </TouchableOpacity>
-          <Text>Your Workout Plans</Text>
+          <Text style={styles.text}>Your Workout Plans</Text>
 
           <TouchableOpacity
             style={styles.createNewWorkoutPlanButton}
@@ -129,6 +129,12 @@ const WorkoutPlansScreen = ({ navigation }) => {
                 You currently have no workout plans.
               </Text>
               <Text style={styles.space}>
+                Workout plans are lists of exercises (sets) that you can create and track your progress with.
+              </Text>
+              <Text style={styles.space}>
+                You can also share your workout plans with others, or use workout plans that others have shared with you.
+              </Text>
+              <Text style={styles.space}>
                 Click the button to create your first one!
               </Text>
             </View>
@@ -154,10 +160,18 @@ const styles = StyleSheet.create({
   },
   space: {
     marginTop: 20,
+    paddingHorizontal: '10%',
+    textAlign: 'center',
   },
   flatlist: {
     maxHeight: 550, //Todo - make responsive for diff screen sizes
   },
+  text: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+  }
 });
 
 export default WorkoutPlansScreen;

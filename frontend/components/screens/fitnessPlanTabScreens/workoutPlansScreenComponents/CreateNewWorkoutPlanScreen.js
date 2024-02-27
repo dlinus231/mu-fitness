@@ -28,8 +28,6 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
-  // const [exercises, setExercises] = useState([]);
-  // const [selectedExercises, setSelectedExercises] = useState([]);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -43,9 +41,13 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
   //callback function when button is pressed, makes call to API and handles response
   const handleCreateWorkout = async () => {
+    console.log(
+      "bm - entering handle create workout function, about to make request"
+    );
     try {
+      const userId = await AsyncStorage.getItem("user_id");
       const response = await axios.post(BACKEND_URL + "/workout/create", {
-        userId: await AsyncStorage.getItem("user_id"),
+        userId,
         name,
         difficulty: selected,
         description,
@@ -62,6 +64,10 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         ]);
       }
     } catch (error) {
+      console.log(
+        "bm - error occurred in handleCreateWorkout function: ",
+        error.response?.data?.error
+      );
       if (error.response) {
         Alert.alert("Invalid request made to server", "Please try again");
       } else {
@@ -78,12 +84,12 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          // style={styles.space}
-        >
-          <BackArrowIcon></BackArrowIcon>
+            onPress={() => navigation.goBack()}
+            // style={styles.space}
+          >
+            <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
-        <View automaticallyAdjustKeyboardInsets={true}>
+        <ScrollView automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>
             <Text> New Workout Plan </Text>
 
@@ -107,7 +113,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
             <View style={styles.space}></View>
 
-            <Text style={styles.space}>Description: </Text>
+            <Text style={styles.space}>Notes: </Text>
             <TextInput
               style={styles.input}
               value={description}
@@ -128,11 +134,11 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
                     Alert.alert("Workout name cannot be empty");
                   }
                 }}
-                color="#333333"
+                color="#6A5ACD"
               ></Button>
             </View>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

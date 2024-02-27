@@ -15,6 +15,17 @@ model User {
   time_created    DateTime  @default(now())
   username        String    @db.VarChar(25)
   workouts        Workout[]
+  active          Boolean @default(false)
+  authcode  AuthCode?
+
+}
+
+model AuthCode {
+  id Int @id @default(autoincrement())
+  user_id Int @unique
+  value Int
+  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  valid_until DateTime
 }
 
 model Workout {
@@ -29,7 +40,7 @@ model Workout {
   //fading in color as it goes to less-worked muscles
   routines     Routine[]
   tags         Tag[]
-  user         User       @relation(fields: [user_id], references: [id])
+  user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Routine {

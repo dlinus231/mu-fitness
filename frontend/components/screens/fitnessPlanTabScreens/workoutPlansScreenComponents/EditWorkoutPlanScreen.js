@@ -130,7 +130,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
 
               <View style={styles.space}></View>
 
-              <Text style={styles.space}>Description: </Text>
+              <Text style={styles.space}>Notes: </Text>
               <TextInput
                 style={styles.input}
                 value={description}
@@ -150,7 +150,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
                       Alert.alert("Workout name cannot be empty");
                     }
                   }}
-                  color="#333333"
+                  color="#6A5ACD"
                 ></Button>
               </View>
             </View>

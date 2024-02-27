@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./LoginScreen";
 import LandingPageMenu from "./LandingPageMenu";
 import SignupScreen from "./SignupScreen";
+import EmailAuthenticationScreen from "./EmailAuthenticationScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,14 @@ export default function FooterNavigator({ handleAuthChange }) {
       <Stack.Screen name="signupScreen">
         {(props) => (
           <SignupScreen {...props} handleAuthChange={handleAuthChange} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="emailAuthScreen">
+        {(props) => (
+          <EmailAuthenticationScreen
+            {...props}
+            handleAuthChange={handleAuthChange}
+          />
         )}
       </Stack.Screen>
     </Stack.Navigator>
