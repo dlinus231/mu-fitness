@@ -353,7 +353,7 @@ app.post(`/workout/routine/add`, async (req, res) => {
         workout_id,
         exercise_id,
         repetitions: parseInt(reps),
-        rest: parseInt(reps),
+        rest: parseInt(rest),
         weight_lbs: parseInt(weight),
       },
     });

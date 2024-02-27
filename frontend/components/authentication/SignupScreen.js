@@ -21,6 +21,12 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
   // makes signin request when signin form is submitted
   const handleSignUp = async () => {
     // console.log("bm - entering handle sign up function, about to make request");
+
+    if (email == "" || password == "" || username == "") {
+      Alert.alert("All fields must be filled out");
+      return;
+    }
+
     try {
       const response = await axios.post(BACKEND_URL + "/user/create", {
         username,
@@ -99,7 +105,7 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign Up" onPress={handleSignUp} />
+      <Button title="Sign Up" onPress={handleSignUp} color="#6A5ACD"/>
     </View>
   );
 };
