@@ -205,9 +205,14 @@ app.post("/user/validateauth", async (req, res) => {
       res.status(401).json({ message: "Authentication token expired" });
     } else if (code != result.value) {
       res.status(401).json({ message: "Invalid authentication token" });
-      console.log("boo");
     } else {
-      //Delete authcode, make user active
+      const activateUser = await prisma.user.update({
+        where: { id: user_id },
+        data: {
+          active: true,
+        },
+      });
+      const deleteAuth = await prisma.authCode.delete({ where: { user_id } });
       res.sendStatus(200);
     }
   } catch (e) {
