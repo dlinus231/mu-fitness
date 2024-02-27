@@ -441,6 +441,7 @@ app.delete("/workout/routine/delete/:routineId", async (req, res) => {
 //   }
 // });
 
+// update workout plan
 app.post(`/workout/edit`, async (req, res) => {
   const { workoutId, name, difficulty, description, routineIds } = req.body;
   if (workoutId == null) {
