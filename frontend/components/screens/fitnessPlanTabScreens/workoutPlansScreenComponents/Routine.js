@@ -74,7 +74,7 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
   const _renderEditingView = () => {
     return (
       <View style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}>
-        <Text>Editing Routine</Text>
+        <Text>Editing</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Reps</Text>
           <TextInput

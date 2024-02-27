@@ -241,11 +241,18 @@ const IndividualWorkoutPlanScreen = ({
         ) : (
           <>
             <View style={styles.container}>
-              <Text>{workout.name}</Text>
-              <Text>Difficulty: {workout.difficulty}</Text>
-              <Text>Notes:</Text>
-              <Text>{workout.description}</Text>
-              <Text>Exercises:</Text>
+              <Text style={styles.titleText}>{workout.name}</Text>
+              <Text style={styles.subTitleText}>{workout.difficulty} difficulty</Text>
+              <Text style={styles.notesText}>Notes: {workout.description}</Text>
+              <View style={styles.topButtonContainer}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={handleEditWorkout}
+                >
+                  <Text style={{ color: "white" }}>  Edit Plan  </Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.exercisesText}>Exercises</Text>
 
               <View>
                 {routines.length === 0 && (
@@ -314,7 +321,7 @@ const IndividualWorkoutPlanScreen = ({
                           Alert.alert("Fields cannot be empty.");
                         }
                       }}
-                      color="#333333"
+                      color="#6A5ACD"
                     ></Button>
                   </View>
                   <View style={styles.cancel_button}>
@@ -350,15 +357,9 @@ const IndividualWorkoutPlanScreen = ({
                     style={styles.deleteButton}
                     onPress={handleDeleteWorkout}
                   >
-                    <Text style={{ color: "lightcoral" }}>Delete</Text>
+                    <Text style={{ color: "lightcoral" }}>Delete Workout Plan</Text>
                   </TouchableOpacity>
-                  <View style={{ width: 20 }}></View>
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={handleEditWorkout}
-                  >
-                    <Text style={{ color: "white" }}>Edit</Text>
-                  </TouchableOpacity>
+                  {/* <View style={{ width: 20 }}></View> */}
                 </View>
               </View>
             )}
@@ -381,10 +382,17 @@ const styles = StyleSheet.create({
   bottomContent: {
     justifyContent: "center",
     alignItems: "flex-end",
-    paddingRight: 30,
+    paddingRight: '3%',
+    paddingBottom: '3%'
   },
   buttonContainer: {
     flexDirection: "row",
+  },
+  topButtonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: '5%'
   },
   container: {
     padding: "3%",
@@ -443,6 +451,32 @@ const styles = StyleSheet.create({
   no_exercises_text: {
     textAlign: 'center',
     paddingHorizontal: '3%',
-  }
+    paddingTop: '3%'
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingBottom: '1%',
+    paddingTop: '4%'
+  },
+  subTitleText: {
+    fontSize: 16,
+    // fontWeight: "bold",
+    textAlign: "center",
+    paddingBottom: '1%',
+  },
+  notesText: {
+    fontSize: 16,
+    textAlign: "center",
+    paddingBottom: '3%',
+  },
+  exercisesText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
+    paddingTop: '5%',
+    paddingLeft: '1%',
+  },
 });
 export default IndividualWorkoutPlanScreen;
