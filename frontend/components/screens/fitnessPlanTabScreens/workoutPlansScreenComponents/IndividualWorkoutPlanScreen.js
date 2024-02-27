@@ -50,16 +50,13 @@ const IndividualWorkoutPlanScreen = ({
   const fetchWorkout = async () => {
     try {
       setLoading(true);
-      console.log('making call to backend to fetch workout')
       const result = await axios.get(
         BACKEND_URL + `/workout/one/${workout_id}`
       );
-      console.log('bm - response from fetch workout request: ', result.data)
       setWorkout(result.data);
       setRoutines(result.data.routines);
       setLoading(false);
     } catch (error) {
-      console.log('bm - error occurred in fetchWorkout function: ', error)
       if (error.response) {
         Alert.alert("Could not find this workout");
       } else {
@@ -154,7 +151,6 @@ const IndividualWorkoutPlanScreen = ({
   };
 
   const onDeleteRoutine = async (routineId) => {
-    console.log('bm - deleting routine with id: ', routineId)
     try {
       const response = await axios.delete(
         BACKEND_URL + `/workout/routine/delete/${routineId}`
@@ -178,7 +174,6 @@ const IndividualWorkoutPlanScreen = ({
 
   const onUpdateRoutine = async (routineId, updatedRoutineData) => {
     // updatedRoutineData should have the form {repetitions: reps, rest: rest, weight_lbs: weight}
-    console.log('bm - updating routine with id: ', routineId, ' and data: ', updatedRoutineData)
     try {
       const response = await axios.patch(
         BACKEND_URL + `/workout/routine/update/${routineId}`,
@@ -221,8 +216,6 @@ const IndividualWorkoutPlanScreen = ({
     fetchWorkout();
   }, [edited]);
 
-
-  console.log('bm - rendering routines: ', routines)
   return (
     <TouchableWithoutFeedback
       style={styles.container}

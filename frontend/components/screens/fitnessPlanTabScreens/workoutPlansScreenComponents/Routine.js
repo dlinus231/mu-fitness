@@ -54,7 +54,6 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
   };
 
   const _handleSave = async () => {
-    console.log('bm - handleSave called with reps:', reps, 'rest:', rest, 'weight:', weight)
     const updatedRoutineData = {
       repetitions: reps,
       rest: rest,

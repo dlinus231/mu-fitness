@@ -71,7 +71,7 @@ const EmailAuthenticationScreen = ({ navigation, handleAuthChange }) => {
           onChangeText={setCode}
           style={styles.input}
         />
-        <Button title="Submit" onPress={handleSubmit} />
+        <Button title="Submit" onPress={handleSubmit} color="#6A5ACD" />
       </View>
     </TouchableWithoutFeedback>
   );
