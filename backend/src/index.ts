@@ -69,7 +69,7 @@ app.post(`/user/login`, async (req, res) => {
     return;
   }
 
-  console.log("login request by " + email);
+  // console.log("login request by " + email);
 
   try {
     const result = await prisma.user.findUnique({
@@ -111,12 +111,10 @@ app.post(`/user/login`, async (req, res) => {
 //Create email validation code
 app.post("/user/createauth", async (req, res) => {
   const { user_id } = req.body;
-  console.log(user_id);
 
   const value = Math.floor(Math.random() * 1000000);
   try {
     const user = await prisma.user.findUnique({ where: { id: user_id } });
-    console.log(user);
 
     if (!user || !validateEmail(user.email)) {
       res.sendStatus(401);
@@ -149,7 +147,6 @@ app.post("/user/createauth", async (req, res) => {
       });
     }
 
-    console.log(value);
 
     var transporter = nodemailer.createTransport({
       service: "gmail",
@@ -194,7 +191,6 @@ app.post("/user/createauth", async (req, res) => {
 //Validate user authentication code
 app.post("/user/validateauth", async (req, res) => {
   const { user_id, code } = req.body;
-  console.log(user_id);
 
   try {
     const result = await prisma.authCode.findUnique({ where: { user_id } });
@@ -367,21 +363,8 @@ app.post(`/workout/routine/add`, async (req, res) => {
 app.patch("/workout/routine/update/:routineId", async (req, res) => {
   const { routineId } = req.params;
 
-  console.log("bm - request body: " + JSON.stringify(req.body));
 
   const { repetitions, rest, weight_lbs } = req.body;
-
-  console.log("bm - in update routine endpoint");
-  console.log(
-    "bm - routineId: " +
-      routineId +
-      " reps: " +
-      repetitions +
-      " rest: " +
-      rest +
-      " weight: " +
-      weight_lbs
-  );
 
   try {
     const result = await prisma.routine.update({
