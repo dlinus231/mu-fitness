@@ -443,7 +443,8 @@ app.delete("/workout/routine/delete/:routineId", async (req, res) => {
 
 // update workout plan
 app.post(`/workout/edit`, async (req, res) => {
-  const { workoutId, name, difficulty, description, routineIds } = req.body;
+  // TOOD add ability to update associated routineId? (might not be needed though)
+  const { workoutId, name, difficulty, description } = req.body;
   if (workoutId == null) {
     res.sendStatus(400);
     return;
@@ -458,9 +459,9 @@ app.post(`/workout/edit`, async (req, res) => {
         name,
         difficulty,
         description,
-        routines: {
-          connect: routineIds.map((routineId: number) => ({ id: routineId })),
-        },
+        // routines: {
+        //   connect: routineIds.map((routineId: number) => ({ id: routineId })),
+        // },
       },
       include: {
         routines: true,
