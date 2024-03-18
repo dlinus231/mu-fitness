@@ -23,7 +23,7 @@ const SearchScroller = ({ category, data }) => {
                 ellipsizeMode="tail"
                 style={styles.caption}
               >
-                {item.name}
+                {item.name ? item.name : item.username}
               </Text>
             </View>
           ))}
@@ -37,7 +37,8 @@ const SearchScroller = ({ category, data }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 0,
+    minHeight: 150,
     marginBottom: 10,
   },
   imageContainer: {

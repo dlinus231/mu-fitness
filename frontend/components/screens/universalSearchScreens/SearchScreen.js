@@ -4,17 +4,21 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  ScrollView,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../../icons/BackArrowIcon";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import SearchScroller from "./SearchScroller";
+import SearchFilterBubble from "./SearchFilterBubble";
 
 const SearchScreen = ({
   onSwitchPage, // callback function
   rootPage, // string
 }) => {
+  const categories = ["exercises", "workouts", "users"];
+
   const [searchBar, setSearchBar] = useState("");
   const prevSearch = useRef("");
   const [timer, setTimer] = useState(0);
@@ -24,6 +28,7 @@ const SearchScreen = ({
     users: [],
   });
   const [loading, setLoading] = useState("");
+  const [focus, setFocus] = useState("");
   const TextInputRef = useRef(null);
 
   //Drop keyboard on return
@@ -63,7 +68,7 @@ const SearchScreen = ({
   }, [timer]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.topContent}>
         <TouchableOpacity
           style={styles.backButton}
@@ -87,30 +92,58 @@ const SearchScreen = ({
           <View style={styles.hr}></View>
         </View>
       </View>
-      <SearchScroller
-        category={"Exercises"}
-        data={searchData.exercises}
-      ></SearchScroller>
-      <SearchScroller
-        category={"Workouts"}
-        data={searchData.workouts}
-      ></SearchScroller>
-      <SearchScroller
-        category={"Users"}
-        data={searchData.users}
-      ></SearchScroller>
+
+      {focus.length === 0 ? (
+        <ScrollView
+          contentContainerStyle={styles.filterScroll}
+          style={{ flexGrow: 0 }}
+        >
+          {categories.map((category, idx) => {
+            return (
+              <SearchFilterBubble
+                key={idx}
+                text={category}
+                setFocus={setFocus}
+              ></SearchFilterBubble>
+            );
+          })}
+        </ScrollView>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.filterScroll}
+          style={{ flexGrow: 0 }}
+        >
+          <SearchFilterBubble
+            text={""}
+            setFocus={setFocus}
+          ></SearchFilterBubble>
+          <SearchFilterBubble
+            text={focus}
+            setFocus={setFocus}
+          ></SearchFilterBubble>
+        </ScrollView>
+      )}
+
+      {categories.map((category, idx) => {
+        return (
+          <SearchScroller
+            key={idx}
+            category={category}
+            data={searchData[category]}
+          ></SearchScroller>
+        );
+      })}
 
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}></View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   bottomContent: {
     width: 0,
-    flexGrow: 1,
     flex: 1,
   },
   buttonContainer: {
@@ -128,12 +161,20 @@ const styles = StyleSheet.create({
     width: "95%",
     marginTop: "5%",
   },
-  container: {
+  filterScroll: {
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "flex-start",
+    flexDirection: "row",
+    gap: 10,
+    flexGrow: 0,
+    marginBottom: 10,
+  },
+  container: {
+    display: "flex",
+    justifyContent: "flex-start",
     padding: 10,
-    height: "100%",
+    minHeight: "100%",
     backgroundColor: "#000000",
     flexDirection: "column",
   },
