@@ -23,6 +23,8 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
       return;
     }
 
+    console.log(BACKEND_URL);
+
     try {
       const response = await axios.post(BACKEND_URL + "/user/login", {
         email,
@@ -94,7 +96,7 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign In" onPress={handleLogin} color="#6A5ACD"/>
+      <Button title="Sign In" onPress={handleLogin} color="#6A5ACD" />
     </View>
   );
 };
