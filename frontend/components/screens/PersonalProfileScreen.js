@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@gluestack-ui/themed';
 import TopBarMenu from '../TopBarMenu';
@@ -7,6 +7,8 @@ import DirectMessagesScreen from './DirectMessagesScreen';
 import SearchScreen from './SearchScreen';
 
 import PersonalProfilePageNagivator from '../PersonalProfilePageNavigator';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PersonalProfileScreen = ({ handleAuthChange }) => {
   // TODO make this an enum?
