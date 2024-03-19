@@ -9,7 +9,7 @@ const FollowingScreen = ({navigation}) => {
       <Text style={styles.align}>A list of all of the users that you follow will go here in the future</Text>
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PersonalProfile')}>
             <Text style={{ color: "white" }}>Go Back</Text>
           </TouchableOpacity>
         </View>
