@@ -123,16 +123,22 @@ const SearchScreen = ({
           ></SearchFilterBubble>
         </ScrollView>
       )}
-
-      {categories.map((category, idx) => {
-        return (
-          <SearchScroller
-            key={idx}
-            category={category}
-            data={searchData[category]}
-          ></SearchScroller>
-        );
-      })}
+      {focus.length === 0 ? (
+        categories.map((category, idx) => {
+          return (
+            <SearchScroller
+              key={idx}
+              category={category}
+              data={searchData[category]}
+            ></SearchScroller>
+          );
+        })
+      ) : (
+        <SearchScroller
+          category={focus}
+          data={searchData[focus]}
+        ></SearchScroller>
+      )}
 
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}></View>
