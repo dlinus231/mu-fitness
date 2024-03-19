@@ -261,6 +261,10 @@ app.get("/user/:userId", async (req, res) => {
       where: {
         id: parseInt(userId),
       },
+      include: {
+        followers: true,
+        following: true,
+      },
     }).then((user) => {
       if (user == null) {
         res.sendStatus(404);
@@ -271,11 +275,95 @@ app.get("/user/:userId", async (req, res) => {
         username: user.username,
         email: user.email,
         active: user.active,
+        // followers: user.followers.map((follower) => follower.followerId),
+        // following: user.following.map((following) => following.followingId),
+        followers: user.followers,
+        following: user.following
       };
     });
 
     res.status(200).json(result);
   } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+// follow user
+app.post("/user/follow/:followedUserId", async (req, res) => {
+  // userId is following followedUserId
+  // userId is the currently logged in user
+  const { userId } = req.body;
+  const { followedUserId } = req.params;
+
+  // check that the user is not trying to follow themselves
+  // and that the accounts exist
+  if (userId == followedUserId) {
+    console.log("You can't follow yourself dum dum");
+    res.sendStatus(400);
+    return;
+  } else if (userId == null || followedUserId == null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  // check if the user is already following the other user
+  const alreadyFollowing = await prisma.follow.findFirst({
+    // TODO do I need to do this the other way like in the unfollow endpoint?
+    where: {
+      followerId: userId,
+      followingId: parseInt(followedUserId),
+    },
+  });
+  if (alreadyFollowing) {
+    console.log("You are already following this user");
+    res.sendStatus(400);
+    return;
+  }
+
+  // create the new following relationship (adds row to Follow table (which is a join table))
+  try {
+    const result = await prisma.follow.create({
+      data: {
+        followerId: userId,
+        followingId: parseInt(followedUserId),
+      },
+    });
+    console.log("User followed successfully")
+    res.status(201).json(result);
+  } catch (error) {
+    console.log(error)
+    res.sendStatus(400);
+  }
+});
+
+// unfollow user
+app.delete("/user/unfollow/:unfollowedUserId", async (req, res) => {
+  const { userId } = req.body;
+  const { unfollowedUserId } = req.params;
+
+  if (userId == unfollowedUserId) {
+    console.log("You can't unfollow yourself dum dum");
+    res.sendStatus(400);
+    return;
+  }
+  if (userId == null || unfollowedUserId == null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    const result = await prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followerId: userId,
+          followingId: parseInt(unfollowedUserId),
+        },
+      }
+    });
+    console.log("User unfollowed successfully")
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
     res.sendStatus(400);
   }
 });
