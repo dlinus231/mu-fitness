@@ -232,6 +232,54 @@ app.delete("/user/delete", async (req, res) => {
   }
 });
 
+// get all users
+app.get("/users", async (req, res) => {
+  try {
+    let result = await prisma.user.findMany();
+
+    // only keep the fields that we need
+    let parsedResult = result.map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        active: user.active,
+      };
+    })
+
+    res.status(200).json(parsedResult);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+// get user by id
+app.get("/user/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    let result = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+    }).then((user) => {
+      if (user == null) {
+        res.sendStatus(404);
+        return
+      }
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        active: user.active,
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
 // Get all exercise names
 // FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
 app.get(`/exercises/names`, async (req, res) => {
