@@ -368,6 +368,54 @@ app.delete("/user/unfollow/:unfollowedUserId", async (req, res) => {
   }
 });
 
+// get all followers of a user
+app.get("/user/followers/:userId", async (req, res) => {
+  const { userId } = req.params;
+  if (userId == null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    const result = await prisma.follow.findMany({
+      where: {
+        followingId: parseInt(userId),
+      },
+      include: {
+        follower: true,
+      },
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// get all users that a user is following
+app.get("/user/following/:userId", async (req, res) => {
+  const { userId } = req.params;
+  if (userId == null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    const result = await prisma.follow.findMany({
+      where: {
+        followerId: parseInt(userId),
+      },
+      include: {
+        following: true,
+      },
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
 // Get all exercise names
 // FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
 app.get(`/exercises/names`, async (req, res) => {
