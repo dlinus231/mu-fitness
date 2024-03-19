@@ -136,6 +136,12 @@ const PersonalProfileScreen = ({route, navigation, handleAuthChange }) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.button}
+                        onPress={() => navigation.navigate('followersList', { userId: userId })}
+                    >
+                        <Text style={styles.text}>Followers</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
                         onPress={handleAuthChange}
                     >
                         <Text style={styles.text}>Sign Out</Text>

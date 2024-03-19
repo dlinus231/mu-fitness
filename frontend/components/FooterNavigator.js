@@ -11,6 +11,7 @@ import PersonalProfileScreen from './screens/PersonalProfileScreen';
 
 import JournalScreen from './screens/personalProfileTabSreens/JournalScreen';
 import FollowingScreen from './screens/personalProfileTabSreens/FollowingScreen'; 
+import FollowersScreen from './screens/personalProfileTabSreens/FollowersScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -54,6 +55,7 @@ export default function FooterNavigator({ handleAuthChange }) {
       </Tab.Screen>
       <Tab.Screen name="journal" component={JournalScreen} options={{ tabBarButton: () => null}} />
       <Tab.Screen name="followingList" component={FollowingScreen} options={{ tabBarButton: () => null}} />
+      <Tab.Screen name="followersList" component={FollowersScreen} options={{ tabBarButton: () => null}} />
     </Tab.Navigator>
   );
 }
