@@ -159,7 +159,7 @@ app.post("/user/createauth", async (req, res) => {
     var mailOptions = {
       from: "mufitnessnoreply@gmail.com",
       to: user.email,
-      subject: "Mu Fitness App: Validate your emai",
+      subject: "Mu Fitness App: Validate your email",
       html: `
     <p>Dear ${user.username},</p>
     

@@ -2,13 +2,21 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { PrismaClient } = require("@prisma/client");
 
-const filePath = "exercises.csv";
+const filePath = "exercises_final_sorted.csv";
 
 const equipmentMap = new Map([["other", "other equipment"]]);
 const tagIdMap = new Map([]);
 const muscleIdMap = new Map([]);
 
 const prisma = new PrismaClient();
+
+// parses the embedding column into a list of floats
+function parseEmbedding(embeddingString) {
+    return embeddingString
+        .slice(1, -1) // Remove square brackets
+        .split(',')
+        .map(parseFloat); // Parse each value as a float
+}
 
 async function main() {
   try {
@@ -40,11 +48,14 @@ async function main() {
     .on("data", async (row) => {
       const name = row.name;
       const type = row.type;
-      let equipment = row.equipment.toLowerCase();
+      let equipment = row.equipment.toLowerCase() || "none";
       const muscle = row.muscle;
-      const description = row.instructions;
+      const description = row.instructions || "";
       const difficulty = row.difficulty;
       const tags = [];
+      const embedding = parseEmbedding(row.embedding)
+      const video_path = row.video_path || ""; 
+
       if (equipmentMap.has(equipment)) {
         equipment = equipmentMap.get(equipment);
       }
@@ -53,24 +64,20 @@ async function main() {
       }
       tags.push(tagIdMap.get(type));
       const muscleId = muscleIdMap.get(muscle);
-      const data = {
-        name,
-        muscleId,
-        description,
-        tags,
-      };
+
       const result = await prisma.exercise.create({
         data: {
           name,
           difficulty,
           description,
+          video_path, 
+          embedding, 
           muscles: { connect: { id: muscleId } },
           tags: {
             connect: tags.map((tag) => ({
               id: tag,
             })),
           },
-          video_path: "",
         },
       });
       console.log(result);
