@@ -21,7 +21,6 @@ async function main() {
     console.error(error);
     return;
   }
-  //   console.log(muscleIdMap);
 
   try {
     const result = await prisma.tag.findMany();
@@ -33,12 +32,11 @@ async function main() {
     console.error(error);
     return;
   }
-  //   console.log(tagIdMap);
 
   fs.createReadStream(filePath)
     .pipe(csv())
     .on("data", async (row) => {
-      const name = row.name;
+      const name = row.name.toLowerCase();
       const type = row.type;
       let equipment = row.equipment.toLowerCase();
       const muscle = row.muscle;

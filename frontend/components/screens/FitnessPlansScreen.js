@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState } from "react";
+import { StyleSheet } from "react-native";
+import { Text, View } from "@gluestack-ui/themed";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import TopBarMenu from '../TopBarMenu';
-import DirectMessagesScreen from './DirectMessagesScreen';
-import SearchScreen from './SearchScreen';
-import WorkoutPlansScreen from './fitnessPlanTabScreens/WorkoutPlansScreen';
-import FitnessPlansScreenNavigator from '../FitnessPlanScreenNavigator';
+import TopBarMenu from "../TopBarMenu";
+import DirectMessagesScreen from "./DirectMessagesScreen";
+import SearchScreen from "./universalSearchScreens/SearchScreen";
+// import WorkoutPlansScreen from './fitnessPlanTabScreens/WorkoutPlansScreen';
+import FitnessPlansScreenNavigator from "../FitnessPlanScreenNavigator";
 
 const Stack = createNativeStackNavigator();
 
 const FitnessPlansScreen = () => {
   // can have values 'fitnessPlan', 'dms', 'search'
-  const [ curPage, setCurPage ] = useState('fitnessPlan');
+  const [curPage, setCurPage] = useState("fitnessPlan");
 
   const handleSwitchPage = (page) => {
     setCurPage(page);
@@ -21,17 +21,18 @@ const FitnessPlansScreen = () => {
 
   return (
     <>
-      { curPage == 'dms' && <DirectMessagesScreen 
-        onSwitchPage={handleSwitchPage} 
-        rootPage='fitnessPlan'
-      /> }
-      { curPage == 'search' && <SearchScreen 
-        onSwitchPage={handleSwitchPage} 
-        rootPage='fitnessPlan'
-      />}
-      { curPage == 'fitnessPlan' && (
+      {curPage == "dms" && (
+        <DirectMessagesScreen
+          onSwitchPage={handleSwitchPage}
+          rootPage="fitnessPlan"
+        />
+      )}
+      {curPage == "search" && (
+        <SearchScreen onSwitchPage={handleSwitchPage} rootPage="fitnessPlan" />
+      )}
+      {curPage == "fitnessPlan" && (
         <>
-          <TopBarMenu onSwitchPage={handleSwitchPage}/>
+          <TopBarMenu onSwitchPage={handleSwitchPage} />
           {/* <View style={styles.container}>
             <Text>This is the fitness plan screen</Text>
           </View> */}
@@ -43,11 +44,11 @@ const FitnessPlansScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
-  
+
 export default FitnessPlansScreen;
