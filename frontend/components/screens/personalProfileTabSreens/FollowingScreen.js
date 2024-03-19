@@ -1,12 +1,61 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, set } from '@gluestack-ui/themed';
 
-const FollowingScreen = ({navigation}) => {
+import { BACKEND_URL } from "@env";
+
+import axios from 'axios';
+
+const FollowingScreen = ({route, navigation}) => {
+  // userId is the id of the user whose following list we want to display
+  const { userId } = route.params;
+
+  const [followingList, setFollowingList] = useState(null);
+
+  const fetchFollowingList = async () => {
+    const response = await axios.get(BACKEND_URL + `/user/following/${userId}`);
+
+    // only extract the needed information from what is returned
+    const followingList = response.data.map((follow) => {
+      user = follow.following;
+      return {
+        id: user.id,
+        username: user.username,
+      }
+    })
+
+    if (response.status == 200) {
+      console.log("bm - following list: ", followingList);
+    }
+
+    setFollowingList(followingList);
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity onPress={() => navigation.navigate('PersonalProfile', { userId: item.id })}>
+        <Text>{item.username}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  // on first load, we should fetch the user's following list
+  useEffect(() => {
+    fetchFollowingList();
+  }, [userId])
+
   return (
     <View style={styles.container}>
-      <Text>This is the Following screen</Text>
-      <Text style={styles.align}>A list of all of the users that you follow will go here in the future</Text>
+      <Text style={styles.topText}>Accounts you follow: </Text>
+      <View>
+        {followingList && followingList.map((user) => {
+          return (
+            <TouchableOpacity onPress={() => navigation.navigate('PersonalProfile', { userId: user.id })}>
+              <Text key={user.id}>{user.username}</Text>
+            </TouchableOpacity>
+          )
+        })}
+      </View>
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PersonalProfile')}>
@@ -14,6 +63,16 @@ const FollowingScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* <FlatList 
+        data={followingList}
+        renderItem={({item}) => (
+          <TouchableOpacity onPress={() => navigation.navigate('PersonalProfile', { userId: item.id })}>
+            <Text>{item.username}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id.toString()}
+      /> */}
     </View>
   );
 };
@@ -29,6 +88,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: '3%',
     paddingBottom: '10%',
   },
+  topText: {
+    paddingBottom: '10%',
+  },
   buttonContainer: {
     flexDirection: "row",
   },
@@ -40,6 +102,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
+  },
+  flatlist: {
+    maxHeight: 550,
   },
   container: {
     flex: 1,
