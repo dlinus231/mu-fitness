@@ -9,7 +9,7 @@ const JournalScreen = ({navigation}) => {
       <Text style={styles.align}>In the future, there will be a list of workouts you have completed here, as well as stats like calories burned, time spent, heart rate, etc.</Text>
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PersonalProfile')}>
             <Text style={{ color: "white" }}>Go Back</Text>
           </TouchableOpacity>
         </View>

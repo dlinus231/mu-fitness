@@ -9,6 +9,10 @@ import UploadScreen from './screens/UploadScreen';
 import PublicFeedScreen from './screens/PublicFeedScreen';
 import PersonalProfileScreen from './screens/PersonalProfileScreen';
 
+import JournalScreen from './screens/personalProfileTabSreens/JournalScreen';
+import FollowingScreen from './screens/personalProfileTabSreens/FollowingScreen'; 
+import FollowersScreen from './screens/personalProfileTabSreens/FollowersScreen';
+
 const Tab = createBottomTabNavigator();
 
 export default function FooterNavigator({ handleAuthChange }) {
@@ -41,13 +45,17 @@ export default function FooterNavigator({ handleAuthChange }) {
           // <MaterialCommunityIcons name="layers-triple-outline" size={24} color={focused ? 'blue' : 'grey'} />
         ),
       }}/>
-      <Tab.Screen name="PersonalProfile" options={{
+
+      <Tab.Screen name="PersonalProfile" initialParams={{ userId: ""}} options={{
         tabBarIcon: ({ color, size, focused }) => (
           <Ionicons name="person-circle-sharp" size={24} color={focused ? '#6A5ACD' : 'grey'} />
         ),
       }}>
         {props => <PersonalProfileScreen {...props} handleAuthChange={handleAuthChange} />}
       </Tab.Screen>
+      <Tab.Screen name="journal" component={JournalScreen} options={{ tabBarButton: () => null}} />
+      <Tab.Screen name="followingList" component={FollowingScreen} options={{ tabBarButton: () => null}} />
+      <Tab.Screen name="followersList" component={FollowersScreen} options={{ tabBarButton: () => null}} />
     </Tab.Navigator>
   );
 }

@@ -18,6 +18,20 @@ model User {
   active          Boolean @default(false)
   authcode  AuthCode?
 
+  // followers    Follow[] @relation("UserFollowers")
+  // following    Follow[] @relation("UserFollowing")
+
+  followers    Follow[] @relation("UserFollowing")
+  following    Follow[] @relation("UserFollowers")
+}
+
+model Follow {
+  followerId   Int
+  followingId  Int
+  createdAt    DateTime @default(now())
+  follower     User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following    User     @relation("UserFollowing", fields: [followingId], references: [id])
+  @@id([followerId, followingId])
 }
 
 model AuthCode {

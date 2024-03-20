@@ -6,18 +6,18 @@ import { BACKEND_URL } from "@env";
 
 import axios from 'axios';
 
-const FollowingScreen = ({route, navigation}) => {
+const FollowersScreen = ({route, navigation}) => {
   // userId is the id of the user whose following list we want to display
   const { userId } = route.params;
 
-  const [followingList, setFollowingList] = useState(null);
+  const [followerList, setFollowerList] = useState(null);
 
-  const fetchFollowingList = async () => {
-    const response = await axios.get(BACKEND_URL + `/user/following/${userId}`);
+  const fetchFollowerList = async () => {
+    const response = await axios.get(BACKEND_URL + `/user/followers/${userId}`);
 
     // only extract the needed information from what is returned
-    const followingList = response.data.map((follow) => {
-      user = follow.following;
+    const followerListResponse = response.data.map((follow) => {
+      user = follow.follower;
       return {
         id: user.id,
         username: user.username,
@@ -25,10 +25,10 @@ const FollowingScreen = ({route, navigation}) => {
     })
 
     if (response.status == 200) {
-      console.log("bm - following list: ", followingList);
+      console.log("bm - follower list: ", followerListResponse);
     }
 
-    setFollowingList(followingList);
+    setFollowerList(followerListResponse);
   };
 
   const renderItem = ({ item }) => {
@@ -41,14 +41,14 @@ const FollowingScreen = ({route, navigation}) => {
 
   // on first load, we should fetch the user's following list
   useEffect(() => {
-    fetchFollowingList();
+    fetchFollowerList();
   }, [userId])
 
   return (
     <View style={styles.container}>
-      <Text style={styles.topText}>Accounts you follow: </Text>
+      <Text style={styles.topText}>Your followers: </Text>
       <View>
-        {followingList && followingList.map((user) => {
+        {followerList && followerList.map((user) => {
           return (
             <TouchableOpacity key={user.id} onPress={() => navigation.navigate('PersonalProfile', { userId: user.id })}>
               <Text>{user.username}</Text>
@@ -114,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
   
-export default FollowingScreen;
+export default FollowersScreen;
