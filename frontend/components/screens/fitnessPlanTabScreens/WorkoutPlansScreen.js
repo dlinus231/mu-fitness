@@ -6,6 +6,7 @@ import {
   FlatList,
   SafeAreaView,
   DeviceEventEmitter,
+  Alert
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
