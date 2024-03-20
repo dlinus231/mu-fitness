@@ -242,8 +242,8 @@ app.get(`/exercises/names`, async (req, res) => {
         name: true,
       },
     });
-    const first100ExerciseNames = exerciseNames.slice(0, 100);
-    res.status(200).json(first100ExerciseNames);
+    //const first100ExerciseNames = exerciseNames.slice(0, 100);
+    res.status(200).json(exerciseNames);
   } catch (error) {
     console.error("Error fetching exercises:", error);
     res.sendStatus(500);
