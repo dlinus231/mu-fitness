@@ -244,7 +244,7 @@ app.get("/users", async (req, res) => {
         email: user.email,
         active: user.active,
       };
-    })
+    });
 
     res.status(200).json(parsedResult);
   } catch (error) {
@@ -256,30 +256,32 @@ app.get("/users", async (req, res) => {
 app.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
-    let result = await prisma.user.findUnique({
-      where: {
-        id: parseInt(userId),
-      },
-      include: {
-        followers: true,
-        following: true,
-      },
-    }).then((user) => {
-      if (user == null) {
-        res.sendStatus(404);
-        return
-      }
-      return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        active: user.active,
-        // followers: user.followers.map((follower) => follower.followerId),
-        // following: user.following.map((following) => following.followingId),
-        followers: user.followers,
-        following: user.following
-      };
-    });
+    let result = await prisma.user
+      .findUnique({
+        where: {
+          id: parseInt(userId),
+        },
+        include: {
+          followers: true,
+          following: true,
+        },
+      })
+      .then((user) => {
+        if (user == null) {
+          res.sendStatus(404);
+          return;
+        }
+        return {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          active: user.active,
+          // followers: user.followers.map((follower) => follower.followerId),
+          // following: user.following.map((following) => following.followingId),
+          followers: user.followers,
+          following: user.following,
+        };
+      });
 
     res.status(200).json(result);
   } catch (error) {
@@ -327,10 +329,10 @@ app.post("/user/follow/:followedUserId", async (req, res) => {
         followingId: parseInt(followedUserId),
       },
     });
-    console.log("User followed successfully")
+    console.log("User followed successfully");
     res.status(201).json(result);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.sendStatus(400);
   }
 });
@@ -357,9 +359,9 @@ app.delete("/user/unfollow/:unfollowedUserId", async (req, res) => {
           followerId: userId,
           followingId: parseInt(unfollowedUserId),
         },
-      }
+      },
     });
-    console.log("User unfollowed successfully")
+    console.log("User unfollowed successfully");
     res.status(200).json(result);
   } catch (error) {
     console.log(error);
