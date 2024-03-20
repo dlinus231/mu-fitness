@@ -130,8 +130,6 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
       <Text>Repetitions: {routine.repetitions}</Text>
       <Text>Rest: {routine.rest} seconds</Text>
       <Text>Weight: {routine.weight_lbs} lbs</Text>
-      <Text>Video_path: {exercise.video_path}</Text>
-      <Text>Embedding: {exercise.embedding}</Text>
       {/* <Button onPress={_handleEditButtonClick}>
         <ButtonText> Edit </ButtonText>
       </Button>
