@@ -13,10 +13,14 @@ https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relat
 
 ## Loading static data
 
-- Loading static data for exercises, body parts, muscle groups etc in `/backend/src/load_data`
-- run `node muscle_groups.js` in this directory to populate the database with `BodyParts` and `Muscles`
-- run `node tags.js` in this directory to populate the database with `Tags`
-- run `node exercises.js` in this directory to populate the database with `Exercises`
+- Loading static data for exercises, body parts, muscle groups etc in `/backend/src/load_data`. Please make sure to run the scripts in the order: tags.js, muscle_groups.js, and finally, exercises.js
+  - run `node tags.js` in this directory to populate the database with `Tags`
+  - run `node muscle_groups.js` in this directory to populate the database with `BodyParts` and `Muscles`
+  - run `node exercises.js` in this directory to populate the database with `Exercises`
+    * There are 3 new fields for an Exercise, contained within `exercises_final_normalized.csv`
+      1. video_path: used for a YouTube embedding, it is of the format such that: `https://www.youtube.com/watch?v={video_path} `loads a YouTube tutorial for an exercise
+      2. embedding: a 256 normalized vector of floats which encodes semantic meaning of the exercise. The string which was embedded includes the name, type, muscle, equipment, and difficulty of the exercise
+      3. log_search_results: the number of search results an exercise has when looked up on Google, transformed using natural log. This is currently used as a surrogate for popularity of an exercise, but could be used as a weight in "intelligent" recommendations
 
 ## Using the REST API Endpoints
 

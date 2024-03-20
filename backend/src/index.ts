@@ -158,7 +158,7 @@ app.post("/user/createauth", async (req, res) => {
     var mailOptions = {
       from: "mufitnessnoreply@gmail.com",
       to: user.email,
-      subject: "Mu Fitness App: Validate your emai",
+      subject: "Mu Fitness App: Validate your email",
       html: `
     <p>Dear ${user.username},</p>
     
@@ -241,8 +241,8 @@ app.get(`/exercises/names`, async (req, res) => {
         name: true,
       },
     });
-    const first100ExerciseNames = exerciseNames.slice(0, 100);
-    res.status(200).json(first100ExerciseNames);
+    //const first100ExerciseNames = exerciseNames.slice(0, 100);
+    res.status(200).json(exerciseNames);
   } catch (error) {
     console.error("Error fetching exercises:", error);
     res.sendStatus(500);

@@ -63,6 +63,8 @@ model Exercise {
   routines    Routine[]
   muscles     Muscle[]
   tags        Tag[]      @relation("ExerciseToTag")
+  embedding   Float[]
+  log_search_results  Float
 }
 
 model Tag {
