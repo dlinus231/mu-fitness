@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { PrismaClient } = require("@prisma/client");
 
-const filePath = "exercises_final_sorted.csv";
+const filePath = "exercises_final_normalized.csv";
 
 const equipmentMap = new Map([["other", "other equipment"]]);
 const tagIdMap = new Map([]);
@@ -53,8 +53,9 @@ async function main() {
       const description = row.instructions || "";
       const difficulty = row.difficulty;
       const tags = [];
-      const embedding = parseEmbedding(row.embedding)
+      const embedding = parseEmbedding(row.embedding);
       const video_path = row.video_path || ""; 
+      const log_search_results = parseFloat(row.log_search_results); 
 
       if (equipmentMap.has(equipment)) {
         equipment = equipmentMap.get(equipment);
@@ -72,6 +73,7 @@ async function main() {
           description,
           video_path, 
           embedding, 
+          log_search_results, 
           muscles: { connect: { id: muscleId } },
           tags: {
             connect: tags.map((tag) => ({
