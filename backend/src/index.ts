@@ -69,7 +69,7 @@ app.post(`/user/login`, async (req, res) => {
     return;
   }
 
-  // console.log("login request by " + email);
+  console.log("login request by " + email);
 
   try {
     const result = await prisma.user.findUnique({
@@ -147,7 +147,6 @@ app.post("/user/createauth", async (req, res) => {
       });
     }
 
-
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -159,7 +158,7 @@ app.post("/user/createauth", async (req, res) => {
     var mailOptions = {
       from: "mufitnessnoreply@gmail.com",
       to: user.email,
-      subject: "Mu Fitness App: Validate your emai",
+      subject: "Mu Fitness App: Validate your email",
       html: `
     <p>Dear ${user.username},</p>
     
@@ -426,8 +425,8 @@ app.get(`/exercises/names`, async (req, res) => {
         name: true,
       },
     });
-    const first100ExerciseNames = exerciseNames.slice(0, 100);
-    res.status(200).json(first100ExerciseNames);
+    //const first100ExerciseNames = exerciseNames.slice(0, 100);
+    res.status(200).json(exerciseNames);
   } catch (error) {
     console.error("Error fetching exercises:", error);
     res.sendStatus(500);
@@ -547,7 +546,6 @@ app.post(`/workout/routine/add`, async (req, res) => {
 app.patch("/workout/routine/update/:routineId", async (req, res) => {
   const { routineId } = req.params;
 
-
   const { repetitions, rest, weight_lbs } = req.body;
 
   try {
@@ -583,30 +581,6 @@ app.delete("/workout/routine/delete/:routineId", async (req, res) => {
     res.sendStatus(400);
   }
 });
-
-// // create routine
-// app.post(`/routine/create`, async (req, res) => {
-//   const { workoutId, exerciseId, repetitions, rest, weightLbs} = req.body;
-//   // console.log("In routine/create: " + workoutId + " " + exerciseId + " "
-//   //  + repetitions + " " + rest + " " + weightLbs)
-
-//   try {
-//     const result = await prisma.routine.create({
-//       data: {
-//         //exercise_id: exerciseId,
-//         repetitions: repetitions,
-//         rest: rest,
-//         weight_lbs: weightLbs,
-//         workout: { connect: { id: workoutId } },
-//         exercise: { connect: {id: exerciseId} }
-//       },
-//     });
-//     res.status(201).json(result);
-//   } catch (e) {
-//     console.error(e);
-//     res.sendStatus(400);
-//   }
-// });
 
 // update workout plan
 app.post(`/workout/edit`, async (req, res) => {
@@ -662,6 +636,60 @@ app.delete(`/workout/delete/:workoutId`, async (req, res) => {
   } catch (e) {
     console.error(e);
     res.sendStatus(400);
+  }
+});
+
+app.get(`/search/:query`, async (req, res) => {
+  const { query } = req.params;
+  interface Data {
+    exercises: any[];
+    workouts: any[];
+    users: any[];
+  }
+
+  const returnData: Data = {
+    exercises: [],
+    workouts: [],
+    users: [],
+  };
+
+  try {
+    const exerciseResult = await prisma.exercise.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+      take: 5,
+    });
+    returnData.exercises = exerciseResult;
+
+    const workoutResult = await prisma.workout.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+      take: 5,
+    });
+    returnData.workouts = workoutResult;
+
+    const userResult = await prisma.user.findMany({
+      where: {
+        username: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+      take: 5,
+    });
+    returnData.users = userResult;
+
+    res.status(200).json(returnData);
+  } catch (error) {
+    res.sendStatus(404);
   }
 });
 

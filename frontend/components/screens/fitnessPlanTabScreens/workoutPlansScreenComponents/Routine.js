@@ -129,7 +129,7 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
       <Text>{exercise.name}</Text>
       <Text>Repetitions: {routine.repetitions}</Text>
       <Text>Rest: {routine.rest} seconds</Text>
-      <Text>Weight: {routine.weight_lbs}</Text>
+      <Text>Weight: {routine.weight_lbs} lbs</Text>
       {/* <Button onPress={_handleEditButtonClick}>
         <ButtonText> Edit </ButtonText>
       </Button>

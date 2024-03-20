@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect} from 'react';
 import { TouchableOpacity, StyleSheet, SafeAreaView, Text  } from 'react-native';
 import { View, VStack, Button, ButtonText} from '@gluestack-ui/themed';
 import TopBarMenu from '../TopBarMenu';
 
-import DirectMessagesScreen from './DirectMessagesScreen';
-import SearchScreen from './SearchScreen';
+
+import DirectMessagesScreen from "./DirectMessagesScreen";
+import SearchScreen from "./universalSearchScreens/SearchScreen";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
@@ -202,6 +204,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: 'bold',
   }
+
 });
-  
+
 export default PersonalProfileScreen;
