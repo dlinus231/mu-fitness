@@ -448,7 +448,12 @@ app.get(`/exercises/one/:exerciseId`, async (req, res) => {
       where: {
         id: parseInt(exerciseId),
       },
+      include: {
+        tags: true,
+        muscles: true,
+      },
     });
+
     res.status(200).json(result);
   } catch (e) {
     console.error(e);
