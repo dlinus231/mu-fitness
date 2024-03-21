@@ -13,19 +13,8 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.headerContainer,
-          category === "smart search"
-            ? styles.smartSearchContainer
-            : styles.none,
-        ]}
-      >
-        <Text
-          style={
-            category === "smart search" ? styles.smartHeader : styles.header
-          }
-        >
+      <View style={[styles.headerContainer]}>
+        <Text style={styles.header}>
           {category
             .split(" ")
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -92,12 +81,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   header: {
-    color: "#525252",
+    color: "#FFFFFF",
     fontSize: 18,
   },
   headerContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: "#525252",
+    borderBottomColor: "#FFFFFF",
     padding: 3,
     alignSelf: "flex-start",
     marginBottom: 5,
@@ -107,13 +96,6 @@ const styles = StyleSheet.create({
   },
   scroller: {
     marginTop: 5,
-  },
-  smartHeader: {
-    color: "#FFFFFF",
-    fontSize: 18,
-  },
-  smartSearchContainer: {
-    borderBottomColor: "#FFFFFF",
   },
 });
 

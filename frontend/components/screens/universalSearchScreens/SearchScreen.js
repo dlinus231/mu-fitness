@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Keyboard,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../../icons/BackArrowIcon";
@@ -53,12 +54,16 @@ const SearchScreen = ({}) => {
   };
 
   useEffect(() => {
+    Alert.alert(
+      "Try our AI-Powered Smart Search!",
+      "Type in a general search prompt, e.g. 'Ab exercises without equipment'"
+    );
     const interval = setInterval(() => {
       setTimer(timer + 1);
     }, 500);
 
     return () => clearInterval(interval);
-  });
+  }, []);
 
   useEffect(() => {
     setTimeout(async () => {
@@ -264,6 +269,7 @@ const styles = StyleSheet.create({
     minHeight: "100%",
     backgroundColor: "#000000",
     flexDirection: "column",
+    paddingBottom: 100,
   },
   hr: {
     borderBottomColor: "#525252",
@@ -276,7 +282,7 @@ const styles = StyleSheet.create({
     height: 55,
     width: "90%",
     flexWrap: "wrap",
-    color: "#525252",
+    color: "#FFFFFF",
   },
 });
 
