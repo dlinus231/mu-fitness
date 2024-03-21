@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View, set } from '@gluestack-ui/themed';
 
 import { BACKEND_URL } from "@env";
+import { useFocusEffect } from '@react-navigation/native';
 
 import axios from 'axios';
 
@@ -12,7 +13,7 @@ const FollowersScreen = ({route, navigation}) => {
 
   const [followerList, setFollowerList] = useState(null);
 
-  const fetchFollowerList = async () => {
+  const fetchFollowerList = useCallback(async () => {
     const response = await axios.get(BACKEND_URL + `/user/followers/${userId}`);
 
     // only extract the needed information from what is returned
@@ -29,7 +30,7 @@ const FollowersScreen = ({route, navigation}) => {
     }
 
     setFollowerList(followerListResponse);
-  };
+  }, [userId]);
 
   const renderItem = ({ item }) => {
     return (
@@ -40,9 +41,15 @@ const FollowersScreen = ({route, navigation}) => {
   }
 
   // on first load, we should fetch the user's following list
-  useEffect(() => {
-    fetchFollowerList();
-  }, [userId])
+  // useEffect(() => {
+  //   fetchFollowerList();
+  // }, [userId])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchFollowerList();
+    }, [userId])
+  )
 
   return (
     <View style={styles.container}>

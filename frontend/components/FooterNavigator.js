@@ -26,6 +26,7 @@ import WorkoutPlansScreen from "./screens/fitnessPlanTabScreens/WorkoutPlansScre
 import CreateNewWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/CreateNewWorkoutPlanScreen";
 import EditWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/EditWorkoutPlanScreen";
 import IndividualWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
+import UserProfileScreen from "./screens/contentViewScreens/UserProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -189,6 +190,11 @@ export default function FooterNavigator({ handleAuthChange }) {
       <Tab.Screen
         name="IndividualWorkoutScreen"
         component={IndividualWorkoutPlanScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
         options={{ tabBarButton: () => null }}
       />
     </Tab.Navigator>
