@@ -8,23 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import ExerciseScreen from "../contentViewScreens/ExerciseScreen";
-
 const SearchScroller = ({ category, data, handleItemPress }) => {
-  const image = require("/Users/jameswu/git/cse437s/semester-project-group-3/frontend/assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
-
-  // const navigation = useNavigation();
-
-  // const handlePress = (id) => {
-  //   switch (category) {
-  //     case "exercises":
-  //       navigation.navigate("ExerciseScreen", { exercise_id: id });
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-  // };
+  const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
 
   return (
     <View style={styles.container}>
