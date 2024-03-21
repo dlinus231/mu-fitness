@@ -65,7 +65,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       try {
         const uId = await AsyncStorage.getItem("user_id");
         if (uId !== null) {
-          setCurrentUserId(uId);
+          setCurrentUserId(parseInt(uId));
         }
 
         // if userId is not set, we should just set it to the current user

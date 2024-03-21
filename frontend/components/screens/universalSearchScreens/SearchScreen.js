@@ -93,6 +93,11 @@ const SearchScreen = ({}) => {
         }
 
         break;
+      
+      case "users":
+        // console.log("bm - navigating to personal profile from universal search")
+        navigation.navigate("PersonalProfile", { userId: id });
+        break;
 
       default:
         break;
