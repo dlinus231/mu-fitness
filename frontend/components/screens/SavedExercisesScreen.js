@@ -59,24 +59,36 @@ const SavedExercisesScreen = ({ navigation }) => {
           <Text>Loading... </Text>
         ) : (
           <ScrollView>
-            {savedExercises.map((exercise) => (
-              <TouchableOpacity
-                key={exercise.id}
-                style={styles.exerciseContainer}
-                onPress={() => {
-                  handlePress(exercise.id);
-                }}
-              >
-                <Image source={image} style={styles.exerciseImage} />
-                <Text
-                  style={styles.exerciseName}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
+            {savedExercises.length === 0 ? (
+              <Text style={styles.placeholder}>
+                You have not saved any exercises yet. Click the star icon when
+                you search for an exercise to save it.
+              </Text>
+            ) : (
+              savedExercises.map((exercise) => (
+                <TouchableOpacity
+                  key={exercise.id}
+                  style={styles.exerciseContainer}
+                  onPress={() => {
+                    handlePress(exercise.id);
+                  }}
                 >
-                  {exercise.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Image source={image} style={styles.exerciseImage} />
+                  <Text
+                    style={styles.exerciseName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {exercise.name
+                      .split(" ")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
         )}
       </ScrollView>
@@ -89,8 +101,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    // minHeight: "100%",
+    paddingTop: 15,
     paddingBottom: 100,
+    minHeight: "90%",
   },
   exerciseContainer: {
     marginBottom: 16,
@@ -105,6 +118,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  placeholder: {
+    marginTop: "60%",
+    fontSize: 18,
+    paddingHorizontal: 30,
+    textAlign: "center",
+    lineHeight: 30,
   },
 });
 

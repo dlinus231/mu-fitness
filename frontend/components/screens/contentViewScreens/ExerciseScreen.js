@@ -24,31 +24,31 @@ const ExerciseScreen = ({ route, navigation }) => {
   const exercise_id = route.params?.exercise_id;
   const prevPage = route.params?.prevPage;
   const exerciseFrom = route.params?.exerciseFrom;
-  const isFocused = useIsFocused();
+  // const isFocused = useIsFocused();
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
-  const fetchExerciseData = async () => {
-    try {
-      const response = await axios.get(
-        BACKEND_URL + `/exercises/one/${exercise_id}`
-      );
+  // const fetchExerciseData = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       BACKEND_URL + `/exercises/one/${exercise_id}`
+  //     );
 
-      await setExerciseData(response.data);
-      const savedResponse = await axios.get(
-        BACKEND_URL +
-          `/exercises/saved/${await AsyncStorage.getItem("user_id")}/${
-            exerciseData.id
-          }`
-      );
-      setSaved(savedResponse.data.saved);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     await setExerciseData(response.data);
+  //     const savedResponse = await axios.get(
+  //       BACKEND_URL +
+  //         `/exercises/saved/${await AsyncStorage.getItem("user_id")}/${
+  //           exerciseData.id
+  //         }`
+  //     );
+  //     setSaved(savedResponse.data.saved);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const handleSave = async () => {
     try {
@@ -72,6 +72,7 @@ const ExerciseScreen = ({ route, navigation }) => {
   const initializeData = async () => {
     const exerciseDataTemp = route.params.exerciseData;
     setExerciseData(exerciseDataTemp);
+    console.log(exerciseDataTemp);
 
     try {
       const savedResponse = await axios.get(
@@ -121,7 +122,10 @@ const ExerciseScreen = ({ route, navigation }) => {
         <View>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
-              {exerciseData.name.replace(/^\w/, (c) => c.toUpperCase())}
+              {exerciseData.name
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
             </Text>
             <TouchableOpacity onPress={handleSave}>
               <View style={styles.star}>
@@ -140,6 +144,43 @@ const ExerciseScreen = ({ route, navigation }) => {
             onChangeState={onStateChange}
           />
 
+          <ScrollView contentContainerStyle={styles.horizontalScroll}>
+            {exerciseData.muscles.map((muscle) => {
+              return (
+                <TouchableOpacity
+                  key={muscle.id}
+                  style={[styles.bubble, styles.muscleGroup]}
+                >
+                  <Text>
+                    {muscle.name
+                      .split("_")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            {exerciseData.tags.map((tag) => {
+              return (
+                <TouchableOpacity
+                  key={tag.id}
+                  style={[styles.bubble, styles.tag]}
+                >
+                  <Text>
+                    {tag.name
+                      .split("_")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
           <Text>
             Difficulty:{" "}
             {exerciseData.difficulty.replace(/^\w/, (c) => c.toUpperCase())}
@@ -152,7 +193,7 @@ const ExerciseScreen = ({ route, navigation }) => {
           </Text>
           <Text>
             Equipment Needed:{" "}
-            {exerciseData.equipment
+            {exerciseData.equipment && exerciseData.equipment != "body_only"
               ? exerciseData.equipment.replace(/^\w/, (c) => c.toUpperCase())
               : "None"}
           </Text>
@@ -181,6 +222,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  bubble: {
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
   container: {
     paddingHorizontal: "5%",
     paddingVertical: "13%",
@@ -188,10 +234,22 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
   },
+  horizontalScroll: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: 10,
+    flexGrow: 0,
+    marginBottom: 10,
+  },
   instructions: {
     padding: 5,
     marginTop: 10,
     backgroundColor: "#E0F7FA",
+  },
+  muscleGroup: {
+    backgroundColor: "#ADD8E6",
   },
   star: {
     width: 24,
@@ -199,6 +257,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginLeft: 5,
     backgroundColor: "transparent",
+  },
+  tag: {
+    backgroundColor: "#FFFACD",
   },
   title: {
     fontSize: 24,
@@ -212,6 +273,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   toggleButtonText: {
+    marginTop: 3,
+    marginBottom: 5,
     fontSize: 12,
     color: "#555555",
   },
