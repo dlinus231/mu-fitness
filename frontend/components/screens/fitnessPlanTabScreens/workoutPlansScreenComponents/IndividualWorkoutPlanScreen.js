@@ -252,10 +252,11 @@ const IndividualWorkoutPlanScreen = ({
       <ScrollView style={styles.content}>
         {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
         <TouchableOpacity
-          style={styles.chevron}
+          style={[styles.chevron, { flexDirection: 'row', alignItems: 'center' }]}
           onPress={onLeaveWorkoutPlanPage}
         >
           <BackArrowIcon></BackArrowIcon>
+          <Text> Back to your Workout Plans</Text>
         </TouchableOpacity>
         {loading ? (
           <Text>Loading...</Text>
