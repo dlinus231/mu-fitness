@@ -457,7 +457,6 @@ app.get(`/exercises/one/:exerciseId`, async (req, res) => {
 
 app.get(`/exercises/saved/:userId/:exerciseId`, async (req, res) => {
   const { userId, exerciseId } = req.params;
-
   try {
     const result = await prisma.userSavedExercises.findMany({
       where: { userId: parseInt(userId), exerciseId: parseInt(exerciseId) },

@@ -10,10 +10,9 @@ import {
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import YoutubePlayer from "react-native-youtube-iframe";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, CommonActions } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { ScrollView } from "@gluestack-ui/themed";
 import BackArrowIcon from "../../icons/BackArrowIcon";
 
 const ExerciseScreen = ({ route, navigation }) => {
@@ -34,7 +33,6 @@ const ExerciseScreen = ({ route, navigation }) => {
       const response = await axios.get(
         BACKEND_URL + `/exercises/one/${exercise_id}`
       );
-      // console.log(response.data);
 
       await setExerciseData(response.data);
       const savedResponse = await axios.get(
@@ -45,7 +43,9 @@ const ExerciseScreen = ({ route, navigation }) => {
       );
       setSaved(savedResponse.data.saved);
       setLoading(false);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSave = async () => {
@@ -67,10 +67,27 @@ const ExerciseScreen = ({ route, navigation }) => {
     }
   };
 
+  const initializeData = async () => {
+    const exerciseDataTemp = route.params.exerciseData;
+    setExerciseData(exerciseDataTemp);
+
+    try {
+      const savedResponse = await axios.get(
+        BACKEND_URL +
+          `/exercises/saved/${await AsyncStorage.getItem("user_id")}/${
+            exerciseDataTemp.id
+          }`
+      );
+      setSaved(savedResponse.data.saved);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    setLoading(true);
-    fetchExerciseData();
-  }, [isFocused]);
+    initializeData();
+  });
 
   //video player stuff
   const [playing, setPlaying] = useState(false);
@@ -85,7 +102,14 @@ const ExerciseScreen = ({ route, navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity
         style={styles.backArrow}
-        onPress={() => navigation.navigate("search")}
+        onPress={() => {
+          navigation.dispatch(
+            CommonActions.navigate({
+              name: "search",
+              params: {},
+            })
+          );
+        }}
       >
         <BackArrowIcon></BackArrowIcon>
       </TouchableOpacity>

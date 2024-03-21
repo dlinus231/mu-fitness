@@ -12,14 +12,13 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 import SearchScroller from "./SearchScroller";
 import SearchFilterBubble from "./SearchFilterBubble";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 // import { getYoutubeMeta } from "react-native-youtube-iframe";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-const SearchScreen = ({
-  onSwitchPage, // callback function
-  rootPage, // string
-}) => {
+const SearchScreen = ({}) => {
   const navigation = useNavigation();
   const route = useRoute();
   const prevPage = route.params?.prevPage;
@@ -75,10 +74,26 @@ const SearchScreen = ({
   }, [timer]);
 
   //Handles items that are on and navigated to, category is passed in from this screen to each searchscroller
-  const handleItemPress = (category, id) => {
+  const handleItemPress = async (category, id) => {
+    console.log(id);
     switch (category) {
       case "exercises":
-        navigation.navigate("ExerciseScreen", { exercise_id: id });
+        try {
+          const response = await axios.get(
+            BACKEND_URL + `/exercises/one/${id}`
+          );
+
+          const exerciseData = response.data;
+
+          navigation.navigate("ExerciseScreen", {
+            exerciseData: exerciseData,
+          });
+        } catch (error) {
+          console.error(error);
+        }
+
+        // navigation.navigate("ExerciseScreen", { exercise_id: id });
+
         break;
 
       default:
