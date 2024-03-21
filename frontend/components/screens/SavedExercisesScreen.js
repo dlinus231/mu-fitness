@@ -1,0 +1,111 @@
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  View,
+  ScrollView,
+  Image,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import TopBarMenu from "../TopBarMenu";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+
+const SavedExercisesScreen = ({ navigation }) => {
+  const image = require("../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+
+  const [loading, setLoading] = useState(true);
+  const [savedExercises, setSavedExercises] = useState([]);
+
+  const loadSavedExercises = async () => {
+    try {
+      const response = await axios.get(
+        BACKEND_URL +
+          `/exercises/saved/${await AsyncStorage.getItem("user_id")}`
+      );
+      setSavedExercises(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSwitchPage = (page) => {
+    navigation.navigate(page, { prevPage: "SavedExercises" });
+  };
+
+  const handlePress = async (id) => {
+    const response = await axios.get(BACKEND_URL + `/exercises/one/${id}`);
+    navigation.navigate("ExerciseScreen", {
+      exerciseData: response.data,
+      prevPage: null,
+      exerciseFrom: "SavedExercises",
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedExercises();
+    }, [])
+  );
+
+  return (
+    <View>
+      <TopBarMenu onSwitchPage={handleSwitchPage} />
+      <ScrollView contentContainerStyle={styles.container}>
+        {loading ? (
+          <Text>Loading... </Text>
+        ) : (
+          <ScrollView>
+            {savedExercises.map((exercise) => (
+              <TouchableOpacity
+                key={exercise.id}
+                style={styles.exerciseContainer}
+                onPress={() => {
+                  handlePress(exercise.id);
+                }}
+              >
+                <Image source={image} style={styles.exerciseImage} />
+                <Text
+                  style={styles.exerciseName}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {exercise.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    // minHeight: "100%",
+    paddingBottom: 100,
+  },
+  exerciseContainer: {
+    marginBottom: 16,
+  },
+  exerciseImage: {
+    width: 300,
+    height: 175,
+    borderRadius: 10,
+  },
+  exerciseName: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});
+
+export default SavedExercisesScreen;

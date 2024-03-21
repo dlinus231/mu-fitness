@@ -22,6 +22,8 @@ const ExerciseScreen = ({ route, navigation }) => {
   const [saved, setSaved] = useState(false);
 
   const exercise_id = route.params?.exercise_id;
+  const prevPage = route.params?.prevPage;
+  const exerciseFrom = route.params?.exerciseFrom;
   const isFocused = useIsFocused();
 
   const toggleExpanded = () => {
@@ -105,8 +107,8 @@ const ExerciseScreen = ({ route, navigation }) => {
         onPress={() => {
           navigation.dispatch(
             CommonActions.navigate({
-              name: "search",
-              params: {},
+              name: exerciseFrom,
+              params: { prevPage: prevPage },
             })
           );
         }}

@@ -21,6 +21,8 @@ import FollowersScreen from "./screens/personalProfileTabSreens/FollowersScreen"
 import ExerciseScreen from "./screens/contentViewScreens/ExerciseScreen";
 import SearchScreen from "./screens/universalSearchScreens/SearchScreen";
 import DirectMessagesScreen from "./screens/DirectMessagesScreen";
+import SavedExercisesScreen from "./screens/SavedExercisesScreen";
+import WorkoutPlansScreen from "./screens/fitnessPlanTabScreens/WorkoutPlansScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -51,9 +53,23 @@ export default function FooterNavigator({ handleAuthChange }) {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="FitnessPlans"
         component={FitnessPlansScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons
+              name="weight-lifter"
+              size={24}
+              color={focused ? "#6A5ACD" : "grey"}
+            />
+          ),
+        }}
+      /> */}
+      {/* Changed to only display workout plans */}
+      <Tab.Screen
+        name="FitnessPlans"
+        component={WorkoutPlansScreen}
         options={{
           tabBarIcon: ({ focused }) => (
             <MaterialCommunityIcons
@@ -77,9 +93,24 @@ export default function FooterNavigator({ handleAuthChange }) {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="PublicFeed"
         component={PublicFeedScreen}
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <SimpleLineIcons
+              name="layers"
+              size={24}
+              color={focused ? "#6A5ACD" : "grey"}
+            />
+            // <MaterialCommunityIcons name="layers-triple-outline" size={24} color={focused ? 'blue' : 'grey'} />
+          ),
+        }}
+      /> */}
+      {/* Changed to display saved exercises */}
+      <Tab.Screen
+        name="SavedExercises"
+        component={SavedExercisesScreen}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
             <SimpleLineIcons

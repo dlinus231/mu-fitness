@@ -435,6 +435,7 @@ app.get(`/exercises/names`, async (req, res) => {
   }
 });
 
+//Get one exercise by ID
 app.get(`/exercises/one/:exerciseId`, async (req, res) => {
   const { exerciseId } = req.params;
 
@@ -455,6 +456,7 @@ app.get(`/exercises/one/:exerciseId`, async (req, res) => {
   }
 });
 
+//Check if one exercise is saved by one user
 app.get(`/exercises/saved/:userId/:exerciseId`, async (req, res) => {
   const { userId, exerciseId } = req.params;
   try {
@@ -467,6 +469,41 @@ app.get(`/exercises/saved/:userId/:exerciseId`, async (req, res) => {
       res.status(200).json({ saved: true });
     }
   } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+//Get name and id for all saved exercises for a single user
+app.get(`/exercises/saved/:userId`, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    let returnData: any[] = [];
+    const result = await prisma.userSavedExercises.findMany({
+      where: { userId: parseInt(userId) },
+      orderBy: {
+        saved: "desc",
+      },
+      select: {
+        exerciseId: true,
+      },
+    });
+
+    const exerciseResult = await Promise.all(
+      result.map((item) =>
+        prisma.exercise.findUnique({
+          where: { id: item.exerciseId },
+          select: {
+            id: true,
+            name: true,
+          },
+        })
+      )
+    );
+
+    res.status(200).json(exerciseResult);
+  } catch (error) {
+    console.error(error);
     res.sendStatus(400);
   }
 });

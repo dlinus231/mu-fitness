@@ -12,7 +12,7 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 import SearchScroller from "./SearchScroller";
 import SearchFilterBubble from "./SearchFilterBubble";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import { getYoutubeMeta } from "react-native-youtube-iframe";
 
@@ -73,26 +73,24 @@ const SearchScreen = ({}) => {
     }, 0);
   }, [timer]);
 
-  //Handles items that are on and navigated to, category is passed in from this screen to each searchscroller
+  //Handles items that are pressed and navigated to, category is passed in from this screen to each searchscroller
   const handleItemPress = async (category, id) => {
-    console.log(id);
     switch (category) {
       case "exercises":
         try {
           const response = await axios.get(
             BACKEND_URL + `/exercises/one/${id}`
           );
-
           const exerciseData = response.data;
 
           navigation.navigate("ExerciseScreen", {
             exerciseData: exerciseData,
+            prevPage: prevPage,
+            exerciseFrom: "search",
           });
         } catch (error) {
           console.error(error);
         }
-
-        // navigation.navigate("ExerciseScreen", { exercise_id: id });
 
         break;
 
@@ -106,7 +104,17 @@ const SearchScreen = ({}) => {
       <View style={styles.topContent}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate(prevPage)}
+          onPress={() => {
+            setSearchBar("");
+            setSearchData({
+              exercises: [],
+              workouts: [],
+              users: [],
+            });
+            setFocus("");
+            prevSearch.current = "";
+            navigation.navigate(prevPage);
+          }}
         >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
