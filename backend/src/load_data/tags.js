@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { PrismaClient } = require("@prisma/client");
 
-const filePath = "exercises.csv";
+const filePath = "exercises_final_normalized.csv";
 
 const distinctTags = [];
 const equipmentMap = new Map([["other", "other equipment"]]);
