@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TouchableOpacity, StyleSheet, SafeAreaView, Text } from "react-native";
-import { View, VStack, Button, ButtonText } from "@gluestack-ui/themed";
+import { View, VStack, Button, ButtonText, set } from "@gluestack-ui/themed";
 // import TopBarMenu from "../TopBarMenu";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,12 +26,38 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  // if logged in user is looking at own profile, this has no effect (since userId is set to currentUserId)
+  // if logged in user is looking at another user's profile, this will be set based on whether they follow them or not
+  const [isFollowing, setIsFollowing] = useState(false);
+
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
     if (userIdFromRoute) {
       setUserId(userIdFromRoute);
     }
   }, [userIdFromRoute]);
+
+  // TODO may need to put this behind loading screen?
+  useEffect(() => {
+    console.log("bm - entered follow status useeffect")
+    console.log(currentUserId && userId && currentUserId !== userId)
+    const checkFollowStatus = async () => {
+      if (currentUserId && userId && currentUserId !== userId) {
+        try {
+          const response = await axios.get(BACKEND_URL + `/user/follows/${currentUserId}/${userId}`);
+          setIsFollowing(response.data.follows);
+          console.log("bm - follow status: ", response.data.follows);
+        } catch (error) {
+          console.error("bm - error checking follow status: ", error);
+        }
+      } else {
+        setIsFollowing(false);
+      }
+    };
+  
+    checkFollowStatus();
+  }, [userId, currentUserId]);
+  
 
   // fetch currently logged in user on iniital load
   useEffect(() => {
@@ -53,14 +79,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     getCurrentUserId();
   }, []);
 
-  // TODO set this to be loading if the userId is not set
-  useEffect(() => {
-    console.log("bm - setIsLoading useEffect reached");
-    if (currentUserId !== "" && userData !== null && userId) {
-      setIsLoading(false);
-    }
-  }, [userId, currentUserId, userData]);
-
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
     console.log("bm - fetching user data useEffect reached");
@@ -69,6 +87,13 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       fetchUserData();
     }
   }, [userId]);
+
+  useEffect(() => {
+    console.log("bm - setIsLoading useEffect reached");
+    if (currentUserId !== "" && userData !== null && userId) {
+      setIsLoading(false);
+    }
+  }, [userId, currentUserId, userData]);
 
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
@@ -79,6 +104,34 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       console.log("bm - set user data: ", response.data);
     } catch (e) {
       console.log("bm - error fetching user data: ", e);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const response = await axios.post(BACKEND_URL + `/user/follow/${userId}`, {
+        userId: parseInt(currentUserId),
+      });
+      console.log("bm - response from handleFollow: ", response.data);
+      setIsFollowing(true);
+    } catch (e) {
+      console.log("bm - error following user: ", e);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    console.log("bm - handleUnfollow reached");
+    console.log("bm - currentUserId: ", currentUserId);
+    try {
+      const response = await axios.post(BACKEND_URL + `/user/unfollow/${userId}`, {
+        userId: parseInt(currentUserId),
+      });
+      console.log("bm - response from handleUnfollow: ", response.data);
+
+      // now need to update the isFollowing state
+      setIsFollowing(false);
+    } catch (e) {
+      console.log("bm - error unfollowing user: ", e);
     }
   };
 
@@ -133,24 +186,64 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
                 <Text style={styles.text}>Sign Out</Text>
               </TouchableOpacity>
 
+              { (currentUserId !== userId) && (isFollowing ? (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleUnfollow}
+                >
+                  <Text style={styles.text}>Unfollow</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleFollow}
+                >
+                  <Text style={styles.text}>Follow</Text>
+                </TouchableOpacity>
+              )) }
+
               {/* <TouchableOpacity
                 style={styles.button}
                 onPress={() => navigation.navigate("FitnessPlans", {workout_id: 1})}
               >
                 <Text style={styles.text}>Debugging Test Button!</Text>
               </TouchableOpacity> */}
+
+              {/* <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate("PersonalProfile", {user_id: 1})}
+              >
+                <Text style={styles.text}>Debugging Test Button2!</Text>
+              </TouchableOpacity> */}
             </>
           ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                navigation.navigate("PersonalProfile", {
-                  userId: currentUserId,
-                })
-              }
-            >
-              <Text style={styles.text}>Back to your profile</Text>
-            </TouchableOpacity>
+            <>
+              {(isFollowing ? (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleUnfollow}
+                >
+                  <Text style={styles.text}>Unfollow</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleFollow}
+                >
+                  <Text style={styles.text}>Follow</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  navigation.navigate("PersonalProfile", {
+                    userId: currentUserId,
+                  })
+                }
+              >
+                <Text style={styles.text}>Back to your profile</Text>
+              </TouchableOpacity>
+            </>
           )}
         </VStack>
       </SafeAreaView>

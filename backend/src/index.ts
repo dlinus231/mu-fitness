@@ -338,9 +338,13 @@ app.post("/user/follow/:followedUserId", async (req, res) => {
 });
 
 // unfollow user
-app.delete("/user/unfollow/:unfollowedUserId", async (req, res) => {
+app.post("/user/unfollow/:unfollowedUserId", async (req, res) => {
   const { userId } = req.body;
   const { unfollowedUserId } = req.params;
+
+  console.log("entering unfollow endpoint")
+  console.log("userId: ", userId);
+  console.log("unfollowedUserId: ", unfollowedUserId)
 
   if (userId == unfollowedUserId) {
     console.log("You can't unfollow yourself dum dum");
@@ -365,6 +369,32 @@ app.delete("/user/unfollow/:unfollowedUserId", async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     console.log(error);
+    res.sendStatus(400);
+  }
+});
+
+// check if userId follows userIdToCheck
+app.get("/user/follows/:userId/:userIdToCheck", async (req, res) => {
+  const { userId, userIdToCheck } = req.params;
+  if (userId == null || userIdToCheck == null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    const result = await prisma.follow.findFirst({
+      where: {
+        followerId: parseInt(userId),
+        followingId: parseInt(userIdToCheck),
+      },
+    });
+    if (result) {
+      res.status(200).json({ follows: true });
+    } else {
+      res.status(200).json({ follows: false });
+    }
+  } catch (error) {
+    console.error(error);
     res.sendStatus(400);
   }
 });
