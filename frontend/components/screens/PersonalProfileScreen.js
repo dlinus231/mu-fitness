@@ -132,6 +132,13 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
               >
                 <Text style={styles.text}>Sign Out</Text>
               </TouchableOpacity>
+
+              {/* <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate("FitnessPlans", {workout_id: 1})}
+              >
+                <Text style={styles.text}>Debugging Test Button!</Text>
+              </TouchableOpacity> */}
             </>
           ) : (
             <TouchableOpacity
