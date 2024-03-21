@@ -18,7 +18,7 @@ import IndividualWorkoutPlanScreen from "./workoutPlansScreenComponents/Individu
 // import BackArrowIcon from "../../icons/BackArrowIcon";
 import TopBarMenu from "../../TopBarMenu";
 
-const WorkoutPlansScreen = ({ navigation }) => {
+const WorkoutPlansScreen = ({ route, navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [created, setCreated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -26,11 +26,22 @@ const WorkoutPlansScreen = ({ navigation }) => {
   // TODO set this to be back to null when the user clicks back on individual workout plan page
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
 
+  const workoutPlanIdFromRoute = route.params?.workout_id;
+  // console.log("bm - WorkoutPlansScreen workoutPlanIdFromRoute: ", workoutPlanIdFromRoute);
+
+  useEffect(() => {
+    if (workoutPlanIdFromRoute) {
+      setSelectedWorkoutPlanId(workoutPlanIdFromRoute);
+    }
+  }, [workoutPlanIdFromRoute]);
+
   const onEnterWorkoutPlanPage = (id) => {
+    // console.log("bm - onEnterWorkoutPlanPage called with id: ", id);
     setSelectedWorkoutPlanId(id);
   };
 
   const onLeaveWorkoutPlanPage = () => {
+    navigation.navigate("FitnessPlans");
     setSelectedWorkoutPlanId(null);
     fetchWorkoutPlans();
   };

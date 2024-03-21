@@ -41,9 +41,6 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
 
   //callback function when button is pressed, makes call to API and handles response
   const handleCreateWorkout = async () => {
-    console.log(
-      "bm - entering handle create workout function, about to make request"
-    );
     try {
       const userId = await AsyncStorage.getItem("user_id");
       const response = await axios.post(BACKEND_URL + "/workout/create", {
@@ -59,7 +56,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         Alert.alert("Workout created successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("WorkoutPlans"),
+            onPress: () => navigation.navigate("FitnessPlans"),
           },
         ]);
       }

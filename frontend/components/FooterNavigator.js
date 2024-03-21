@@ -23,6 +23,8 @@ import SearchScreen from "./screens/universalSearchScreens/SearchScreen";
 import DirectMessagesScreen from "./screens/DirectMessagesScreen";
 import SavedExercisesScreen from "./screens/SavedExercisesScreen";
 import WorkoutPlansScreen from "./screens/fitnessPlanTabScreens/WorkoutPlansScreen";
+import CreateNewWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/CreateNewWorkoutPlanScreen";
+import EditWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/EditWorkoutPlanScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -172,6 +174,16 @@ export default function FooterNavigator({ handleAuthChange }) {
         name="dms"
         component={DirectMessagesScreen}
         options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="CreateNewWorkoutPlan"
+        component={CreateNewWorkoutPlanScreen}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen 
+        name="EditWorkoutPlan" 
+        component={EditWorkoutPlanScreen}
+        options={{ tabBarButton: () => null }} 
       />
     </Tab.Navigator>
   );

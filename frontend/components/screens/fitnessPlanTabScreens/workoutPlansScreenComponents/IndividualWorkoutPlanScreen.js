@@ -26,6 +26,8 @@ import {
   MultipleSelectList,
 } from "react-native-dropdown-select-list";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const IndividualWorkoutPlanScreen = ({
   navigation,
   onLeaveWorkoutPlanPage,
@@ -43,9 +45,34 @@ const IndividualWorkoutPlanScreen = ({
   const [weight, setWeight] = useState(0);
   // const [updatingRoutineState, setUpdateRoutineState] = useState({});
 
+  // we will use this to check if the workout belongs to the current user
+  const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
+  const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
+
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
   });
+
+  // check if the workout belongs to the current user (compare to AsyncStorage user_id)
+  useEffect(() => {
+    const checkIfOwnedByCurrentUser = async () => {
+      if (workoutOwnerId == -1) return; // don't run if workoutOwnerId hasn't been populated yet
+      try {
+        const uId = await AsyncStorage.getItem("user_id");
+        if (uId !== null) {
+          if (uId == workoutOwnerId) {
+            // console.log("bm - setting isOwnedByCurrentUser to true because user_id matches workoutOwnerId");
+            // console.log("bm - uId: ", uId);
+            // console.log("bm - workoutOwnerId: ", workoutOwnerId);
+            setIsOwnedByCurrentUser(true);
+          }
+        }
+      } catch (e) {
+        console.log("bm - error getting user id: ", e);
+      }
+    };
+    checkIfOwnedByCurrentUser();
+  }, [workoutOwnerId])
 
   const fetchWorkout = async () => {
     try {
@@ -55,6 +82,7 @@ const IndividualWorkoutPlanScreen = ({
       );
       setWorkout(result.data);
       setRoutines(result.data.routines);
+      setWorkoutOwnerId(result.data.user_id);
       setLoading(false);
     } catch (error) {
       if (error.response) {
@@ -237,23 +265,28 @@ const IndividualWorkoutPlanScreen = ({
               <Text style={styles.titleText}>{workout.name}</Text>
               <Text style={styles.subTitleText}>{workout.difficulty} difficulty</Text>
               <Text style={styles.notesText}>Notes: {workout.description}</Text>
-              <View style={styles.topButtonContainer}>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={handleEditWorkout}
-                >
-                  <Text style={{ color: "white" }}>  Edit Plan  </Text>
-                </TouchableOpacity>
-              </View>
+              { isOwnedByCurrentUser && (
+                <View style={styles.topButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={handleEditWorkout}
+                  >
+                    <Text style={{ color: "white" }}>  Edit Plan  </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
               <Text style={styles.exercisesText}>Exercises</Text>
 
               <View>
-                {routines.length === 0 && (
+                {routines.length === 0 && ( isOwnedByCurrentUser ? (
                   <>
                     <Text style={styles.no_exercises_text}>You haven't added any exercises to this workout yet.</Text>
                     <Text style={styles.no_exercises_text}>Add a set by clicking the button below.</Text>
                   </>
-                )}
+                ) : (
+                  <Text style={styles.no_exercises_text}>This workout plan does not have any exercises yet.</Text>
+                ))}
               </View>
               
               <View>
@@ -327,7 +360,7 @@ const IndividualWorkoutPlanScreen = ({
                     ></Button>
                   </View>
                 </View>
-              ) : (
+              ) : ( isOwnedByCurrentUser && (
                 <TouchableOpacity
                   style={styles.addNewButton}
                   onPress={() => {
@@ -337,12 +370,12 @@ const IndividualWorkoutPlanScreen = ({
                   <MaterialIcons name="post-add" size={48} color="black" />
                   <Text>Add an exercise</Text>
                 </TouchableOpacity>
-              )}
+              ))}
             </View>
 
             {addingWorkout ? (
               <></>
-            ) : (
+            ) : ( isOwnedByCurrentUser && (
               <View style={styles.bottomContent}>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
@@ -355,7 +388,7 @@ const IndividualWorkoutPlanScreen = ({
                   {/* <View style={{ width: 20 }}></View> */}
                 </View>
               </View>
-            )}
+            ))}
           </>
         )}
         {/* </KeyboardAvoidingView> */}
