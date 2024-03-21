@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csv-parser");
 const { PrismaClient } = require("@prisma/client");
 
-const filePath = "exercises.csv";
+const filePath = "exercises_final_normalized.csv";
 
 const distinctMuscles = [];
 const bodyParts = ["core", "legs", "arms", "chest", "back", "neck"];
@@ -30,16 +30,11 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
-    bodyParts.forEach(async (name) => {
-      const result = await prisma.bodyPart.create({ data: { name } });
-      console.log(result);
+    const promises = bodyParts.map((name) => {
+      return prisma.bodyPart.create({ data: { name } });
     });
-  } catch (error) {
-    console.error(error);
-    return;
-  }
+    await Promise.all(promises);
 
-  try {
     const result = await prisma.bodyPart.findMany();
 
     result.forEach((bodyPart) => {
