@@ -1,8 +1,15 @@
 import React from "react";
-import { View, ScrollView, Text, Image, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
-const SearchScroller = ({ category, data }) => {
-  const image = require("/Users/jameswu/git/cse437s/semester-project-group-3/frontend/assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+const SearchScroller = ({ category, data, handleItemPress }) => {
+  const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
 
   return (
     <View style={styles.container}>
@@ -17,14 +24,20 @@ const SearchScroller = ({ category, data }) => {
         >
           {data.map((item) => (
             <View key={item["id"]} style={styles.imageContainer}>
-              <Image source={image} style={styles.image} />
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={styles.caption}
+              <TouchableOpacity
+                onPress={() => {
+                  handleItemPress(category, item["id"]);
+                }}
               >
-                {item.name ? item.name : item.username}
-              </Text>
+                <Image source={image} style={styles.image} />
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={styles.caption}
+                >
+                  {item.name ? item.name : item.username}
+                </Text>
+              </TouchableOpacity>
             </View>
           ))}
         </ScrollView>

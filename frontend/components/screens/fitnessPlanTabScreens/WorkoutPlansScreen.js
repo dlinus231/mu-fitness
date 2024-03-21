@@ -6,7 +6,7 @@ import {
   FlatList,
   SafeAreaView,
   DeviceEventEmitter,
-  Alert
+  Alert,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -15,7 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import WorkoutPlan from "./workoutPlansScreenComponents/WorkoutPlan";
 import IndividualWorkoutPlanScreen from "./workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
-import BackArrowIcon from "../../icons/BackArrowIcon";
+// import BackArrowIcon from "../../icons/BackArrowIcon";
+import TopBarMenu from "../../TopBarMenu";
 
 const WorkoutPlansScreen = ({ navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
@@ -85,11 +86,15 @@ const WorkoutPlansScreen = ({ navigation }) => {
     fetchWorkoutPlans();
   }, [created]);
 
+  const handleSwitchPage = (page) => {
+    navigation.navigate(page, { prevPage: "FitnessPlans" });
+  };
+
   // render the infinite scroll list unless the user has clicked a workout plan
   // then render individual page for that workout plan until they click back
 
   return (
-    <SafeAreaView>
+    <View>
       {selectedWorkoutPlanId !== null ? (
         <IndividualWorkoutPlanScreen
           onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
@@ -98,9 +103,10 @@ const WorkoutPlansScreen = ({ navigation }) => {
         />
       ) : (
         <>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          {/* <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackArrowIcon></BackArrowIcon>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <TopBarMenu onSwitchPage={handleSwitchPage} />
           <Text style={styles.text}>Your Workout Plans</Text>
 
           <TouchableOpacity
@@ -130,10 +136,12 @@ const WorkoutPlansScreen = ({ navigation }) => {
                 You currently have no workout plans.
               </Text>
               <Text style={styles.space}>
-                Workout plans are lists of exercises (sets) that you can create and track your progress with.
+                Workout plans are lists of exercises (sets) that you can create
+                and track your progress with.
               </Text>
               <Text style={styles.space}>
-                You can also share your workout plans with others, or use workout plans that others have shared with you.
+                You can also share your workout plans with others, or use
+                workout plans that others have shared with you.
               </Text>
               <Text style={styles.space}>
                 Click the button to create your first one!
@@ -142,7 +150,7 @@ const WorkoutPlansScreen = ({ navigation }) => {
           )}
         </>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -161,8 +169,8 @@ const styles = StyleSheet.create({
   },
   space: {
     marginTop: 20,
-    paddingHorizontal: '10%',
-    textAlign: 'center',
+    paddingHorizontal: "10%",
+    textAlign: "center",
   },
   flatlist: {
     maxHeight: 550, //Todo - make responsive for diff screen sizes
@@ -172,7 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "black",
-  }
+  },
 });
 
 export default WorkoutPlansScreen;

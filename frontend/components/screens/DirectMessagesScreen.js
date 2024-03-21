@@ -1,31 +1,31 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, View } from '@gluestack-ui/themed';
+import React from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View } from "@gluestack-ui/themed";
 
-const DirectMessagesScreen = ({ 
-  onSwitchPage, // callback function
-  rootPage, // string
-}) => {
+const DirectMessagesScreen = ({ route, navigation }) => {
+  const prevPage = route.params?.prevPage;
+
   return (
     <View style={styles.container}>
       <Text>This is the DMs screen</Text>
 
       <View style={styles.bottomContent}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => onSwitchPage(rootPage)}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.navigate(prevPage)}
+          >
             <Text style={{ color: "white" }}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </View>
-      
     </View>
   );
 };
 
-
 const styles = StyleSheet.create({
   bottomContent: {
-    display: 'flex',
+    display: "flex",
     alignItems: "flex-end",
     paddingTop: 10,
   },
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 10,
   },
 });
