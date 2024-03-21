@@ -1,8 +1,30 @@
 import React from "react";
-import { View, ScrollView, Text, Image, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
-const SearchScroller = ({ category, data }) => {
+import ExerciseScreen from "../contentViewScreens/ExerciseScreen";
+
+const SearchScroller = ({ category, data, handleItemPress }) => {
   const image = require("/Users/jameswu/git/cse437s/semester-project-group-3/frontend/assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+
+  // const navigation = useNavigation();
+
+  // const handlePress = (id) => {
+  //   switch (category) {
+  //     case "exercises":
+  //       navigation.navigate("ExerciseScreen", { exercise_id: id });
+  //       break;
+
+  //     default:
+  //       break;
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -17,14 +39,20 @@ const SearchScroller = ({ category, data }) => {
         >
           {data.map((item) => (
             <View key={item["id"]} style={styles.imageContainer}>
-              <Image source={image} style={styles.image} />
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={styles.caption}
+              <TouchableOpacity
+                onPress={() => {
+                  handleItemPress(category, item["id"]);
+                }}
               >
-                {item.name ? item.name : item.username}
-              </Text>
+                <Image source={image} style={styles.image} />
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={styles.caption}
+                >
+                  {item.name ? item.name : item.username}
+                </Text>
+              </TouchableOpacity>
             </View>
           ))}
         </ScrollView>

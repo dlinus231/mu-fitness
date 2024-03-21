@@ -455,6 +455,61 @@ app.get(`/exercises/one/:exerciseId`, async (req, res) => {
   }
 });
 
+app.get(`/exercises/saved/:userId/:exerciseId`, async (req, res) => {
+  const { userId, exerciseId } = req.params;
+
+  try {
+    const result = await prisma.userSavedExercises.findMany({
+      where: { userId: parseInt(userId), exerciseId: parseInt(exerciseId) },
+    });
+    if (result.length == 0) {
+      res.status(200).json({ saved: false });
+    } else {
+      res.status(200).json({ saved: true });
+    }
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
+//Save Exercise
+app.post(`/exercises/save`, async (req, res) => {
+  const { userId, exerciseId } = req.body;
+
+  try {
+    const result = await prisma.userSavedExercises.create({
+      data: {
+        userId: parseInt(userId),
+        exerciseId: parseInt(exerciseId),
+        saved: new Date(),
+      },
+    });
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+
+    res.sendStatus(400);
+  }
+});
+
+//Unsave Exercise
+app.post(`/exercises/unsave`, async (req, res) => {
+  const { userId, exerciseId } = req.body;
+
+  try {
+    const result = await prisma.userSavedExercises.deleteMany({
+      where: {
+        userId: parseInt(userId),
+        exerciseId: parseInt(exerciseId),
+      },
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(400);
+  }
+});
+
 //Get single workout by id
 app.get(`/workout/one/:workoutId`, async (req, res) => {
   const { workoutId } = req.params;

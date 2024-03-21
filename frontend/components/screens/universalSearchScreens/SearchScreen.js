@@ -12,11 +12,18 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 import SearchScroller from "./SearchScroller";
 import SearchFilterBubble from "./SearchFilterBubble";
+// import { getYoutubeMeta } from "react-native-youtube-iframe";
+
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const SearchScreen = ({
   onSwitchPage, // callback function
   rootPage, // string
 }) => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const prevPage = route.params?.prevPage;
+
   const categories = ["exercises", "workouts", "users"];
 
   const [searchBar, setSearchBar] = useState("");
@@ -59,7 +66,7 @@ const SearchScreen = ({
           const response = await axios.get(
             BACKEND_URL + `/search/${searchBar}`
           );
-          setSearchData(response.data);
+          await setSearchData(response.data);
         } catch (error) {
           console.error(error);
         }
@@ -67,12 +74,24 @@ const SearchScreen = ({
     }, 0);
   }, [timer]);
 
+  //Handles items that are on and navigated to, category is passed in from this screen to each searchscroller
+  const handleItemPress = (category, id) => {
+    switch (category) {
+      case "exercises":
+        navigation.navigate("ExerciseScreen", { exercise_id: id });
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.topContent}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onSwitchPage(rootPage)}
+          onPress={() => navigation.navigate(prevPage)}
         >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
@@ -130,6 +149,7 @@ const SearchScreen = ({
               key={idx}
               category={category}
               data={searchData[category]}
+              handleItemPress={handleItemPress}
             ></SearchScroller>
           );
         })
@@ -137,6 +157,7 @@ const SearchScreen = ({
         <SearchScroller
           category={focus}
           data={searchData[focus]}
+          handleItemPress={handleItemPress}
         ></SearchScroller>
       )}
 

@@ -12,10 +12,10 @@ const prisma = new PrismaClient();
 
 // parses the embedding column into a list of floats
 function parseEmbedding(embeddingString) {
-    return embeddingString
-        .slice(1, -1) // Remove square brackets
-        .split(',')
-        .map(parseFloat); // Parse each value as a float
+  return embeddingString
+    .slice(1, -1) // Remove square brackets
+    .split(",")
+    .map(parseFloat); // Parse each value as a float
 }
 
 async function main() {
@@ -51,9 +51,10 @@ async function main() {
       const description = row.instructions || "";
       const difficulty = row.difficulty;
       const tags = [];
+      const users = [];
       const embedding = parseEmbedding(row.embedding);
-      const video_path = row.video_path || ""; 
-      const log_search_results = parseFloat(row.log_search_results); 
+      const video_path = row.video_path || "";
+      const log_search_results = parseFloat(row.log_search_results);
 
       if (equipmentMap.has(equipment)) {
         equipment = equipmentMap.get(equipment);
@@ -69,9 +70,16 @@ async function main() {
           name,
           difficulty,
           description,
-          video_path, 
-          embedding, 
-          log_search_results, 
+          video_path,
+          embedding,
+          log_search_results,
+          type,
+          equipment,
+          users: {
+            connect: users.map((user) => {
+              id: user;
+            }),
+          },
           muscles: { connect: { id: muscleId } },
           tags: {
             connect: tags.map((tag) => ({
