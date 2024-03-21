@@ -37,7 +37,11 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
 
   const onEnterWorkoutPlanPage = (id) => {
     // console.log("bm - onEnterWorkoutPlanPage called with id: ", id);
-    setSelectedWorkoutPlanId(id);
+    // setSelectedWorkoutPlanId(id);
+    navigation.navigate("IndividualWorkoutScreen", {
+      workout_id: id,
+      workoutFrom: "FitnessPlans",
+    });
   };
 
   const onLeaveWorkoutPlanPage = () => {

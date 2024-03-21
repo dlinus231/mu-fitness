@@ -1,7 +1,11 @@
 import { Prisma, PrismaClient, Routine } from "@prisma/client";
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { env } from "process";
+// import { env } from "process";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 
@@ -113,6 +117,8 @@ app.post("/user/createauth", async (req, res) => {
   const { user_id } = req.body;
 
   const value = Math.floor(Math.random() * 1000000);
+  console.log(value);
+
   try {
     const user = await prisma.user.findUnique({ where: { id: user_id } });
 
@@ -767,6 +773,7 @@ app.delete(`/workout/delete/:workoutId`, async (req, res) => {
   }
 });
 
+//Universal search based on textual similarity to query
 app.get(`/search/:query`, async (req, res) => {
   const { query } = req.params;
   interface Data {
@@ -789,6 +796,10 @@ app.get(`/search/:query`, async (req, res) => {
           mode: "insensitive",
         },
       },
+      select: {
+        id: true,
+        name: true,
+      },
       take: 5,
     });
     returnData.exercises = exerciseResult;
@@ -799,6 +810,10 @@ app.get(`/search/:query`, async (req, res) => {
           contains: query,
           mode: "insensitive",
         },
+      },
+      select: {
+        id: true,
+        name: true,
       },
       take: 5,
     });
@@ -818,6 +833,49 @@ app.get(`/search/:query`, async (req, res) => {
     res.status(200).json(returnData);
   } catch (error) {
     res.sendStatus(404);
+  }
+});
+
+//Smart search to use word embeddings to recommend exercises based on query, not just textual similarity to query
+app.get(`/search/smartsearch/:query`, async (req, res) => {
+  const { query } = req.params;
+
+  try {
+    const embeddings = await openai.embeddings.create({
+      model: "text-embedding-3-large",
+      input: query,
+      encoding_format: "float",
+    });
+
+    const vector = normalizeL2(embeddings.data[0].embedding.slice(0, 256));
+
+    const commonExercises = await prisma.exercise.findMany({
+      take: 200,
+      orderBy: { log_search_results: "desc" },
+      select: {
+        id: true,
+        name: true,
+        embedding: true,
+      },
+    });
+
+    const k = 5; //arbitrary for now
+
+    const kNearest = commonExercises
+      .map((exercise) => {
+        const cosineSimilarity = dotProduct(exercise.embedding, vector);
+        return { ...exercise, similarity: cosineSimilarity };
+      })
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k)
+      .map((exercise) => {
+        return { id: exercise.id, name: exercise.name };
+      });
+
+    res.status(200).json(kNearest);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
   }
 });
 
@@ -850,4 +908,28 @@ function validateEmail(email: string): boolean {
   const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   return emailRegex.test(email);
+}
+
+//L2 normalize 1d vector (ONLY WORKS FOR 1D)
+function normalizeL2(vector: number[]): number[] {
+  const norm = Math.sqrt(vector.reduce((acc, val) => acc + val ** 2, 0));
+  if (norm === 0) {
+    return vector;
+  }
+
+  return vector.map((val) => val / norm);
+}
+
+//Dot Product (same as cosine similarity since both vectors are normalized for smartSearch)
+function dotProduct(vector1: number[], vector2: number[]): number {
+  if (vector1.length !== vector2.length) {
+    throw new Error("Vectors must have the same length");
+  }
+
+  let result = 0;
+  for (let i = 0; i < vector1.length; i++) {
+    result += vector1[i] * vector2[i];
+  }
+
+  return result;
 }

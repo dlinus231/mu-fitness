@@ -23,6 +23,11 @@ https://www.prisma.io/docs/getting-started/setup-prisma/start-from-scratch/relat
       3. log_search_results: the number of search results an exercise has when looked up on Google, transformed using natural log. This is currently used as a surrogate for popularity of an exercise, but could be used as a weight in "intelligent" recommendations
   - run `node clear_exercises.js` in this directory to clear the exercises database for a variety of use cases
 
+## Other env variables
+
+- Email api password
+- OpenAPI API Key (In Important Links doc)
+
 ## Using the REST API Endpoints
 
 You can access the REST API of the server using the following endpoints:
