@@ -45,6 +45,9 @@ const styles = StyleSheet.create({
   clearFocusText: {
     color: "#525252",
   },
+  smartSearchtext: {
+    color: "#FFFFFF",
+  },
 });
 
 export default SearchFilterBubble;
