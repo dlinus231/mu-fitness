@@ -766,10 +766,10 @@ app.get(`/search/:query`, async (req, res) => {
           mode: "insensitive",
         },
       },
-      // select: {
-      //   id: true,
-      //   name: true,
-      // },
+      select: {
+        id: true,
+        name: true,
+      },
       take: 5,
     });
     returnData.exercises = exerciseResult;
@@ -780,6 +780,10 @@ app.get(`/search/:query`, async (req, res) => {
           contains: query,
           mode: "insensitive",
         },
+      },
+      select: {
+        id: true,
+        name: true,
       },
       take: 5,
     });

@@ -72,7 +72,6 @@ const ExerciseScreen = ({ route, navigation }) => {
   const initializeData = async () => {
     const exerciseDataTemp = route.params.exerciseData;
     setExerciseData(exerciseDataTemp);
-    console.log(exerciseDataTemp);
 
     try {
       const savedResponse = await axios.get(
@@ -219,8 +218,9 @@ const ExerciseScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   backArrow: {
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
+    marginLeft: -20,
   },
   bubble: {
     borderRadius: 20,
