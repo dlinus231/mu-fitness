@@ -58,12 +58,15 @@ const SearchScreen = ({}) => {
       "Try our AI-Powered Smart Search!",
       "Type in a general search prompt, e.g. 'Ab exercises without equipment'"
     );
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setTimer(timer + 1);
     }, 500);
 
     return () => clearInterval(interval);
-  }, []);
+  });
 
   useEffect(() => {
     setTimeout(async () => {
@@ -109,10 +112,10 @@ const SearchScreen = ({}) => {
         }
 
         break;
-      
+
       case "users":
         // console.log("bm - navigating to personal profile from universal search")
-        navigation.navigate("PersonalProfile", { userId: id });
+        navigation.navigate("UserProfile", { userId: id });
         break;
 
       case "workouts":
