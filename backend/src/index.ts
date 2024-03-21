@@ -829,7 +829,6 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
       },
     });
 
-    console.log(commonExercises);
     const k = 5; //arbitrary for now
 
     const kNearest = commonExercises
