@@ -28,11 +28,7 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const IndividualWorkoutPlanScreen = ({
-  navigation,
-  onLeaveWorkoutPlanPage,
-  workout_id,
-}) => {
+const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [workout, setWorkout] = useState({});
   const [routines, setRoutines] = useState([]);
@@ -48,6 +44,10 @@ const IndividualWorkoutPlanScreen = ({
   // we will use this to check if the workout belongs to the current user
   const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
   const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
+
+  const workout_id = route.params?.workout_id;
+  const prevPage = route.params?.prevPage;
+  const workoutFrom = route.params?.workoutFrom;
 
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
@@ -72,7 +72,7 @@ const IndividualWorkoutPlanScreen = ({
       }
     };
     checkIfOwnedByCurrentUser();
-  }, [workoutOwnerId])
+  }, [workoutOwnerId]);
 
   const fetchWorkout = async () => {
     try {
@@ -105,7 +105,7 @@ const IndividualWorkoutPlanScreen = ({
         Alert.alert("Workout deleted successfully", "", [
           {
             text: "Ok",
-            onPress: onLeaveWorkoutPlanPage,
+            onPress: navigation.navigate("FitnessPlans"),
           },
         ]);
       }
@@ -224,7 +224,11 @@ const IndividualWorkoutPlanScreen = ({
         );
       }
     }
-  }
+  };
+
+  const returnToWorkoutPlans = () => {
+    navigation.navigate(workoutFrom, { prevPage: prevPage });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -252,8 +256,11 @@ const IndividualWorkoutPlanScreen = ({
       <ScrollView style={styles.content}>
         {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
         <TouchableOpacity
-          style={[styles.chevron, { flexDirection: 'row', alignItems: 'center' }]}
-          onPress={onLeaveWorkoutPlanPage}
+          style={[
+            styles.chevron,
+            { flexDirection: "row", alignItems: "center" },
+          ]}
+          onPress={returnToWorkoutPlans}
         >
           <BackArrowIcon></BackArrowIcon>
           <Text> Back to your Workout Plans</Text>
@@ -264,39 +271,51 @@ const IndividualWorkoutPlanScreen = ({
           <>
             <View style={styles.container}>
               <Text style={styles.titleText}>{workout.name}</Text>
-              <Text style={styles.subTitleText}>{workout.difficulty} difficulty</Text>
+              <Text style={styles.subTitleText}>
+                {workout.difficulty} difficulty
+              </Text>
               <Text style={styles.notesText}>Notes: {workout.description}</Text>
-              { isOwnedByCurrentUser && (
+              {isOwnedByCurrentUser && (
                 <View style={styles.topButtonContainer}>
                   <TouchableOpacity
                     style={styles.editButton}
                     onPress={handleEditWorkout}
                   >
-                    <Text style={{ color: "white" }}>  Edit Plan  </Text>
+                    <Text style={{ color: "white" }}> Edit Plan </Text>
                   </TouchableOpacity>
                 </View>
               )}
-              
+
               <Text style={styles.exercisesText}>Exercises</Text>
 
               <View>
-                {routines.length === 0 && ( isOwnedByCurrentUser ? (
-                  <>
-                    <Text style={styles.no_exercises_text}>You haven't added any exercises to this workout yet.</Text>
-                    <Text style={styles.no_exercises_text}>Add a set by clicking the button below.</Text>
-                  </>
-                ) : (
-                  <Text style={styles.no_exercises_text}>This workout plan does not have any exercises yet.</Text>
-                ))}
+                {routines.length === 0 &&
+                  (isOwnedByCurrentUser ? (
+                    <>
+                      <Text style={styles.no_exercises_text}>
+                        You haven't added any exercises to this workout yet.
+                      </Text>
+                      <Text style={styles.no_exercises_text}>
+                        Add a set by clicking the button below.
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={styles.no_exercises_text}>
+                      This workout plan does not have any exercises yet.
+                    </Text>
+                  ))}
               </View>
-              
+
               <View>
                 {routines.map((routine) => {
-                  return <Routine 
-                    routine={routine} 
-                    onDeleteRoutine={() => onDeleteRoutine(routine.id)} 
-                    onUpdateRoutine={onUpdateRoutine}
-                    key={routine.id}/>;
+                  return (
+                    <Routine
+                      routine={routine}
+                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
+                      onUpdateRoutine={onUpdateRoutine}
+                      key={routine.id}
+                    />
+                  );
                 })}
               </View>
 
@@ -361,35 +380,41 @@ const IndividualWorkoutPlanScreen = ({
                     ></Button>
                   </View>
                 </View>
-              ) : ( isOwnedByCurrentUser && (
-                <TouchableOpacity
-                  style={styles.addNewButton}
-                  onPress={() => {
-                    setAddingWorkout(true);
-                  }}
-                >
-                  <MaterialIcons name="post-add" size={48} color="black" />
-                  <Text>Add an exercise</Text>
-                </TouchableOpacity>
-              ))}
+              ) : (
+                isOwnedByCurrentUser && (
+                  <TouchableOpacity
+                    style={styles.addNewButton}
+                    onPress={() => {
+                      setAddingWorkout(true);
+                    }}
+                  >
+                    <MaterialIcons name="post-add" size={48} color="black" />
+                    <Text>Add an exercise</Text>
+                  </TouchableOpacity>
+                )
+              )}
             </View>
 
             {addingWorkout ? (
               <></>
-            ) : ( isOwnedByCurrentUser && (
-              <View style={styles.bottomContent}>
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    //Todo conditionally render buttons if this workout belongs to this user
-                    style={styles.deleteButton}
-                    onPress={handleDeleteWorkout}
-                  >
-                    <Text style={{ color: "lightcoral" }}>Delete Workout Plan</Text>
-                  </TouchableOpacity>
-                  {/* <View style={{ width: 20 }}></View> */}
+            ) : (
+              isOwnedByCurrentUser && (
+                <View style={styles.bottomContent}>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      //Todo conditionally render buttons if this workout belongs to this user
+                      style={styles.deleteButton}
+                      onPress={handleDeleteWorkout}
+                    >
+                      <Text style={{ color: "lightcoral" }}>
+                        Delete Workout Plan
+                      </Text>
+                    </TouchableOpacity>
+                    {/* <View style={{ width: 20 }}></View> */}
+                  </View>
                 </View>
-              </View>
-            ))}
+              )
+            )}
           </>
         )}
         {/* </KeyboardAvoidingView> */}
@@ -409,17 +434,17 @@ const styles = StyleSheet.create({
   bottomContent: {
     justifyContent: "center",
     alignItems: "flex-end",
-    paddingRight: '3%',
-    paddingBottom: '3%'
+    paddingRight: "3%",
+    paddingBottom: "3%",
   },
   buttonContainer: {
     flexDirection: "row",
   },
   topButtonContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: '5%'
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: "5%",
   },
   container: {
     padding: "3%",
@@ -476,34 +501,34 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   no_exercises_text: {
-    textAlign: 'center',
-    paddingHorizontal: '3%',
-    paddingTop: '3%'
+    textAlign: "center",
+    paddingHorizontal: "3%",
+    paddingTop: "3%",
   },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    paddingBottom: '1%',
-    paddingTop: '4%'
+    paddingBottom: "1%",
+    paddingTop: "4%",
   },
   subTitleText: {
     fontSize: 16,
     // fontWeight: "bold",
     textAlign: "center",
-    paddingBottom: '1%',
+    paddingBottom: "1%",
   },
   notesText: {
     fontSize: 16,
     textAlign: "center",
-    paddingBottom: '3%',
+    paddingBottom: "3%",
   },
   exercisesText: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
-    paddingTop: '5%',
-    paddingLeft: '1%',
+    paddingTop: "5%",
+    paddingLeft: "1%",
   },
 });
 export default IndividualWorkoutPlanScreen;

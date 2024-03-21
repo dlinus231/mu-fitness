@@ -113,6 +113,8 @@ app.post("/user/createauth", async (req, res) => {
   const { user_id } = req.body;
 
   const value = Math.floor(Math.random() * 1000000);
+  console.log(value);
+
   try {
     const user = await prisma.user.findUnique({ where: { id: user_id } });
 

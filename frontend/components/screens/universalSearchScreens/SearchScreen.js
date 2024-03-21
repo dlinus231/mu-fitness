@@ -94,6 +94,14 @@ const SearchScreen = ({}) => {
 
         break;
 
+      case "workouts":
+        navigation.navigate("IndividualWorkoutScreen", {
+          workout_id: id,
+          prevPage: prevPage,
+          workoutFrom: "search",
+        });
+        break;
+
       default:
         break;
     }
@@ -113,6 +121,7 @@ const SearchScreen = ({}) => {
             });
             setFocus("");
             prevSearch.current = "";
+            console.log(prevPage);
             navigation.navigate(prevPage);
           }}
         >
