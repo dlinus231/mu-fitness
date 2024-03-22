@@ -45,6 +45,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
   const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
 
+  // console.log("bm - individual workout plan screen route params: ", route.params);
+
   const workout_id = route.params?.workout_id;
   const prevPage = route.params?.prevPage;
   const workoutFrom = route.params?.workoutFrom;
@@ -230,11 +232,12 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
     navigation.navigate(workoutFrom, { prevPage: prevPage });
   };
 
+  // fetch workout on initial render and if we try to access a new workout (meaning wokrout_id changed)
   useEffect(() => {
     setLoading(true);
     fetchWorkout();
     fetchExercises();
-  }, []);
+  }, [workout_id]);
 
   useEffect(() => {
     setReps(8);
@@ -263,7 +266,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
           onPress={returnToWorkoutPlans}
         >
           <BackArrowIcon></BackArrowIcon>
-          <Text> Back to your Workout Plans</Text>
+          {/* <Text> Back to your Workout Plans</Text> */}
         </TouchableOpacity>
         {loading ? (
           <Text>Loading...</Text>
@@ -402,7 +405,6 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                 <View style={styles.bottomContent}>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                      //Todo conditionally render buttons if this workout belongs to this user
                       style={styles.deleteButton}
                       onPress={handleDeleteWorkout}
                     >

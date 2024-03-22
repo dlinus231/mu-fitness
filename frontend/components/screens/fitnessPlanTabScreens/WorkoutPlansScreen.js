@@ -111,11 +111,17 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
   return (
     <View>
       {selectedWorkoutPlanId !== null ? (
-        <IndividualWorkoutPlanScreen
-          onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
-          workout_id={selectedWorkoutPlanId}
-          navigation={navigation}
-        />
+        <>
+        </>
+        // EXPLANATION: now that we are accessing IndividualWorkoutPLanScreen using navigators
+          // it should not be a child of WorkoutPlansScreen
+          // this is because if we render it as a child, it will have no route prop
+          // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
+        // <IndividualWorkoutPlanScreen
+        //   onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
+        //   workout_id={selectedWorkoutPlanId}
+        //   navigation={navigation}
+        // />
       ) : (
         <>
           {/* <TouchableOpacity onPress={() => navigation.goBack()}>
