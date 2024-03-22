@@ -453,6 +453,71 @@ app.get("/user/following/:userId", async (req, res) => {
   }
 });
 
+// takes in exercise id's separated by "+"
+app.get(`/exercises/recommendations/:exerciseIds`, async (req, res) => {
+  const { exerciseIds } = req.params; 
+  const ids = exerciseIds.split("+")
+  // console.log("Exercide IDs in recommendations/:exercideIds: " + ids)
+  let embeddings = []
+  let exercise_names : string[] = [] 
+  
+  
+  if (exerciseIds == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    for (const id of ids) {
+      const result = await prisma.exercise.findUniqueOrThrow({
+        where: {
+          id: parseInt(id),
+        },
+        select: {
+          embedding: true,
+          name: true,
+        },
+      });
+      embeddings.push(result.embedding);
+      exercise_names.push(result.name);
+    }
+    // the average embedding
+    const centroid = computeCentroid(embeddings); 
+
+    // Now you have filled the embeddings and exercise_names lists with data
+    // console.log("Embeddings:", embeddings);
+    // console.log("Exercise Names:", exercise_names);
+    // console.log("Centroid: ", centroid);
+
+    const commonExercises = await prisma.exercise.findMany({
+      take: 400,
+      orderBy: { log_search_results: "desc" },
+      select: {
+        id: true,
+        name: true,
+        embedding: true,
+      },
+    });
+
+    const k = 10; 
+
+    const kNearest = commonExercises
+      .filter((exercise) => !exercise_names.includes(exercise.name)) // remove exercises already in the workout
+      .map((exercise) => {
+        const cosineSimilarity = exercise.embedding.reduce((acc, val, idx) => acc + val * centroid[idx], 0.0);
+        return { ...exercise, similarity: cosineSimilarity };
+      })
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k)
+      .map((exercise) => {
+        return { id: exercise.id, name: exercise.name };
+      });
+
+    res.status(200).json(kNearest);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+}); 
 // Get all exercise names
 // FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
 app.get(`/exercises/names`, async (req, res) => {
@@ -932,4 +997,24 @@ function dotProduct(vector1: number[], vector2: number[]): number {
   }
 
   return result;
+}
+
+function computeCentroid(embeddings: number[][]): number[] {
+  const dimension = embeddings[0].length;
+  const numVectors = embeddings.length;
+  const centroid: number[] = new Array(dimension).fill(0);
+
+  // Sum up all vectors
+  for (const vector of embeddings) {
+    for (let i = 0; i < dimension; i++) {
+      centroid[i] += vector[i];
+    }
+  }
+
+  // Divide each element by the number of vectors to get the average
+  for (let i = 0; i < dimension; i++) {
+    centroid[i] /= numVectors;
+  }
+
+  return centroid;
 }
