@@ -4,7 +4,7 @@ import axios from "axios";
 import { Text, View, Button, ButtonText } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
 
-const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
+const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUser }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [exercise, setExercise] = useState("");
 
@@ -136,26 +136,29 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine }) => {
       <Button onPress={onDeleteRoutine}>
         <ButtonText> Delete </ButtonText>
       </Button> */}
-      <View style={styles.bottomContent}>
-        <View style={styles.buttonContainer}>
-          
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={_handleEditButtonClick}
-          >
-            <Text style={{ color: "white" }}>Edit</Text>
-          </TouchableOpacity>
-          <View style={{ width: 10 }}></View>
-          <TouchableOpacity
-            //Todo conditionally render buttons if this workout belongs to this user
-            style={styles.deleteButton}
-            onPress={onDeleteRoutine}
-          >
-            <Text style={{ color: "lightcoral" }}>Delete</Text>
-          </TouchableOpacity>
+      {isOwnedByCurrentUser &&(
+        <View style={styles.bottomContent}>
+          <View style={styles.buttonContainer}>
+            
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={_handleEditButtonClick}
+            >
+              <Text style={{ color: "white" }}>Edit</Text>
+            </TouchableOpacity>
+            <View style={{ width: 10 }}></View>
+            <TouchableOpacity
+              //Todo conditionally render buttons if this workout belongs to this user
+              style={styles.deleteButton}
+              onPress={onDeleteRoutine}
+            >
+              <Text style={{ color: "lightcoral" }}>Delete</Text>
+            </TouchableOpacity>
 
+          </View>
         </View>
-      </View>
+      )}
+      
     </View>
   );
 };

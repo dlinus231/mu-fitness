@@ -317,6 +317,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                       onDeleteRoutine={() => onDeleteRoutine(routine.id)}
                       onUpdateRoutine={onUpdateRoutine}
                       key={routine.id}
+                      isOwnedByCurrentUser={isOwnedByCurrentUser}
                     />
                   );
                 })}
