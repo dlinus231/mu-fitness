@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View, set } from '@gluestack-ui/themed';
 
 import { BACKEND_URL } from "@env";
 
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 const FollowingScreen = ({route, navigation}) => {
   // userId is the id of the user whose following list we want to display
@@ -12,7 +13,7 @@ const FollowingScreen = ({route, navigation}) => {
 
   const [followingList, setFollowingList] = useState(null);
 
-  const fetchFollowingList = async () => {
+  const fetchFollowingList = useCallback(async () => {
     const response = await axios.get(BACKEND_URL + `/user/following/${userId}`);
 
     // only extract the needed information from what is returned
@@ -25,11 +26,13 @@ const FollowingScreen = ({route, navigation}) => {
     })
 
     if (response.status == 200) {
-      console.log("bm - following list: ", followingList);
+      console.log("bm - following list2: ", followingList);
+      setFollowingList(followingList);
     }
-
-    setFollowingList(followingList);
-  };
+    else {
+      console.log("bm - error getting following list");
+    }
+  }, [userId]);
 
   const renderItem = ({ item }) => {
     return (
@@ -39,10 +42,16 @@ const FollowingScreen = ({route, navigation}) => {
     );
   }
 
-  // on first load, we should fetch the user's following list
-  useEffect(() => {
-    fetchFollowingList();
-  }, [userId])
+  // on each load, we should fetch the user's following list
+  // useEffect(() => {
+  //   fetchFollowingList();
+  // }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchFollowingList();
+    }, [fetchFollowingList])
+  )
 
   return (
     <View style={styles.container}>

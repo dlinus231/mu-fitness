@@ -13,8 +13,13 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>{category}</Text>
+      <View style={[styles.headerContainer]}>
+        <Text style={styles.header}>
+          {category
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")}
+        </Text>
       </View>
       {data.length > 0 ? (
         <ScrollView
@@ -35,7 +40,14 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
                   ellipsizeMode="tail"
                   style={styles.caption}
                 >
-                  {item.name ? item.name : item.username}
+                  {item.name
+                    ? item.name
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
+                    : item.username}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -69,12 +81,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   header: {
-    color: "#525252",
+    color: "#FFFFFF",
     fontSize: 18,
   },
   headerContainer: {
     borderBottomWidth: 1,
-    borderBottomColor: "#525252",
+    borderBottomColor: "#FFFFFF",
     padding: 3,
     alignSelf: "flex-start",
     marginBottom: 5,

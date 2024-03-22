@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Keyboard,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../../icons/BackArrowIcon";
@@ -17,6 +18,7 @@ import SearchFilterBubble from "./SearchFilterBubble";
 // import { getYoutubeMeta } from "react-native-youtube-iframe";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
+import SmartSearchToggleBubble from "./SmartSearchToggleBubble";
 
 const SearchScreen = ({}) => {
   const navigation = useNavigation();
@@ -29,11 +31,13 @@ const SearchScreen = ({}) => {
   const prevSearch = useRef("");
   const [timer, setTimer] = useState(0);
   const [searchData, setSearchData] = useState({
+    smartSearch: [],
     exercises: [],
     workouts: [],
     users: [],
   });
-  const [loading, setLoading] = useState("");
+  // const [loading, setLoading] = useState("");
+  const [smartSearch, setSmartSearch] = useState(true);
   const [focus, setFocus] = useState("");
   const TextInputRef = useRef(null);
 
@@ -48,6 +52,13 @@ const SearchScreen = ({}) => {
   const onChangeText = (newText) => {
     setSearchBar(newText.replace(/\n/g, ""));
   };
+
+  useEffect(() => {
+    Alert.alert(
+      "Try our AI-Powered Smart Search!",
+      "Type in a general search prompt, e.g. 'Ab exercises without equipment'"
+    );
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,7 +76,14 @@ const SearchScreen = ({}) => {
           const response = await axios.get(
             BACKEND_URL + `/search/${searchBar}`
           );
-          await setSearchData(response.data);
+          const data = response.data;
+
+          const smartResponse = await axios.get(
+            BACKEND_URL + `/search/smartsearch/${searchBar}`
+          );
+          data["smartSearch"] = smartResponse.data;
+
+          setSearchData(data);
         } catch (error) {
           console.error(error);
         }
@@ -77,6 +95,7 @@ const SearchScreen = ({}) => {
   const handleItemPress = async (category, id) => {
     switch (category) {
       case "exercises":
+      case "smart search":
         try {
           const response = await axios.get(
             BACKEND_URL + `/exercises/one/${id}`
@@ -92,6 +111,11 @@ const SearchScreen = ({}) => {
           console.error(error);
         }
 
+        break;
+
+      case "users":
+        // console.log("bm - navigating to personal profile from universal search")
+        navigation.navigate("UserProfile", { userId: id });
         break;
 
       case "workouts":
@@ -115,6 +139,7 @@ const SearchScreen = ({}) => {
           onPress={() => {
             setSearchBar("");
             setSearchData({
+              smartSearch: [],
               exercises: [],
               workouts: [],
               users: [],
@@ -143,37 +168,53 @@ const SearchScreen = ({}) => {
           <View style={styles.hr}></View>
         </View>
       </View>
-
-      {focus.length === 0 ? (
-        <ScrollView
-          contentContainerStyle={styles.filterScroll}
-          style={{ flexGrow: 0 }}
-        >
-          {categories.map((category, idx) => {
-            return (
-              <SearchFilterBubble
-                key={idx}
-                text={category}
-                setFocus={setFocus}
-              ></SearchFilterBubble>
-            );
-          })}
-        </ScrollView>
+      <ScrollView
+        contentContainerStyle={styles.filterScroll}
+        style={{ flexGrow: 0 }}
+      >
+        {focus.length === 0 ? (
+          <>
+            <SmartSearchToggleBubble
+              smartSearch={smartSearch}
+              setSmartSearch={setSmartSearch}
+            ></SmartSearchToggleBubble>
+            {categories.map((category, idx) => {
+              return (
+                <SearchFilterBubble
+                  key={idx}
+                  text={category}
+                  setFocus={setFocus}
+                ></SearchFilterBubble>
+              );
+            })}
+          </>
+        ) : (
+          <>
+            <SearchFilterBubble
+              text={""}
+              setFocus={setFocus}
+            ></SearchFilterBubble>
+            <SmartSearchToggleBubble
+              smartSearch={smartSearch}
+              setSmartSearch={setSmartSearch}
+            ></SmartSearchToggleBubble>
+            <SearchFilterBubble
+              text={focus}
+              setFocus={setFocus}
+            ></SearchFilterBubble>
+          </>
+        )}
+      </ScrollView>
+      {smartSearch ? (
+        <SearchScroller
+          category={"smart search"}
+          data={searchData["smartSearch"]}
+          handleItemPress={handleItemPress}
+        ></SearchScroller>
       ) : (
-        <ScrollView
-          contentContainerStyle={styles.filterScroll}
-          style={{ flexGrow: 0 }}
-        >
-          <SearchFilterBubble
-            text={""}
-            setFocus={setFocus}
-          ></SearchFilterBubble>
-          <SearchFilterBubble
-            text={focus}
-            setFocus={setFocus}
-          ></SearchFilterBubble>
-        </ScrollView>
+        <></>
       )}
+
       {focus.length === 0 ? (
         categories.map((category, idx) => {
           return (
@@ -223,7 +264,7 @@ const styles = StyleSheet.create({
   filterScroll: {
     display: "flex",
     justifyContent: "flex-start",
-    alignItems: "flex-start",
+    // alignItems: "flex-start",
     flexDirection: "row",
     gap: 10,
     flexGrow: 0,
@@ -236,6 +277,7 @@ const styles = StyleSheet.create({
     minHeight: "100%",
     backgroundColor: "#000000",
     flexDirection: "column",
+    paddingBottom: 100,
   },
   hr: {
     borderBottomColor: "#525252",
@@ -248,7 +290,7 @@ const styles = StyleSheet.create({
     height: 55,
     width: "90%",
     flexWrap: "wrap",
-    color: "#525252",
+    color: "#FFFFFF",
   },
 });
 
