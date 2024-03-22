@@ -77,7 +77,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
         Alert.alert("Workout edited successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("FitnessPlans", { workout_id: workout_id}),
+            onPress: () => navigation.navigate("IndividualWorkoutScreen", { workout_id: workout_id, workoutFrom: "FitnessPlans"}),
           },
         ]);
       }

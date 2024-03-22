@@ -781,6 +781,44 @@ app.delete("/workout/routine/delete/:routineId", async (req, res) => {
   }
 });
 
+// follower feed endpoint
+// get all workouts from users that the user is following
+app.get(`/feed/workouts/:userId`, async (req, res) => {
+  const { userId } = req.params;
+
+  if (userId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.workout.findMany({
+      where: {
+        user: {
+          followers: {
+            some: {
+              followerId: parseInt(userId),
+            },
+          },
+        },
+      },
+      include: { // we want the username of the workout owners as well
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        time_created: "desc",
+      },
+    });
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
+
 // update workout plan
 app.post(`/workout/edit`, async (req, res) => {
   // TOOD add ability to update associated routineId? (might not be needed though)
