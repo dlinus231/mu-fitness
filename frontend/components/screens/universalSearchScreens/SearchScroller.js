@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
@@ -7,9 +7,35 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import {getYoutubeMeta} from "react-native-youtube-iframe";
+
 
 const SearchScroller = ({ category, data, handleItemPress }) => {
-  const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+  const [thumbnails, setThumbnails] = useState({});
+  const placeHolderImage = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+
+  useEffect(() => {
+      // Function to fetch thumbnails for each video
+      const fetchThumbnails = async () => {
+        const thumbnailData = {};
+        for (const item of data) {
+          try {
+            const meta = await getYoutubeMeta(item.video_path);
+            thumbnailData[item.id] = meta.thumbnail_url;
+          } catch (error) {
+            console.error("Error fetching YouTube meta:", error);
+          }
+        }
+        setThumbnails(thumbnailData);
+      };
+
+      fetchThumbnails();
+    }, [data]);
+
+  for(let key in thumbnails) {
+    console.log("ENTRY: " , key, thumbnails[key])
+  }
+  console.log("THUMBDAILS: " + thumbnails)
 
   return (
     <View style={styles.container}>
@@ -34,7 +60,15 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
                   handleItemPress(category, item["id"]);
                 }}
               >
-                <Image source={image} style={styles.image} />
+                <Image
+                  source={
+                    thumbnails[item.id]
+                      ? { uri: thumbnails[item.id] }
+                      : placeHolderImage
+                  }
+                  style={styles.image}
+                />
+
                 <Text
                   numberOfLines={1}
                   ellipsizeMode="tail"
