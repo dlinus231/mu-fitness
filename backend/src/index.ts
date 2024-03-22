@@ -975,25 +975,6 @@ function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-function computeCentroid(embeddings: number[][]): number[] {
-  const dimension = embeddings[0].length;
-  const numVectors = embeddings.length;
-  const centroid: number[] = new Array(dimension).fill(0);
-
-  // Sum up all vectors
-  for (const vector of embeddings) {
-    for (let i = 0; i < dimension; i++) {
-      centroid[i] += vector[i];
-    }
-  }
-
-  // Divide each element by the number of vectors to get the average
-  for (let i = 0; i < dimension; i++) {
-    centroid[i] /= numVectors;
-  }
-
-  return centroid;
-}
 //L2 normalize 1d vector (ONLY WORKS FOR 1D)
 function normalizeL2(vector: number[]): number[] {
   const norm = Math.sqrt(vector.reduce((acc, val) => acc + val ** 2, 0));
@@ -1016,4 +997,24 @@ function dotProduct(vector1: number[], vector2: number[]): number {
   }
 
   return result;
+}
+
+function computeCentroid(embeddings: number[][]): number[] {
+  const dimension = embeddings[0].length;
+  const numVectors = embeddings.length;
+  const centroid: number[] = new Array(dimension).fill(0);
+
+  // Sum up all vectors
+  for (const vector of embeddings) {
+    for (let i = 0; i < dimension; i++) {
+      centroid[i] += vector[i];
+    }
+  }
+
+  // Divide each element by the number of vectors to get the average
+  for (let i = 0; i < dimension; i++) {
+    centroid[i] /= numVectors;
+  }
+
+  return centroid;
 }
