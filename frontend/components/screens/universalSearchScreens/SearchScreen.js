@@ -56,7 +56,7 @@ const SearchScreen = ({}) => {
   useEffect(() => {
     Alert.alert(
       "Try our AI-Powered Smart Search!",
-      "Type in a general search prompt, e.g. 'Ab exercises without equipment'"
+      "Type in a general search prompt, e.g. 'Body only ab exercises'"
     );
   }, []);
 
