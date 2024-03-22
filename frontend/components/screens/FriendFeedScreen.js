@@ -64,12 +64,19 @@ const FriendFeedScreen = ({ navigation }) => {
       case "workout":
         return (
           <TouchableOpacity
+            style={styles.workoutPlan}
             onPress={() => navigation.navigate("IndividualWorkoutScreen", { workout_id: item.id, workoutFrom: "FriendFeed" })}
           >
-            <Text>{item.username} created a workout plan: {item.name}</Text>
-            <Text>Difficulty: {item.difficulty}</Text>
-            <Text>Description: {item.description}</Text>
-            <Text>Created: {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+            <View style={styles.workoutMainContent}>
+              <Text>
+                <Text style={styles.username}>{item.username}</Text>
+                <Text style={styles.workoutDescription}> created a new workout plan</Text>
+              </Text>
+              <Text style={styles.workoutName}>{item.name}</Text>
+            </View>
+            
+            <Text style={styles.workoutTime}>{formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+
           </TouchableOpacity>
         );
       default:
@@ -113,8 +120,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    padding: 10
   },
+  workoutPlan: {
+    backgroundColor: '#FFF',
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  workoutName: {
+    fontWeight: 'bold',
+    marginTop: 8,
+    fontSize: 23,
+  },
+  workoutMainContent: {
+
+  },
+  workoutDetail: {
+    fontSize: 14,
+  },
+  workoutTime: {
+    fontSize: 12,
+    color: '#666', 
+    alignSelf: 'flex-end', 
+  },
+  username: {
+    fontWeight: 'bold',
+  }
 });
 
 export default FriendFeedScreen;
