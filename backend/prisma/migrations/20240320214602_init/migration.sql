@@ -5,5 +5,5 @@
 
 */
 -- AlterTable
-ALTER TABLE "Exercise" ADD COLUMN     "embedding" DOUBLE PRECISION[],
-ADD COLUMN     "log_search_results" DOUBLE PRECISION NOT NULL;
+-- ALTER TABLE "Exercise" ADD COLUMN     "embedding" DOUBLE PRECISION[],
+-- ADD COLUMN     "log_search_results" DOUBLE PRECISION NOT NULL;
