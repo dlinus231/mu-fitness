@@ -32,17 +32,32 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // calculate number of followers and following when userData is updated
   useEffect(() => {
     if (!userData) return;
-    console.log("bm - userData coming back: ", userData)
+    // 
     setFollowers(userData.followers.length);
     setFollowing(userData.following.length);
 
     // setWorkouts(userData.workouts);
     // setFavoriteExercises(userData.favoriteExercises);
 
+    console.log('bm - workouts: ', userData.workouts)
+    const parsedWorkouts = userData.workouts.map((workout) => {
+      return {
+        id: workout.id,
+        name: workout.name,
+        timeCreated: workout.time_created,
+      }
+    })
     // TODO remove placeholder debugging code
-    setWorkouts([])
+    // console.log("bm - DEBUG")
+    console.log("bm - parsedWorkouts profilescreen: ", parsedWorkouts)
+    setWorkouts(parsedWorkouts);
+
     setFavoriteExercises([])
   }, [userData])
+
+  useEffect(() => {
+    console.log("bm - workouts State: ", workouts)
+  }, [workouts])
 
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
@@ -58,8 +73,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
   };
 
-  const renderWorkoutItem = async ({item}) => {
-    print("bm - item: ", item)
+  const renderWorkoutItem = ({item}) => {
     return (
       <TouchableOpacity
         style={styles.workoutPlan}
@@ -116,18 +130,18 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           </View>
         </View>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleAuthChange}>
-        <Text style={styles.buttonText}>Sign Out</Text>
-      </TouchableOpacity>
-      <View style={styles.iconsContainer}>
-        <TouchableOpacity onPress={() => setActiveTab('workouts')}>
+      <View style={styles.buttonsAndIconsContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleAuthChange}>
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('workouts')}>
           <MaterialIcons
             name="fitness-center"
             size={30}
             color={activeTab === 'workouts' ? '#6A5ACD' : '#aaa'} //
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setActiveTab('favoriteExercises')}>
+        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
           <MaterialIcons
             name="favorite-border"
             size={30}
@@ -135,6 +149,8 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           />
         </TouchableOpacity>
       </View>
+
+      <View style={styles.divider} />
 
       {/* Placeholder for the content based on the active tab */}
       <View style={styles.contentContainer}>
@@ -151,7 +167,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
             }
           />
         )} 
-        {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
+        {/* {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
           <FlatList
             data={favoriteExercises}
             keyExtractor={item => item.id.toString()}
@@ -163,7 +179,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
               />
             }
           />
-        )}
+        )} */}
       </View>
     </SafeAreaView>
   );
@@ -218,8 +234,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#6A5ACD",
     padding: 10,
     borderRadius: 5,
-    width: '90%',
-    marginTop: 20,
+    width: '60%',
+    marginTop: 5,
   },
   buttonText: {
     textAlign: "center",
@@ -227,15 +243,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  iconsContainer: {
+  icon: {
+    marginTop: 10,
+  },
+  divider: {
+    height: 1, 
+    backgroundColor: '#D3D3D3',
+    width: '100%',
+    marginTop: 20, 
+    marginBottom: 10,
+  },
+  buttonsAndIconsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
     width: '100%', // adjust later if needed
     alignSelf: 'center', // center icons horitzontally
   },
   contentContainer: {
-    marginTop: 20,
+    marginTop: 5,
   },
   workoutName: {
     fontWeight: 'bold',
@@ -252,6 +277,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666', 
     alignSelf: 'flex-end', 
+  },
+  workoutPlan: {
+    backgroundColor: '#FFF',
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  workoutName: {
+    fontWeight: 'bold',
+    marginTop: 8,
+    fontSize: 23,
   },
 });
 
