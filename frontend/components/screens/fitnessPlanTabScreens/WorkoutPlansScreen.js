@@ -134,7 +134,7 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
             style={styles.createNewWorkoutPlanButton}
             onPress={() => {
               setCreated(false);
-              navigation.navigate("CreateNewWorkoutPlan");
+              navigation.navigate("CreateNewWorkoutPlan", { prevPage: "FitnessPlans" });
             }}
           >
             <MaterialIcons name="post-add" size={48} color="black" />

@@ -151,7 +151,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
   const handleAddMoreButtonPress = async () => {
     if (activeTab === 'workouts') {
-      navigation.navigate("CreateNewWorkoutPlan");
+      navigation.navigate("CreateNewWorkoutPlan", { prevPage: "PersonalProfile" });
     } 
     if (activeTab === 'favoriteExercises'){
       navigation.navigate("search", { prevPage: "PersonalProfile" });
