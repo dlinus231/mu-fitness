@@ -223,7 +223,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
       <View style={styles.contentContainerHeader}>
         <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
-        <TouchableOpacity onPress={handleAddMoreButtonPress}>
+        <TouchableOpacity style={styles.contentContainerButton} onPress={handleAddMoreButtonPress}>
           <MaterialIcons name="add-circle" size={32} color="#6A5ACD" />
         </TouchableOpacity>
       </View>
@@ -280,13 +280,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10, // Adjust padding as necessary
-    marginBottom: 20, // Space before the content section
+    paddingHorizontal: 10,
+    marginBottom: 0, 
   },
   contentContainerText: {
     fontWeight: 'bold',
-    fontSize: 20, // Adjust font size as necessary
-    flex: 1, // Allows text to take up the maximum width minus button
+    fontSize: 20,
+    flex: 1, 
+  },
+  contentContainerButton: {
+    marginTop: 3,
   },
   username: {
     fontWeight: 'bold',
@@ -344,12 +347,12 @@ const styles = StyleSheet.create({
   buttonsAndIconsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%', // adjust later if needed
+    width: '100%',
     alignSelf: 'center', // center icons horitzontally
   },
   contentContainer: {
     marginTop: 5,
-    marginBottom: '65%'
+    marginBottom: '60%' // contols how close to the footerNavigator that the content (FlatLists) is
   },
   workoutName: {
     fontWeight: 'bold',
@@ -373,7 +376,8 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     paddingHorizontal: 20,
     marginVertical: 8,
-    marginHorizontal: 16,
+    marginLeft: 16,
+    marginRight: 20,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -398,6 +402,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 175,
     borderRadius: 10,
+    marginLeft: '2%', // controls where the image is horizontally (how close to either side of screen)
   },
   exerciseName: {
     marginTop: 8,
