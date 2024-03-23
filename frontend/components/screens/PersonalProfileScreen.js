@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     marginTop: 5,
+    marginBottom: '65%'
   },
   workoutName: {
     fontWeight: 'bold',
