@@ -270,7 +270,10 @@ app.get("/user/:userId", async (req, res) => {
         include: {
           followers: true,
           following: true,
+          saved_exercises: true,
+          workouts: true,
         },
+        
       })
       .then((user) => {
         if (user == null) {
@@ -286,6 +289,8 @@ app.get("/user/:userId", async (req, res) => {
           // following: user.following.map((following) => following.followingId),
           followers: user.followers,
           following: user.following,
+          saved_exercises: user.saved_exercises,
+          workouts: user.workouts,
         };
       });
 
