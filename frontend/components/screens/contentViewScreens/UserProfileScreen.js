@@ -7,6 +7,7 @@ import {
   Alert,
 } from "react-native";
 import { View, VStack, Button, ButtonText, set } from "@gluestack-ui/themed";
+import { MaterialIcons } from "react-native-vector-icons";
 // import TopBarMenu from "../TopBarMenu";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,6 +26,9 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
   const [currentUserId, setCurrentUserId] = useState(""); // id of currently logged in user
 
   const [userData, setUserData] = useState(null);
+
+  const [followers, setFollowers] = useState(0);
+  const [following, setFollowing] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -52,12 +56,31 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
         if (userId === "") {
           setUserId(uId);
         }
+
       } catch (e) {
         console.log("bm - error getting user id: ", e);
       }
     };
     getCurrentUserId();
   }, []);
+
+  // check if the current user is following the user whose profile we are viewing
+  useEffect(() => {
+    if (currentUserId === "" || userId === "") return;
+    const checkIfFollowing = async () => {
+      print("bm - checking if following")
+      try {
+        const response = await axios.get(
+          BACKEND_URL + `/user/follows/${currentUserId}/${userId}`
+        );
+        console.log("bm - response from isFollowing: ", response.data);
+        setIsFollowing(response.data.follows);
+      } catch (e) {
+        console.log("bm - error checking if following: ", e);
+      }
+    };
+    checkIfFollowing();
+  }, [currentUserId, userId]);
 
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
@@ -75,6 +98,13 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
   }, [userId, currentUserId, userData]);
 
+  // calculate number of followers and following when userData is updated
+  useEffect(() => {
+    if (!userData) return;
+    setFollowers(userData.followers.length);
+    setFollowing(userData.following.length);
+  }, [userData])
+
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
     try {
@@ -87,7 +117,17 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
   };
 
+  const handleFollowUnfollow = async () => {
+    if (isFollowing) {
+      await handleUnfollow();
+    } else {
+      await handleFollow();
+    }
+    fetchUserData();
+  }
+
   const handleFollow = async () => {
+    console.log("bm - now inside handleFollow")
     const curUserId = await AsyncStorage.getItem("user_id");
     if (parseInt(userId) === parseInt(curUserId)) {
       Alert.alert("You can't follow yourself dum dum");
@@ -101,6 +141,7 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
         }
       );
       console.log("bm - response from handleFollow: ", response.data);
+      console.log("bm - about to set isFollowing to true");
       setIsFollowing(true);
     } catch (e) {
       console.log("bm - error following user: ", e);
@@ -118,7 +159,7 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
         }
       );
       console.log("bm - response from handleUnfollow: ", response.data);
-
+      console.log("bm - about to set isFollowing to false")
       // now need to update the isFollowing state
       setIsFollowing(false);
     } catch (e) {
@@ -135,48 +176,71 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
   }
 
   return (
-    <>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.top_text}>{userData.username}'s User Profile</Text>
-        <Text style={styles.mid_text}> Username: {userData.username}</Text>
-        <Text style={styles.mid_text}> UserId: {userData.id}</Text>
-        <Text style={styles.mid_text}> Email: {userData.email}</Text>
-
-        <VStack space="md" style={styles.buttonContainer}>
-          {isFollowing ? (
-            <TouchableOpacity style={styles.button} onPress={handleUnfollow}>
-              <Text style={styles.text}>Unfollow</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.profileContainer}>
+        <MaterialIcons
+          name="account-circle"
+          size={95}
+          color="#000" 
+          style={styles.avatar}
+        />
+        <View style={styles.userInfo}>
+          <Text style={styles.username}>{userData.username}</Text>
+          <View style={styles.stats}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("followersList", { userId: userData.id })}
+            >
+              <Text style={styles.statText}>{followers} Followers</Text>
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={handleFollow}>
-              <Text style={styles.text}>Follow</Text>
+            
+            <TouchableOpacity
+              onPress={() => navigation.navigate("followingList", { userId: userData.id })}
+            >
+              <Text style={styles.statText}>{following} Following</Text>
             </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate("PersonalProfile", {
-                userId: currentUserId,
-              })
-            }
-          >
-            <Text style={styles.text}>Back to your profile</Text>
-          </TouchableOpacity>
-        </VStack>
-      </SafeAreaView>
-    </>
+            
+          </View>
+        </View>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={handleFollowUnfollow}>
+        <Text style={styles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    // alignItems: 'center',
+    marginTop: "10%",
+    alignItems: "left", // specifies where items are aligned horizontally
+    padding: "6%",
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center", 
+  },
+  userInfo: {
+    flexDirection: 'column',
+    marginLeft: '5%',
+  },
+  username: {
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  stats: {
+    flexDirection: 'col',
+    marginTop: 5,
+  },
+  statText: {
+    marginRight: 15,
+    fontSize: 16,
+  },
+  avatar: {
+
   },
   buttonContainer: {
     justifyContent: "space-around",
-    // Adjust the padding as needed
     paddingHorizontal: 10,
   },
   top_text: {
@@ -194,12 +258,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#6A5ACD",
     padding: 10,
     borderRadius: 5,
-    // height: '17%',
-    // display: 'flex',
-    // justifyContent: 'center',
-    // alignItems: 'center',
+    width: '90%',
+    marginTop: 20,
   },
-  text: {
+  buttonText: {
     textAlign: "center",
     color: "white",
     fontSize: 16,
