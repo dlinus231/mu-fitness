@@ -32,14 +32,12 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // calculate number of followers and following when userData is updated
   useEffect(() => {
     if (!userData) return;
-    // 
     setFollowers(userData.followers.length);
     setFollowing(userData.following.length);
 
     // setWorkouts(userData.workouts);
     // setFavoriteExercises(userData.favoriteExercises);
 
-    console.log('bm - workouts: ', userData.workouts)
     const parsedWorkouts = userData.workouts.map((workout) => {
       return {
         id: workout.id,
@@ -47,9 +45,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         timeCreated: workout.time_created,
       }
     })
-    // TODO remove placeholder debugging code
-    // console.log("bm - DEBUG")
-    console.log("bm - parsedWorkouts profilescreen: ", parsedWorkouts)
     setWorkouts(parsedWorkouts);
 
     setFavoriteExercises([])
@@ -152,6 +147,13 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
       <View style={styles.divider} />
 
+      <View style={styles.contentContainerHeader}>
+        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("CreateNewWorkoutPlan")}>
+          <MaterialIcons name="add-circle" size={32} color="#6A5ACD" />
+        </TouchableOpacity>
+      </View>
+
       {/* Placeholder for the content based on the active tab */}
       <View style={styles.contentContainer}>
         {(activeTab === 'workouts' && workouts.length > 0) && (
@@ -199,6 +201,18 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'column',
     marginLeft: '5%',
+  },
+  contentContainerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10, // Adjust padding as necessary
+    marginBottom: 20, // Space before the content section
+  },
+  contentContainerText: {
+    fontWeight: 'bold',
+    fontSize: 20, // Adjust font size as necessary
+    flex: 1, // Allows text to take up the maximum width minus button
   },
   username: {
     fontWeight: 'bold',
