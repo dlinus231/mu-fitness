@@ -602,6 +602,7 @@ app.get(`/exercises/saved/:userId`, async (req, res) => {
           select: {
             id: true,
             name: true,
+            video_path: true, 
           },
         })
       )
@@ -864,6 +865,7 @@ app.get(`/search/:query`, async (req, res) => {
       select: {
         id: true,
         name: true,
+        video_path: true, 
       },
       take: 5,
     });
@@ -921,6 +923,7 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
         id: true,
         name: true,
         embedding: true,
+        video_path: true, 
       },
     });
 
@@ -934,7 +937,7 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, k)
       .map((exercise) => {
-        return { id: exercise.id, name: exercise.name };
+        return { id: exercise.id, name: exercise.name, video_path: exercise.video_path};
       });
 
     res.status(200).json(kNearest);
