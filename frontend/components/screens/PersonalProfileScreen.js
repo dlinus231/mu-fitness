@@ -95,7 +95,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           <Text style={styles.workoutName}>{item.name}</Text>
         </View>
         
-        {/* <Text style={styles.workoutTime}>{formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text> */}
+        <Text style={styles.workoutTime}>created {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
 
       </TouchableOpacity>
     );

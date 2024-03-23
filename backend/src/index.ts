@@ -271,9 +271,12 @@ app.get("/user/:userId", async (req, res) => {
           followers: true,
           following: true,
           saved_exercises: true,
-          workouts: true,
+          workouts: {
+            orderBy: {
+              time_created: 'desc', // Sort workouts in reverse order by 'created'
+            },
+          },
         },
-        
       })
       .then((user) => {
         if (user == null) {
