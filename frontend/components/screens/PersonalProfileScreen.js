@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TouchableOpacity, StyleSheet, SafeAreaView, Text, FlatList, RefreshControl } from "react-native";
+import { TouchableOpacity, StyleSheet, SafeAreaView, Text, FlatList, RefreshControl, Image } from "react-native";
 import { View, VStack, Button, ButtonText, set, Avatar } from "@gluestack-ui/themed";
 import { formatDistanceToNow } from "date-fns";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -12,7 +12,7 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 
 const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState(null); // note: workouts are included in userData
 
   const [activeTab, setActiveTab] = useState('workouts'); // 'workouts' or 'favoriteExercises'
 
@@ -47,12 +47,29 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     })
     setWorkouts(parsedWorkouts);
 
-    setFavoriteExercises([])
+    getFavoriteExercises();
   }, [userData])
 
   useEffect(() => {
     console.log("bm - workouts State: ", workouts)
   }, [workouts])
+
+  const getFavoriteExercises = async () => {
+    try {
+      const response = await axios.get(BACKEND_URL + `/exercises/saved/${userData.id}`);
+      const parsedExercises = response.data.map((exercise) => {
+        return {
+          id: exercise.id,
+          name: exercise.name,
+          timeCreated: exercise.saved,
+        }
+      })
+      console.log("bm - setting favorite exercises to: ", parsedExercises)
+      setFavoriteExercises(parsedExercises);
+    } catch (e) {
+      console.log("bm - error fetching favorite exercises: ", e);
+    }
+  }
 
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
@@ -82,6 +99,53 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
       </TouchableOpacity>
     );
+  }
+
+  const goToExercise = async (id) => {
+    const response = await axios.get(BACKEND_URL + `/exercises/one/${id}`);
+    navigation.navigate("ExerciseScreen", {
+      exerciseData: response.data,
+      prevPage: null,
+      exerciseFrom: "PersonalProfile",
+    });
+  };
+
+  // silly guy image lol
+  const image = require("../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+
+  const renderExerciseItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.exerciseContainer}
+        onPress={() => {
+          goToExercise(item.id);
+        }}
+      >
+        <Image source={image} style={styles.exerciseImage} />
+        <Text
+          style={styles.exerciseName}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {item.name
+            .split(" ")
+            .map(
+              (word) => word.charAt(0).toUpperCase() + word.slice(1)
+            )
+            .join(" ")}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
+  const handleAddMoreButtonPress = async () => {
+    if (activeTab === 'workouts') {
+      navigation.navigate("CreateNewWorkoutPlan");
+    } 
+    if (activeTab === 'favoriteExercises'){
+      navigation.navigate("search", { prevPage: "PersonalProfile" });
+    }
   }
 
   const onRefresh = async () => {
@@ -149,7 +213,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
       <View style={styles.contentContainerHeader}>
         <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("CreateNewWorkoutPlan")}>
+        <TouchableOpacity onPress={handleAddMoreButtonPress}>
           <MaterialIcons name="add-circle" size={32} color="#6A5ACD" />
         </TouchableOpacity>
       </View>
@@ -169,11 +233,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
             }
           />
         )} 
-        {/* {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
+        {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
           <FlatList
             data={favoriteExercises}
             keyExtractor={item => item.id.toString()}
-            renderItem={renderWorkoutItem}
+            renderItem={renderExerciseItem}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -181,7 +245,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
               />
             }
           />
-        )} */}
+        )}
       </View>
     </SafeAreaView>
   );
@@ -315,6 +379,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 8,
     fontSize: 23,
+  },
+  exerciseContainer: {
+    marginBottom: 16,
+  },
+  exerciseImage: {
+    width: 300,
+    height: 175,
+    borderRadius: 10,
+  },
+  exerciseName: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

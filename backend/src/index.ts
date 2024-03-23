@@ -532,6 +532,7 @@ app.get(`/exercises/saved/:userId`, async (req, res) => {
       },
       select: {
         exerciseId: true,
+        saved: true,
       },
     });
 
@@ -543,7 +544,7 @@ app.get(`/exercises/saved/:userId`, async (req, res) => {
             id: true,
             name: true,
           },
-        })
+        }).then((exercise) => ({ ...exercise, saved: item.saved }))
       )
     );
 
