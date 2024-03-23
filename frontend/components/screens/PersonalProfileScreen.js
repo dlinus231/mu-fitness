@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { TouchableOpacity, StyleSheet, SafeAreaView, Text, FlatList, RefreshControl, Image } from "react-native";
 import { View, VStack, Button, ButtonText, set, Avatar } from "@gluestack-ui/themed";
 import { formatDistanceToNow } from "date-fns";
@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 import { BACKEND_URL } from "@env";
+import { useFocusEffect } from "@react-navigation/native";
 
 const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   const [userData, setUserData] = useState(null); // note: workouts are included in userData
@@ -28,6 +29,15 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  // fetch the user data each time the page is navigated back to
+  useFocusEffect(
+    useCallback(() => {
+      if (!userData) return;
+      fetchUserData();
+      getFavoriteExercises();
+    }, [])
+  )
 
   // calculate number of followers and following when userData is updated
   useEffect(() => {
@@ -50,9 +60,9 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     getFavoriteExercises();
   }, [userData])
 
-  useEffect(() => {
-    console.log("bm - workouts State: ", workouts)
-  }, [workouts])
+  // useEffect(() => {
+  //   console.log("bm - workouts State: ", workouts)
+  // }, [workouts])
 
   const getFavoriteExercises = async () => {
     try {
@@ -64,7 +74,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           timeCreated: exercise.saved,
         }
       })
-      console.log("bm - setting favorite exercises to: ", parsedExercises)
+      // console.log("bm - setting favorite exercises to: ", parsedExercises)
       setFavoriteExercises(parsedExercises);
     } catch (e) {
       console.log("bm - error fetching favorite exercises: ", e);
