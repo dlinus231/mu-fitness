@@ -82,6 +82,7 @@ model DefaultSet {
   // duration_set DurationSet?
   routine      Routine      @relation(fields: [routine_id], references: [id], onDelete: Cascade)
   routine_id   Int
+  set_order Int
 }
 
 // model DurationSet {

@@ -758,6 +758,7 @@ app.post(`/workout/routine/add`, async (req, res) => {
     const setResult = await prisma.defaultSet.create({
       data: {
         routine_id: result.id,
+        set_order: 0,
       },
     });
 
@@ -803,6 +804,86 @@ app.delete("/workout/routine/delete/:routineId", async (req, res) => {
     res.status(200).json(result);
   } catch (e) {
     console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+//Get info associated with a set
+app.get(`/workout/routine/set/:id`, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await prisma.defaultSet.findUnique({
+      where: { id: parseInt(id) },
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+const setDefaultSetOrder = async (req: any, res: any, next: any) => {
+  try {
+    const { routine_id } = req.body;
+
+    const routine = await prisma.routine.findUnique({
+      where: { id: routine_id },
+      include: { sets: true },
+    });
+
+    req.body.set_order = routine?.sets.length;
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+};
+
+//Create a set
+app.post(`/workout/routine/addSet`, setDefaultSetOrder, async (req, res) => {
+  const { routine_id, set_order } = req.body;
+  console.log(set_order);
+
+  try {
+    const result = await prisma.defaultSet.create({
+      data: { routine_id, set_order },
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+//Update a set
+app.post(`/workout/routine/set/update`, async (req, res) => {
+  const { set_id, repetitions, weight_lbs } = req.body;
+
+  try {
+    const result = await prisma.defaultSet.update({
+      where: { id: set_id },
+      data: { repetitions, weight_lbs },
+    });
+    res.status(201).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+//Delete a set
+app.delete(`/workout/routine/deleteSet/:id`, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await prisma.defaultSet.delete({
+      where: { id: parseInt(id) },
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
     res.sendStatus(400);
   }
 });

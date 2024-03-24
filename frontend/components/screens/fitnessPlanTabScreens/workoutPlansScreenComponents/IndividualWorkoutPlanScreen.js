@@ -78,6 +78,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     setLoading(true);
+    setShowRoutineInfo(false);
     fetchWorkout();
     fetchExercises();
     setExerciseIds([]); // Clear recommended exercises when a new workout is loaded
@@ -142,6 +143,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
     setEdited(false);
     navigation.navigate("EditWorkoutPlan", {
       workout_id,
+      prevPage,
+      workoutFrom,
     });
   };
 
@@ -573,7 +576,6 @@ const styles = StyleSheet.create({
   },
   subTitleText: {
     fontSize: 16,
-    // fontWeight: "bold",
     textAlign: "center",
     paddingBottom: "1%",
   },
@@ -598,7 +600,7 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   workoutInfo: {
-    backgroundColor: "#BBC8FF",
+    backgroundColor: "#CBCBCB",
     paddingVertical: 15,
     borderRadius: 10,
     paddingHorizontal: 12,

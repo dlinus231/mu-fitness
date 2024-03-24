@@ -23,7 +23,7 @@ import { useRoute } from "@react-navigation/native";
 
 const EditWorkoutPlanScreen = ({ navigation }) => {
   const route = useRoute();
-  const { workout_id } = route.params;
+  const { workout_id, prevPage, workoutFrom } = route.params;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -77,7 +77,11 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
         Alert.alert("Workout edited successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("IndividualWorkoutScreen", { workout_id: workout_id, workoutFrom: "FitnessPlans"}),
+            onPress: () =>
+              navigation.navigate("IndividualWorkoutScreen", {
+                workout_id: workout_id,
+                workoutFrom: "FitnessPlans",
+              }),
           },
         ]);
       }
@@ -100,7 +104,15 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("IndividualWorkoutScreen", {
+              workout_id,
+              prevPage,
+              workoutFrom,
+            })
+          }
+        >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
         {loading ? (
