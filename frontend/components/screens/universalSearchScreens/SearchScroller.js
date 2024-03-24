@@ -33,9 +33,9 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
     }, [data]);
 
   for(let key in thumbnails) {
-    console.log("ENTRY: " , key, thumbnails[key])
+    // console.log("ENTRY: " , key, thumbnails[key])
   }
-  console.log("THUMBDAILS: " + thumbnails)
+  // console.log("THUMBDAILS: " + thumbnails)
 
   return (
     <View style={styles.container}>
