@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Text, View, FlatList, RefreshControl } from "@gluestack-ui/themed";
 import TopBarMenu from "../TopBarMenu";
 
@@ -97,8 +97,8 @@ const FriendFeedScreen = ({ navigation }) => {
 
   return (
     <>
-      <TopBarMenu onSwitchPage={handleSwitchPage} />
-      <View style={styles.container}>
+      {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
+      <SafeAreaView style={styles.container}>
         <FlatList
           data={workouts}
           keyExtractor={item => item.id.toString()}
@@ -110,8 +110,7 @@ const FriendFeedScreen = ({ navigation }) => {
             />
           }
         />
-      </View>
-
+      </SafeAreaView>
     </>
   );
 };
@@ -120,7 +119,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 10
+    padding: 10,
+    paddingTop: '17%',
   },
   workoutPlan: {
     backgroundColor: '#FFF',

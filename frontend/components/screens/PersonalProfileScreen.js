@@ -99,7 +99,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     return (
       <TouchableOpacity
         style={styles.workoutPlan}
-        onPress={() => navigation.navigate("IndividualWorkoutScreen", { workout_id: item.id, workoutFrom: "PersonalProfile" })}
+        onPress={() => navigation.navigate("IndividualWorkoutScreen", { 
+          workout_id: item.id, 
+          prevPage: "PersonalProfile",
+          workoutFrom: "PersonalProfile" 
+        })}
       >
         <View style={styles.workoutMainContent}>
           <Text style={styles.workoutName}>{item.name}</Text>

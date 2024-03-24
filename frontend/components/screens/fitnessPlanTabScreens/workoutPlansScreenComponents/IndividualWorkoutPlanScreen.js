@@ -107,7 +107,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         Alert.alert("Workout deleted successfully", "", [
           {
             text: "Ok",
-            onPress: navigation.navigate("FitnessPlans"),
+            onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
           },
         ]);
       }
@@ -126,7 +126,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const handleEditWorkout = () => {
     setEdited(false);
     navigation.navigate("EditWorkoutPlan", {
-      workout_id,
+      workout_id: workout_id,
+      prevPage: "IndividualWorkoutScreen",
+      workoutFrom: "IndividualWorkoutScreen",
+      workoutFromFrom: workoutFrom,
     });
   };
 
@@ -229,7 +232,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   };
 
   const returnToWorkoutPlans = () => {
-    navigation.navigate(workoutFrom, { prevPage: prevPage });
+    navigation.navigate(workoutFrom, { prevPage: prevPage, workout_id: workout_id});
   };
 
   // fetch workout on initial render and if we try to access a new workout (meaning wokrout_id changed)

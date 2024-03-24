@@ -38,25 +38,13 @@ export default function FooterNavigator({ handleAuthChange }) {
 
   return (
     <Tab.Navigator
-      // initialRouteName="FriendFeed"
+      initialRouteName="PersonalProfile"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
       }}
     >
-      <Tab.Screen
-        name="FriendFeed"
-        component={FriendFeedScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name="people-sharp"
-              size={24}
-              color={focused ? "#6A5ACD" : "grey"}
-            />
-          ),
-        }}
-      />
+      
       {/* <Tab.Screen
         name="FitnessPlans"
         component={FitnessPlansScreen}
@@ -71,7 +59,7 @@ export default function FooterNavigator({ handleAuthChange }) {
         }}
       /> */}
       {/* Changed to only display workout plans */}
-      <Tab.Screen
+      {/* <Tab.Screen
         name="FitnessPlans"
         component={WorkoutPlansScreen}
         options={{
@@ -83,8 +71,8 @@ export default function FooterNavigator({ handleAuthChange }) {
             />
           ),
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="Upload"
         component={UploadScreen}
         options={{
@@ -96,7 +84,7 @@ export default function FooterNavigator({ handleAuthChange }) {
             />
           ),
         }}
-      />
+      /> */}
       {/* <Tab.Screen
         name="PublicFeed"
         component={PublicFeedScreen}
@@ -112,7 +100,7 @@ export default function FooterNavigator({ handleAuthChange }) {
         }}
       /> */}
       {/* Changed to display saved exercises */}
-      <Tab.Screen
+      {/* <Tab.Screen
         name="SavedExercises"
         component={SavedExercisesScreen}
         options={{
@@ -123,6 +111,20 @@ export default function FooterNavigator({ handleAuthChange }) {
               color={focused ? "#6A5ACD" : "grey"}
             />
             // <MaterialCommunityIcons name="layers-triple-outline" size={24} color={focused ? 'blue' : 'grey'} />
+          ),
+        }}
+      /> */}
+
+      <Tab.Screen
+        name="search"
+        component={SearchScreen}
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <MaterialIcons
+              name="search"
+              size={24}
+              color={focused ? "#6A5ACD" : "grey"}
+            />
           ),
         }}
       />
@@ -147,6 +149,21 @@ export default function FooterNavigator({ handleAuthChange }) {
           />
         )}
       </Tab.Screen>
+
+      <Tab.Screen
+        name="FriendFeed"
+        component={FriendFeedScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="people-sharp"
+              size={24}
+              color={focused ? "#6A5ACD" : "grey"}
+            />
+          ),
+        }}
+      />
+
       <Tab.Screen
         name="journal"
         component={JournalScreen}
@@ -165,11 +182,6 @@ export default function FooterNavigator({ handleAuthChange }) {
       <Tab.Screen
         name="ExerciseScreen"
         component={ExerciseScreen}
-        options={{ tabBarButton: () => null }}
-      />
-      <Tab.Screen
-        name="search"
-        component={SearchScreen}
         options={{ tabBarButton: () => null }}
       />
       <Tab.Screen

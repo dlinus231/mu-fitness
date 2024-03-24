@@ -59,7 +59,7 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
         Alert.alert("Workout created successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("FitnessPlans"),
+            onPress: () => navigation.navigate("PersonalProfile"),
           },
         ]);
       }
