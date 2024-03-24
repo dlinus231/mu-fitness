@@ -13,7 +13,7 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 import SearchScroller from "./SearchScroller";
 import SearchFilterBubble from "./SearchFilterBubble";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import { getYoutubeMeta } from "react-native-youtube-iframe";
 
@@ -114,8 +114,14 @@ const SearchScreen = ({}) => {
         break;
 
       case "users":
-        // console.log("bm - navigating to personal profile from universal search")
-        navigation.navigate("UserProfile", { userId: id });
+        currentUserId = await AsyncStorage.getItem("user_id");
+        // if the user is trying to navigate to their own profile, navigate to the personal profile tab
+        if (id == currentUserId) {
+          navigation.navigate("PersonalProfile");
+        }
+        else { // else just go to normal user profile tab
+          navigation.navigate("UserProfile", { userId: id });
+        }
         break;
 
       case "workouts":
