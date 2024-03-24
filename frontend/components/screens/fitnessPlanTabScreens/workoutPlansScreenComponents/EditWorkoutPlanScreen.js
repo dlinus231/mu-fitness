@@ -111,9 +111,10 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
     }
   };
 
+  // fetch workout on initial load and whenever workout_id changes
   useEffect(() => {
     fetchWorkout();
-  }, []);
+  }, [workout_id]);
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
