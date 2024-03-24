@@ -48,7 +48,7 @@ const FriendFeedScreen = ({ navigation }) => {
           timeCreated: workout.time_created,
         }
       });
-      console.log("bm - parsedWorkouts: ", parsedWorkouts)
+      // console.log("bm - parsedWorkouts: ", parsedWorkouts)
       setWorkouts(parsedWorkouts);
     } catch (e) {
       console.log("error fetching friend workouts for friendFeed page: ", e);

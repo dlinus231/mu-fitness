@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   Text,
   Alert,
+  FlatList,
+  RefreshControl,
+  Image,
 } from "react-native";
 import { View, VStack, Button, ButtonText, set } from "@gluestack-ui/themed";
 import { MaterialIcons } from "react-native-vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { formatDistanceToNow } from "date-fns";
+
 // import TopBarMenu from "../TopBarMenu";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,17 +21,20 @@ import axios from "axios";
 
 import { BACKEND_URL } from "@env";
 
-const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
-  // const handleSwitchPage = (page) => {
-  //   navigation.navigate(page, { prevPage: "PersonalProfile" });
-  // };
-
+const UserProfileScreen = ({ route, navigation }) => {
   const userIdFromRoute = route.params?.userId;
 
   const [userId, setUserId] = useState(userIdFromRoute); // id of user we want to display profile for (empty string means current user's profile)
   const [currentUserId, setCurrentUserId] = useState(""); // id of currently logged in user
 
   const [userData, setUserData] = useState(null);
+
+  const [activeTab, setActiveTab] = useState('workouts'); // 'workouts' or 'favoriteExercises'
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const [workouts, setWorkouts] = useState([]);
+  const [favoriteExercises, setFavoriteExercises] = useState([]);
 
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
@@ -84,15 +93,26 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
-    console.log("bm - fetching user data useEffect reached");
+    // console.log("bm - fetching user data useEffect reached");
     if (userId) {
       // fetch user data
       fetchUserData();
+      getFavoriteExercises();
     }
   }, [userId]);
 
+  // if userId is populated, then we should be re-fetching data every time the page is navigated to
+  useFocusEffect(
+    useCallback(() => {
+      console.log("bm - userProfileScreen focus callback conditional: " + (!userId || userId === ""))
+      if (!userId || userId === "") return;
+      fetchUserData();
+      getFavoriteExercises();
+    }, [])
+  )
+
   useEffect(() => {
-    console.log("bm - setIsLoading useEffect reached");
+    // console.log("bm - setIsLoading useEffect reached");
     if (currentUserId !== "" && userData !== null && userId) {
       setIsLoading(false);
     }
@@ -103,7 +123,35 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
     if (!userData) return;
     setFollowers(userData.followers.length);
     setFollowing(userData.following.length);
+
+    const parsedWorkouts = userData.workouts.map((workout) => {
+      return {
+        id: workout.id,
+        name: workout.name,
+        timeCreated: workout.time_created,
+      }
+    })
+    setWorkouts(parsedWorkouts);
+
+    getFavoriteExercises();
   }, [userData])
+
+  const getFavoriteExercises = async () => {
+    try {
+      const response = await axios.get(BACKEND_URL + `/exercises/saved/${userId}`);
+      const parsedExercises = response.data.map((exercise) => {
+        return {
+          id: exercise.id,
+          name: exercise.name,
+          timeCreated: exercise.saved,
+        }
+      })
+      // console.log("bm - setting favorite exercises to: ", parsedExercises)
+      setFavoriteExercises(parsedExercises);
+    } catch (e) {
+      console.log("bm - error fetching favorite exercises: ", e);
+    }
+  }
 
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
@@ -111,7 +159,7 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
       // fetch user data
       const response = await axios.get(BACKEND_URL + `/user/${userId}`);
       setUserData(response.data);
-      console.log("bm - set user data: ", response.data);
+      // console.log("bm - set user data: ", response.data);
     } catch (e) {
       console.log("bm - error fetching user data: ", e);
     }
@@ -124,10 +172,10 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
       await handleFollow();
     }
     fetchUserData();
+    getFavoriteExercises();
   }
 
   const handleFollow = async () => {
-    console.log("bm - now inside handleFollow")
     const curUserId = await AsyncStorage.getItem("user_id");
     if (parseInt(userId) === parseInt(curUserId)) {
       Alert.alert("You can't follow yourself dum dum");
@@ -167,6 +215,67 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
   };
 
+  const renderWorkoutItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        style={styles.workoutPlan}
+        onPress={() => navigation.navigate("IndividualWorkoutScreen", { workout_id: item.id, workoutFrom: "UserProfile" })}
+      >
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name}</Text>
+        </View>
+        
+        <Text style={styles.workoutTime}>created {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+
+      </TouchableOpacity>
+    );
+  }
+
+  const goToExercise = async (id) => {
+    const response = await axios.get(BACKEND_URL + `/exercises/one/${id}`);
+    navigation.navigate("ExerciseScreen", {
+      exerciseData: response.data,
+      prevPage: null,
+      exerciseFrom: "UserProfile",
+    });
+  };
+
+  // silly guy image lol
+  const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+
+  const renderExerciseItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.exerciseContainer}
+        onPress={() => {
+          goToExercise(item.id);
+        }}
+      >
+        <Image source={image} style={styles.exerciseImage} />
+        <Text
+          style={styles.exerciseName}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {item.name
+            .split(" ")
+            .map(
+              (word) => word.charAt(0).toUpperCase() + word.slice(1)
+            )
+            .join(" ")}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchUserData();
+    await getFavoriteExercises();
+    setRefreshing(false);
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -202,9 +311,60 @@ const UserProfileScreen = ({ route, navigation, handleAuthChange }) => {
           </View>
         </View>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleFollowUnfollow}>
-        <Text style={styles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsAndIconsContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleFollowUnfollow}>
+          <Text style={styles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('workouts')}>
+          <MaterialIcons
+            name="fitness-center"
+            size={30}
+            color={activeTab === 'workouts' ? '#6A5ACD' : '#aaa'} //
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
+          <MaterialIcons
+            name="favorite-border"
+            size={30}
+            color={activeTab === 'favoriteExercises' ? '#6A5ACD' : '#aaa'}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.contentContainerHeader}>
+        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
+      </View>
+
+      <View style={styles.contentContainer}>
+        {(activeTab === 'workouts' && workouts.length > 0) && (
+          <FlatList
+            data={workouts}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderWorkoutItem}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
+          />
+        )} 
+        {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
+          <FlatList
+            data={favoriteExercises}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderExerciseItem}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
+          />
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -223,6 +383,21 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'column',
     marginLeft: '5%',
+  },
+  contentContainerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    marginBottom: 0, 
+  },
+  contentContainerText: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    flex: 1, 
+  },
+  contentContainerButton: {
+    marginTop: 3,
   },
   username: {
     fontWeight: 'bold',
@@ -258,14 +433,90 @@ const styles = StyleSheet.create({
     backgroundColor: "#6A5ACD",
     padding: 10,
     borderRadius: 5,
-    width: '90%',
-    marginTop: 20,
+    width: '60%',
+    marginTop: 5,
   },
   buttonText: {
     textAlign: "center",
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  icon: {
+    marginTop: 10,
+  },
+  divider: {
+    height: 1, 
+    backgroundColor: '#D3D3D3',
+    width: '100%',
+    marginTop: 20, 
+    marginBottom: 10,
+  },
+  buttonsAndIconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    alignSelf: 'center', // center icons horitzontally
+  },
+  contentContainer: {
+    marginTop: 5,
+    marginBottom: '60%' // contols how close to the footerNavigator that the content (FlatLists) is
+  },
+  workoutName: {
+    fontWeight: 'bold',
+    marginTop: 8,
+    fontSize: 23,
+  },
+  workoutMainContent: {
+
+  },
+  workoutDetail: {
+    fontSize: 14,
+  },
+  workoutTime: {
+    fontSize: 12,
+    color: '#666', 
+    alignSelf: 'flex-end', 
+  },
+  workoutPlan: {
+    backgroundColor: '#FFF',
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginLeft: 16,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  workoutName: {
+    fontWeight: 'bold',
+    marginTop: 8,
+    fontSize: 23,
+  },
+  exerciseContainer: {
+    marginBottom: 16,
+  },
+  exerciseImage: {
+    width: 300,
+    height: 175,
+    borderRadius: 10,
+    marginLeft: '2%', // controls where the image is horizontally (how close to either side of screen)
+  },
+  exerciseName: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

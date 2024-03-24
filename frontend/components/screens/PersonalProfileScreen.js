@@ -161,6 +161,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchUserData();
+    await getFavoriteExercises();
     setRefreshing(false);
   };
 
@@ -228,7 +229,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Placeholder for the content based on the active tab */}
       <View style={styles.contentContainer}>
         {(activeTab === 'workouts' && workouts.length > 0) && (
           <FlatList
