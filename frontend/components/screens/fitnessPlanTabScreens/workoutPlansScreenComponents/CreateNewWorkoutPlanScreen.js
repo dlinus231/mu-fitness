@@ -81,10 +81,10 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
         <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            // style={styles.space}
-          >
-            <BackArrowIcon></BackArrowIcon>
+          onPress={() => navigation.navigate("FitnessPlans")}
+          // style={styles.space}
+        >
+          <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
           <View style={styles.container}>

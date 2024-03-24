@@ -8,44 +8,45 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique @db.VarChar(100)
-  last_login      DateTime  
-  password_hashed String    @db.VarChar(255)
-  time_created    DateTime  @default(now())
-  username        String    @db.VarChar(25)
+  id              Int                  @id @default(autoincrement())
+  email           String               @unique @db.VarChar(100)
+  last_login      DateTime
+  password_hashed String               @db.VarChar(255)
+  time_created    DateTime             @default(now())
+  username        String               @db.VarChar(25)
   workouts        Workout[]
-  active          Boolean @default(false)
-  authcode  AuthCode?
-  followers    Follow[] @relation("UserFollowing")
-  following    Follow[] @relation("UserFollowers")
-  saved_exercises UserSavedExercises[] 
+  active          Boolean              @default(false)
+  authcode        AuthCode?
+  followers       Follow[]             @relation("UserFollowing")
+  following       Follow[]             @relation("UserFollowers")
+  saved_exercises UserSavedExercises[]
 }
 
 model UserSavedExercises {
-  user User @relation(fields:[userId], references: [id], onDelete: Cascade)
-  userId Int
-  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   exerciseId Int
-  saved DateTime
+  saved      DateTime
 
   @@id([userId, exerciseId])
 }
 
 model Follow {
-  followerId   Int
-  followingId  Int
-  createdAt    DateTime @default(now())
-  follower     User     @relation("UserFollowers", fields: [followerId], references: [id])
-  following    User     @relation("UserFollowing", fields: [followingId], references: [id])
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id])
+
   @@id([followerId, followingId])
 }
 
 model AuthCode {
-  id Int @id @default(autoincrement())
-  user_id Int @unique
-  value Int
-  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  user_id     Int      @unique
+  value       Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   valid_until DateTime
 }
 
@@ -56,7 +57,7 @@ model Workout {
   difficulty   Difficulty
   description  String
   time_created DateTime   @default(now())
-  muscles      Muscle[]
+  // muscles      Muscle[]
   //Idea: autogenerate the muscle groups hit and have them displayed with the workout in order of intensity for that muscle group
   //fading in color as it goes to less-worked muscles
   routines     Routine[]
@@ -65,30 +66,45 @@ model Workout {
 }
 
 model Routine {
-  id          Int      @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   exercise_id Int
-  repetitions Int
-  rest        Int
+  rest        Int @default(60)
   workout_id  Int
-  weight_lbs  Int
-  exercise    Exercise @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
-  workout     Workout  @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  exercise    Exercise     @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  workout     Workout      @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  sets        DefaultSet[]
 }
 
+model DefaultSet {
+  id           Int          @id @default(autoincrement())
+  repetitions  Int @default(8)
+  weight_lbs   Int @default(45)
+  // duration_set DurationSet?
+  routine      Routine      @relation(fields: [routine_id], references: [id], onDelete: Cascade)
+  routine_id   Int
+}
+
+// model DurationSet {
+//   id             Int        @id @default(autoincrement())
+//   duration       Int
+//   default_set    DefaultSet @relation(fields: [default_set_id], references: [id])
+//   default_set_id Int        @unique
+// }
+
 model Exercise {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(255)
-  difficulty  Difficulty
-  description String
-  video_path  String
-  routines    Routine[]
-  muscles     Muscle[]
-  tags        Tag[]      @relation("ExerciseToTag")
-  embedding   Float[]
-  type String
-  equipment String
-  log_search_results  Float
-  users UserSavedExercises[]
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  difficulty         Difficulty
+  description        String
+  video_path         String
+  routines           Routine[]
+  muscles            Muscle[]
+  tags               Tag[]                @relation("ExerciseToTag")
+  embedding          Float[]
+  type               String
+  equipment          String
+  log_search_results Float
+  users              UserSavedExercises[]
 }
 
 model Tag {
@@ -99,17 +115,17 @@ model Tag {
 }
 
 model Muscle {
-  id        Int @id @default(autoincrement())
-  name      String @db.VarChar(255)
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(255)
   bodyPart_id Int
-  bodyPart BodyPart @relation(fields: [bodyPart_id], references: [id], onDelete: Cascade)
-  workouts Workout[]
-  exercises Exercise[]
+  bodyPart    BodyPart   @relation(fields: [bodyPart_id], references: [id], onDelete: Cascade)
+  // workouts Workout[]
+  exercises   Exercise[]
 }
 
 model BodyPart {
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(255)
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(255)
   muscles Muscle[]
 }
 
@@ -117,4 +133,9 @@ enum Difficulty {
   beginner
   intermediate
   expert
+}
+
+enum RoutineType {
+  default
+  duration
 }
