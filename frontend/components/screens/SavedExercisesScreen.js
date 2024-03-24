@@ -12,12 +12,27 @@ import axios from "axios";
 import { BACKEND_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import {getYoutubeMeta} from "react-native-youtube-iframe";
 
 const SavedExercisesScreen = ({ navigation }) => {
-  const image = require("../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+  const placeHolderImage = require("../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
 
   const [loading, setLoading] = useState(true);
   const [savedExercises, setSavedExercises] = useState([]);
+  const [thumbnails, setThumbnails] = useState({});
+  
+  const fetchThumbnails = async (data) => {
+    const thumbnailData = {};
+    for (const item of data) {
+      try {
+        const meta = await getYoutubeMeta(item.video_path);
+        thumbnailData[item.id] = meta.thumbnail_url;
+      } catch (error) {
+        console.error("Error fetching YouTube meta:", error);
+      }
+    }
+    setThumbnails(thumbnailData);
+  };
 
   const loadSavedExercises = async () => {
     try {
@@ -27,6 +42,7 @@ const SavedExercisesScreen = ({ navigation }) => {
       );
       setSavedExercises(response.data);
       setLoading(false);
+      fetchThumbnails(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -73,7 +89,14 @@ const SavedExercisesScreen = ({ navigation }) => {
                     handlePress(exercise.id);
                   }}
                 >
-                  <Image source={image} style={styles.exerciseImage} />
+                <Image
+                  source={
+                    thumbnails[exercise.id]
+                      ? { uri: thumbnails[exercise.id] }
+                      : placeHolderImage
+                  }
+                  style={styles.exerciseImage}
+                />
                   <Text
                     style={styles.exerciseName}
                     numberOfLines={1}

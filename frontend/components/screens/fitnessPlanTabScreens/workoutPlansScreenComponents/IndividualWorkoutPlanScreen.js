@@ -39,6 +39,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const [reps, setReps] = useState(8);
   const [rest, setRest] = useState(60);
   const [weight, setWeight] = useState(0);
+  const [exerciseIds, setExerciseIds] = useState([]);
+  const [recommendedExercises, setRecommendedExercises] = useState([]);
   // const [updatingRoutineState, setUpdateRoutineState] = useState({});
 
   // we will use this to check if the workout belongs to the current user
@@ -78,6 +80,21 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
     };
     checkIfOwnedByCurrentUser();
   }, [workoutOwnerId]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchWorkout();
+    fetchExercises();
+    setExerciseIds([]); // Clear recommended exercises when a new workout is loaded
+  }, [workout_id]);
+
+  useEffect(() => {
+    fetchRecommendations(); // fetchRecommendations() when exerciseIds changes
+  }, [exerciseIds]);
+
+  const addExerciseId = (id) => {
+    setExerciseIds([...exerciseIds, id]);
+  };
 
   const fetchWorkout = async () => {
     try {
@@ -136,6 +153,34 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
     });
   };
 
+  // TODO: recommendations reset after checking out a different workout, can change implementation
+  // to pull in previous exercise_ids whenever the workout_id changes!
+  const fetchRecommendations = async () => {
+    try {
+      if(exerciseIds.length === 0) {
+        return
+      }
+      const exerciseIdsString = exerciseIds.join("+")
+      console.log("ENDPOINT: " + BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`)
+
+      const response = await axios.get(BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`);
+      if(response.status === 200) {
+        const recommendations = []; 
+        response.data.forEach((exercise) => {
+          recommendations.push({
+            key: exercise.id,
+            value: exercise.name,
+          });
+        });
+        setRecommendedExercises(recommendations); 
+        // console.log("Recommendations: " + response.data)
+      }
+
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    }
+  };
+
   const fetchExercises = async () => {
     try {
       const response = await axios.get(BACKEND_URL + "/exercises/names");
@@ -173,6 +218,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
+        addExerciseId(selected); // used to fetchRecommendations
       }
     } catch (error) {
       if (error.response) {
@@ -315,22 +361,17 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                   ))}
               </View>
 
-              <View>
-                {routines.map((routine) => {
-                  return (
-                    <Routine
-                      routine={routine}
-                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
-                      onUpdateRoutine={onUpdateRoutine}
-                      key={routine.id}
-                      isOwnedByCurrentUser={isOwnedByCurrentUser}
-                    />
-                  );
-                })}
-              </View>
-
               {addingWorkout ? (
                 <View style={styles.space}>
+                  <Text>Recommended Exercises:</Text>
+                  <SelectList
+                    setSelected={(val) => setSelected(val)}
+                    data={recommendedExercises}
+                    save="key"
+                    search={true}
+                    maxHeight={240}
+                    placeholder="Select exercises"
+                  />
                   <Text>New Exercise:</Text>
                   <SelectList
                     setSelected={(val) => setSelected(val)}
@@ -403,6 +444,20 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 )
               )}
+              <View>
+                {/* Display the most recently added routine first */}
+                {routines.slice().reverse().map((routine) => {
+                  return (
+                    <Routine
+                      routine={routine}
+                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
+                      onUpdateRoutine={onUpdateRoutine}
+                      key={routine.id}
+                    />
+                  );
+                })}
+              </View>
+
             </View>
 
             {addingWorkout ? (
