@@ -33,7 +33,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // fetch the user data each time the page is navigated back to
   useFocusEffect(
     useCallback(() => {
-      if (!userData) return;
       fetchUserData();
       getFavoriteExercises();
     }, [])

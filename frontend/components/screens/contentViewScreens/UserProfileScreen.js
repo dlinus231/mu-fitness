@@ -104,8 +104,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   // if userId is populated, then we should be re-fetching data every time the page is navigated to
   useFocusEffect(
     useCallback(() => {
-      console.log("bm - userProfileScreen focus callback conditional: " + (!userId || userId === ""))
-      if (!userId || userId === "") return;
       fetchUserData();
       getFavoriteExercises();
     }, [])
