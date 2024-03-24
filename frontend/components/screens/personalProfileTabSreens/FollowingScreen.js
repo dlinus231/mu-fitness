@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View, set } from '@gluestack-ui/themed';
+import { MaterialIcons } from "react-native-vector-icons";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CommonActions } from '@react-navigation/native';
 
 import { BACKEND_URL } from "@env";
 
@@ -9,9 +13,28 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const FollowingScreen = ({route, navigation}) => {
   // userId is the id of the user whose following list we want to display
-  const { userId } = route.params;
+  const userId = route.params.userId;
 
+  // this is the page that the user is navigating from
+  const navigatingFrom = route.params.navigatingFrom;
+
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [followingList, setFollowingList] = useState(null);
+
+  // set the current user id on initial load
+  useEffect(() => {
+    const getCurrentUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem('user_id');
+        setCurrentUserId(id);
+      }
+      catch (e) {
+        console.log("error getting current user id: ", e);
+      }
+    }
+
+    getCurrentUserId();
+  }, []);
 
   const fetchFollowingList = useCallback(async () => {
     const response = await axios.get(BACKEND_URL + `/user/following/${userId}`);
@@ -26,26 +49,59 @@ const FollowingScreen = ({route, navigation}) => {
     })
 
     if (response.status == 200) {
-      console.log("bm - following list2: ", followingList);
       setFollowingList(followingList);
     }
     else {
-      console.log("bm - error getting following list");
+      console.log("error getting following list: ", response.data);
     }
   }, [userId]);
 
-  const renderItem = ({ item }) => {
-    return (
-      <TouchableOpacity onPress={() => navigation.navigate('PersonalProfile', { userId: item.id })}>
-        <Text>{item.username}</Text>
-      </TouchableOpacity>
+  const getTitleText = () => {
+    // if the userId is the current user, then we want to display "Your Followers"
+    // otherwise, we want to display "Followers"
+    try {
+      if (userId === parseInt(currentUserId)) {
+        return "Accounts you Follow";
+      }
+      else {
+        return "Followed Accounts";
+      }
+    }
+    catch (e) {
+      return "Followed Accounts";
+    }
+  }
+
+  const handleBackButtonPress = () => { 
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: navigatingFrom,
+        params: { prevPage: "followingList", userId: userId},
+      })
     );
   }
 
-  // on each load, we should fetch the user's following list
-  // useEffect(() => {
-  //   fetchFollowingList();
-  // }, [])
+  const handleNavToProfile = async (userId) => {
+    // need to go to personal profile page if the user is the current user
+    if (userId === parseInt(currentUserId)) {
+      navigation.navigate('PersonalProfile');
+    }
+    else {
+      navigation.navigate('UserProfile', { userId: userId });
+    }
+  }
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.itemContainer} onPress={() => handleNavToProfile(item.id)}>
+      <MaterialIcons
+          name="account-circle"
+          size={48}
+          color="#000" 
+          style={styles.avatar}
+        />
+      <Text style={styles.username}>{item.username}</Text>
+    </TouchableOpacity>
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -55,33 +111,17 @@ const FollowingScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.topText}>Accounts you follow: </Text>
-      <View>
-        {followingList && followingList.map((user) => {
-          return (
-            <TouchableOpacity key={user.id} onPress={() => navigation.navigate('PersonalProfile', { userId: user.id })}>
-              <Text>{user.username}</Text>
-            </TouchableOpacity>
-          )
-        })}
+      <View style={styles.header}>
+        <Text style={styles.title}>{getTitleText()}</Text>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackButtonPress}>
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.bottomContent}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PersonalProfile')}>
-            <Text style={{ color: "white" }}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* <FlatList 
+      <FlatList
         data={followingList}
-        renderItem={({item}) => (
-          <TouchableOpacity onPress={() => navigation.navigate('PersonalProfile', { userId: item.id })}>
-            <Text>{item.username}</Text>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      /> */}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+      />
     </View>
   );
 };
@@ -117,9 +157,35 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    padding: 10,
+    paddingTop: '15%',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+  },
+  avatar: {
+    marginRight: 10,
+  },
+  username: {
+    fontSize: 18,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
   

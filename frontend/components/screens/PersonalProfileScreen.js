@@ -189,13 +189,13 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           <Text style={styles.username}>{userData.username}</Text>
           <View style={styles.stats}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("followersList", { userId: userData.id })}
+              onPress={() => navigation.navigate("followersList", { userId: userData.id, navigatingFrom: "PersonalProfile"})}
             >
               <Text style={styles.statText}>{followers} Followers</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
-              onPress={() => navigation.navigate("followingList", { userId: userData.id })}
+              onPress={() => navigation.navigate("followingList", { userId: userData.id, navigatingFrom: "PersonalProfile"})}
             >
               <Text style={styles.statText}>{following} Following</Text>
             </TouchableOpacity>

@@ -77,7 +77,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (currentUserId === "" || userId === "") return;
     const checkIfFollowing = async () => {
-      print("bm - checking if following")
       try {
         const response = await axios.get(
           BACKEND_URL + `/user/follows/${currentUserId}/${userId}`
@@ -295,13 +294,13 @@ const UserProfileScreen = ({ route, navigation }) => {
           <Text style={styles.username}>{userData.username}</Text>
           <View style={styles.stats}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("followersList", { userId: userData.id })}
+              onPress={() => navigation.navigate("followersList", { userId: userData.id, navigatingFrom: "UserProfile"})}
             >
               <Text style={styles.statText}>{followers} Followers</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
-              onPress={() => navigation.navigate("followingList", { userId: userData.id })}
+              onPress={() => navigation.navigate("followingList", { userId: userData.id, navigatingFrom: "UserProfile"})}
             >
               <Text style={styles.statText}>{following} Following</Text>
             </TouchableOpacity>
