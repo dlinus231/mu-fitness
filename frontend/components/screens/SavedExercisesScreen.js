@@ -24,6 +24,7 @@ const SavedExercisesScreen = ({ navigation }) => {
   const fetchThumbnails = async (data) => {
     const thumbnailData = {};
     for (const item of data) {
+      if (!item.video_path) continue;
       try {
         const meta = await getYoutubeMeta(item.video_path);
         thumbnailData[item.id] = meta.thumbnail_url;
