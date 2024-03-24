@@ -19,6 +19,7 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
       const fetchThumbnails = async () => {
         const thumbnailData = {};
         for (const item of data) {
+          if (!item.video_path) continue;
           try {
             const meta = await getYoutubeMeta(item.video_path);
             thumbnailData[item.id] = meta.thumbnail_url;
@@ -33,9 +34,9 @@ const SearchScroller = ({ category, data, handleItemPress }) => {
     }, [data]);
 
   for(let key in thumbnails) {
-    console.log("ENTRY: " , key, thumbnails[key])
+    // console.log("ENTRY: " , key, thumbnails[key])
   }
-  console.log("THUMBDAILS: " + thumbnails)
+  // console.log("THUMBDAILS: " + thumbnails)
 
   return (
     <View style={styles.container}>

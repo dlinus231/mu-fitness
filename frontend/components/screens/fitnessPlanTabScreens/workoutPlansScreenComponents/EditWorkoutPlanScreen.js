@@ -19,11 +19,15 @@ import { Text, View } from "@gluestack-ui/themed";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SelectList } from "react-native-dropdown-select-list";
-import { useRoute } from "@react-navigation/native";
+import { CommonActions, useRoute } from "@react-navigation/native";
 
 const EditWorkoutPlanScreen = ({ navigation }) => {
   const route = useRoute();
-  const { workout_id } = route.params;
+
+  const workout_id = route.params?.workout_id;
+  const prevPage = route.params?.prevPage;
+  const workoutFrom = route.params?.workoutFrom;
+  const workoutFromFrom = route.params?.workoutFromFrom;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -77,7 +81,21 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
         Alert.alert("Workout edited successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("FitnessPlans", { workout_id: workout_id}),
+            onPress: navigation.dispatch(
+              CommonActions.navigate({
+                name: workoutFrom,
+                params: { 
+                  workoutFrom: workoutFromFrom,
+                  prevPage: prevPage,
+                  workout_id: workout_id
+                },
+              })
+            ),
+            // onPress: () => navigation.navigate("IndividualWorkoutScreen", { 
+            //   workout_id: workout_id, 
+            //   workoutFrom: "PersonalProfile", 
+            //   prevPage: "PersonalProfile"
+            // }),
           },
         ]);
       }
@@ -93,14 +111,25 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
     }
   };
 
+  // fetch workout on initial load and whenever workout_id changes
   useEffect(() => {
     fetchWorkout();
-  }, []);
+  }, [workout_id]);
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        {/* <TouchableOpacity onPress={() => navigation.goBack()}> */}
+        <TouchableOpacity onPress={() => navigation.dispatch(
+          CommonActions.navigate({
+            name: workoutFrom,
+            params: { 
+              workoutFrom: workoutFromFrom,
+              prevPage: prevPage,
+              workout_id: workout_id
+            },
+          })
+        )}>
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
         {loading ? (

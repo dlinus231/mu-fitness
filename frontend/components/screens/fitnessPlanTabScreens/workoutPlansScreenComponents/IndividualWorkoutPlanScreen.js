@@ -16,11 +16,10 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { Text, View, set } from "@gluestack-ui/themed";
-import { Octicons } from "@expo/vector-icons";
 import { BACKEND_URL } from "@env";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
-import { MaterialIcons } from "@expo/vector-icons";
 import Routine from "./Routine";
+import RoutineInfo from "./RoutineInfo";
 import {
   SelectList,
   MultipleSelectList,
@@ -36,9 +35,6 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const [addingWorkout, setAddingWorkout] = useState(false);
   const [exercises, setExercises] = useState(false);
   const [selected, setSelected] = useState("");
-  const [reps, setReps] = useState(8);
-  const [rest, setRest] = useState(60);
-  const [weight, setWeight] = useState(0);
   const [exerciseIds, setExerciseIds] = useState([]);
   const [recommendedExercises, setRecommendedExercises] = useState([]);
   // const [updatingRoutineState, setUpdateRoutineState] = useState({});
@@ -46,6 +42,11 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   // we will use this to check if the workout belongs to the current user
   const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
   const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
+
+  const [showRoutineInfo, setShowRoutineInfo] = useState(false);
+  const [routineInfoId, setRoutineInfoId] = useState(-1);
+
+  // console.log("bm - individual workout plan screen route params: ", route.params);
 
   const workout_id = route.params?.workout_id;
   const prevPage = route.params?.prevPage;
@@ -63,10 +64,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         const uId = await AsyncStorage.getItem("user_id");
         if (uId !== null) {
           if (uId == workoutOwnerId) {
-            // console.log("bm - setting isOwnedByCurrentUser to true because user_id matches workoutOwnerId");
-            // console.log("bm - uId: ", uId);
-            // console.log("bm - workoutOwnerId: ", workoutOwnerId);
             setIsOwnedByCurrentUser(true);
+          }  
+          else {
+            setIsOwnedByCurrentUser(false);
           }
         }
       } catch (e) {
@@ -78,6 +79,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     setLoading(true);
+    setShowRoutineInfo(false);
     fetchWorkout();
     fetchExercises();
     setExerciseIds([]); // Clear recommended exercises when a new workout is loaded
@@ -122,7 +124,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         Alert.alert("Workout deleted successfully", "", [
           {
             text: "Ok",
-            onPress: navigation.navigate("FitnessPlans"),
+            onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
           },
         ]);
       }
@@ -141,7 +143,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const handleEditWorkout = () => {
     setEdited(false);
     navigation.navigate("EditWorkoutPlan", {
-      workout_id,
+      workout_id: workout_id,
+      prevPage: "IndividualWorkoutScreen",
+      workoutFrom: "IndividualWorkoutScreen",
+      workoutFromFrom: workoutFrom,
     });
   };
 
@@ -149,25 +154,30 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   // to pull in previous exercise_ids whenever the workout_id changes!
   const fetchRecommendations = async () => {
     try {
-      if(exerciseIds.length === 0) {
-        return
+      if (exerciseIds.length === 0) {
+        return;
       }
-      const exerciseIdsString = exerciseIds.join("+")
-      console.log("ENDPOINT: " + BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`)
+      const exerciseIdsString = exerciseIds.join("+");
+      console.log(
+        "ENDPOINT: " +
+          BACKEND_URL +
+          `/exercises/recommendations/${exerciseIdsString}`
+      );
 
-      const response = await axios.get(BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`);
-      if(response.status === 200) {
-        const recommendations = []; 
+      const response = await axios.get(
+        BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`
+      );
+      if (response.status === 200) {
+        const recommendations = [];
         response.data.forEach((exercise) => {
           recommendations.push({
             key: exercise.id,
             value: exercise.name,
           });
         });
-        setRecommendedExercises(recommendations); 
+        setRecommendedExercises(recommendations);
         // console.log("Recommendations: " + response.data)
       }
-
     } catch (error) {
       console.error("Error fetching recommendations:", error);
     }
@@ -182,7 +192,13 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         response.data.forEach((exercise) => {
           exerciseIdNames.push({
             key: exercise.id,
-            value: exercise.name,
+            value: exercise.name
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" "),
           });
         });
 
@@ -202,9 +218,6 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
       const response = await axios.post(BACKEND_URL + `/workout/routine/add`, {
         workout_id,
         exercise_id: selected,
-        reps,
-        rest,
-        weight,
       });
       if (response.status == 201) {
         Alert.alert("Exercise added successfully");
@@ -273,19 +286,17 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   };
 
   const returnToWorkoutPlans = () => {
-    navigation.navigate(workoutFrom, { prevPage: prevPage });
+    navigation.navigate(workoutFrom, { prevPage: prevPage, workout_id: workout_id});
   };
 
+  // fetch workout on initial render and if we try to access a new workout (meaning wokrout_id changed)
   useEffect(() => {
     setLoading(true);
     fetchWorkout();
     fetchExercises();
-  }, []);
+  }, [workout_id]);
 
   useEffect(() => {
-    setReps(8);
-    setRest(60);
-    setWeight(0);
     setSelected("");
   }, [addingWorkout]);
 
@@ -295,42 +306,54 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   }, [edited]);
 
   return (
-    <TouchableWithoutFeedback
-      style={styles.container}
-      onPress={dismissKeyboard}
-    >
-      <ScrollView style={styles.content}>
-        {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
-        <TouchableOpacity
-          style={[
-            styles.chevron,
-            { flexDirection: "row", alignItems: "center" },
-          ]}
-          onPress={returnToWorkoutPlans}
-        >
-          <BackArrowIcon></BackArrowIcon>
-          <Text> Back to your Workout Plans</Text>
-        </TouchableOpacity>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          <>
+    <>
+      <TouchableWithoutFeedback
+        style={styles.container}
+        onPress={dismissKeyboard}
+      >
+        <ScrollView style={styles.content}>
+          {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
+          <TouchableOpacity
+            style={[
+              styles.chevron,
+              { flexDirection: "row", alignItems: "center" },
+            ]}
+            onPress={returnToWorkoutPlans}
+          >
+            <BackArrowIcon></BackArrowIcon>
+            {/* <Text> Back to your Workout Plans</Text> */}
+          </TouchableOpacity>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
             <View style={styles.container}>
-              <Text style={styles.titleText}>{workout.name}</Text>
-              <Text style={styles.subTitleText}>
-                {workout.difficulty} difficulty
-              </Text>
-              <Text style={styles.notesText}>Notes: {workout.description}</Text>
-              {isOwnedByCurrentUser && (
-                <View style={styles.topButtonContainer}>
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={handleEditWorkout}
-                  >
-                    <Text style={{ color: "white" }}> Edit Plan </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <View style={styles.workoutInfo}>
+                <Text style={styles.titleText}>{workout.name}</Text>
+                <Text style={styles.subTitleText}>
+                  Difficulty:{" "}
+                  {workout.difficulty
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </Text>
+                <Text style={styles.notesText}>{workout.description}</Text>
+                {isOwnedByCurrentUser && (
+                  <View style={styles.topButtonContainer}>
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={handleEditWorkout}
+                    >
+                      <Text style={{ color: "black" }}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={handleDeleteWorkout}
+                    >
+                      <Text style={{ color: "#FF0000" }}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
 
               <Text style={styles.exercisesText}>Exercises</Text>
 
@@ -342,7 +365,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                         You haven't added any exercises to this workout yet.
                       </Text>
                       <Text style={styles.no_exercises_text}>
-                        Add a set by clicking the button below.
+                        Add an exercise by clicking the button below.
                       </Text>
                     </>
                   ) : (
@@ -352,56 +375,37 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                   ))}
               </View>
 
+              <View>
+                {routines.map((routine) => {
+                  return (
+                    <Routine
+                      routine={routine}
+                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
+                      onUpdateRoutine={onUpdateRoutine}
+                      key={routine.id}
+                      isOwnedByCurrentUser={isOwnedByCurrentUser}
+                      setShowRoutineInfo={setShowRoutineInfo}
+                      setRoutineInfoId={setRoutineInfoId}
+                    />
+                  );
+                })}
+              </View>
+
               {addingWorkout ? (
-                <View style={styles.space}>
-                  <Text>Recommended Exercises:</Text>
-                  <SelectList
-                    setSelected={(val) => setSelected(val)}
-                    data={recommendedExercises}
-                    save="key"
-                    search={true}
-                    maxHeight={240}
-                    placeholder="Select exercises"
-                  />
-                  <Text>New Exercise:</Text>
+                <View style={[styles.space, styles.addWorkout]}>
+                  <Text style={styles.addExercisesText}>Add Exercise</Text>
                   <SelectList
                     setSelected={(val) => setSelected(val)}
                     data={exercises}
                     save="key"
                     search={true}
                     maxHeight={240}
-                    placeholder="Select exercises"
+                    placeholder="Select Exercises"
                   />
-                  <View style={styles.inputContainer}>
-                    <Text style={{ flex: 1 }}>Repetitions:</Text>
-                    <TextInput
-                      keyboardType="numeric"
-                      style={[styles.input, { flex: 1 }]}
-                      value={reps.toString()}
-                      onChangeText={setReps}
-                    ></TextInput>
-                  </View>
-                  <View style={styles.inputContainer}>
-                    <Text style={{ flex: 1 }}>Rest Time (s):</Text>
-                    <TextInput
-                      keyboardType="numeric"
-                      style={[styles.input, { flex: 1 }]}
-                      value={rest.toString()}
-                      onChangeText={setRest}
-                    ></TextInput>
-                  </View>
-                  <View style={styles.inputContainer}>
-                    <Text style={{ flex: 1 }}>Weight (lbs):</Text>
-                    <TextInput
-                      keyboardType="numeric"
-                      style={[styles.input, { flex: 1 }]}
-                      value={weight.toString()}
-                      onChangeText={setWeight}
-                    ></TextInput>
-                  </View>
+
                   <View style={styles.submit_button}>
                     <Button
-                      title="Add Exercise"
+                      title="Add"
                       onPress={() => {
                         if (selected != "") {
                           handleAddExercise();
@@ -430,14 +434,17 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                       setAddingWorkout(true);
                     }}
                   >
-                    <MaterialIcons name="post-add" size={48} color="black" />
-                    <Text>Add an exercise</Text>
+                    {/* <MaterialIcons name="post-add" size={48} color="black" /> */}
+                    <Text style={styles.addNewText}>Add a New Exercise</Text>
                   </TouchableOpacity>
                 )
               )}
-              <View>
-                {/* Display the most recently added routine first */}
-                {routines.slice().reverse().map((routine) => {
+              {/* Display the most recently added routine first */}
+              {/* <View>
+              {routines
+                .slice()
+                .reverse()
+                .map((routine) => {
                   return (
                     <Routine
                       routine={routine}
@@ -447,45 +454,45 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                     />
                   );
                 })}
-              </View>
+            </View> */}
 
-            </View>
-
-            {addingWorkout ? (
-              <></>
-            ) : (
-              isOwnedByCurrentUser && (
-                <View style={styles.bottomContent}>
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      //Todo conditionally render buttons if this workout belongs to this user
-                      style={styles.deleteButton}
-                      onPress={handleDeleteWorkout}
-                    >
-                      <Text style={{ color: "lightcoral" }}>
-                        Delete Workout Plan
-                      </Text>
-                    </TouchableOpacity>
-                    {/* <View style={{ width: 20 }}></View> */}
+              {addingWorkout ? (
+                <></>
+              ) : (
+                isOwnedByCurrentUser && (
+                  <View style={styles.bottomContent}>
+                    <View style={styles.buttonContainer}></View>
                   </View>
-                </View>
-              )
-            )}
-          </>
-        )}
-        {/* </KeyboardAvoidingView> */}
-      </ScrollView>
-    </TouchableWithoutFeedback>
+                )
+              )}
+            </View>
+          )}
+          {/* </KeyboardAvoidingView> */}
+        </ScrollView>
+      </TouchableWithoutFeedback>
+      {showRoutineInfo && (
+        <RoutineInfo
+          setShowRoutineInfo={setShowRoutineInfo}
+          routineInfoId={routineInfoId}
+          fetchWorkout={fetchWorkout}
+          isOwnedByCurrentUser={isOwnedByCurrentUser}
+        ></RoutineInfo>
+      )}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   addNewButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "#CCCCCC",
+    padding: 30,
+    backgroundColor: "#6A5ACD",
     marginTop: 20,
+    borderRadius: 10,
+  },
+  addNewText: {
+    textAlign: "center",
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
   bottomContent: {
     justifyContent: "center",
@@ -497,10 +504,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   topButtonContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingBottom: "5%",
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    paddingHorizontal: "5%",
+    paddingVertical: "3%",
   },
   container: {
     padding: "3%",
@@ -514,7 +522,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderWidth: 2,
-    borderColor: "lightcoral",
+    borderColor: "#FF0000",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -522,9 +530,9 @@ const styles = StyleSheet.create({
   },
   editButton: {
     borderWidth: 2,
-    borderColor: "#6A5ACD",
+    borderColor: "#90EE90",
     borderRadius: 10,
-    backgroundColor: "#6A5ACD",
+    backgroundColor: "#90EE90",
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
@@ -570,21 +578,34 @@ const styles = StyleSheet.create({
   },
   subTitleText: {
     fontSize: 16,
-    // fontWeight: "bold",
     textAlign: "center",
     paddingBottom: "1%",
   },
   notesText: {
     fontSize: 16,
     textAlign: "center",
-    paddingBottom: "3%",
+    paddingTop: "5%",
   },
   exercisesText: {
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "left",
-    paddingTop: "5%",
+    paddingTop: "6%",
     paddingLeft: "1%",
+    textAlign: "center",
+  },
+  addExercisesText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingTop: "6%",
+    paddingLeft: "1%",
+    textAlign: "center",
+    marginBottom: "4%",
+  },
+  workoutInfo: {
+    backgroundColor: "#CBCBCB",
+    paddingVertical: 15,
+    borderRadius: 10,
+    paddingHorizontal: 12,
   },
 });
 export default IndividualWorkoutPlanScreen;

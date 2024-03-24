@@ -23,11 +23,14 @@ import {
   SelectList,
   MultipleSelectList,
 } from "react-native-dropdown-select-list";
+import { CommonActions } from "@react-navigation/native";
 
-const CreateNewWorkoutPlanScreen = ({ navigation }) => {
+const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState("beginner");
+
+  const prevPage = route.params?.prevPage;
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -56,7 +59,7 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
         Alert.alert("Workout created successfully", "", [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("FitnessPlans"),
+            onPress: () => navigation.navigate("PersonalProfile"),
           },
         ]);
       }
@@ -81,7 +84,15 @@ const CreateNewWorkoutPlanScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
         <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            // onPress={() => navigation.goBack()}
+            onPress={() => {
+              navigation.dispatch(
+                CommonActions.navigate({
+                  name: prevPage,
+                  params: { prevPage: prevPage },
+                })
+              )
+            }}
             // style={styles.space}
           >
             <BackArrowIcon></BackArrowIcon>
