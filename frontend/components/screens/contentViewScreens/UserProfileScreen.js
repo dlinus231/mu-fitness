@@ -332,7 +332,7 @@ const UserProfileScreen = ({ route, navigation }) => {
       <View style={styles.divider} />
 
       <View style={styles.contentContainerHeader}>
-        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
+        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Favorite Exercises"}</Text>
       </View>
 
       <View style={styles.contentContainer}>

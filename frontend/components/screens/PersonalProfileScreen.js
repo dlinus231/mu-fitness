@@ -226,7 +226,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       <View style={styles.divider} />
 
       <View style={styles.contentContainerHeader}>
-        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Saved Exercises"}</Text>
+        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Favorite Exercises"}</Text>
         <TouchableOpacity style={styles.contentContainerButton} onPress={handleAddMoreButtonPress}>
           <MaterialIcons name="add-circle" size={32} color="#6A5ACD" />
         </TouchableOpacity>
