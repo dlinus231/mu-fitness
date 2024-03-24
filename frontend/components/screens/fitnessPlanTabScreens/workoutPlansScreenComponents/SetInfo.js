@@ -4,14 +4,20 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import SetEditor from "./SetEditor";
 
-const SetInfo = ({ item, handleRemoveSet, editing, fetchRoutineInfo }) => {
+const SetInfo = ({
+  item,
+  index,
+  handleRemoveSet,
+  editing,
+  fetchRoutineInfo,
+}) => {
   const [editingSet, setEditingSet] = useState(false);
 
   return (
     <>
       <View key={item.id} style={styles.card}>
         <Text>
-          Set {item.set_order + 1}: {item.repetitions} x {item.weight_lbs}lbs
+          Set {parseInt(index) + 1}: {item.repetitions} x {item.weight_lbs}lbs
         </Text>
         {editing && (
           <View style={styles.setButtonContainer}>

@@ -75,10 +75,11 @@ const RoutineInfo = ({
     }
   };
 
-  const renderSet = (item) => {
+  const renderSet = (item, index) => {
     return (
       <SetInfo
         item={item}
+        index={index}
         handleRemoveSet={handleRemoveSet}
         editing={editing}
         fetchRoutineInfo={fetchRoutineInfo}
@@ -97,7 +98,7 @@ const RoutineInfo = ({
         <FlatList
           data={sets}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => renderSet(item)}
+          renderItem={({ item, index }) => renderSet(item, index)}
         />
         {editing && (
           <>
