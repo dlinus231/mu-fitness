@@ -68,6 +68,9 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
             // console.log("bm - workoutOwnerId: ", workoutOwnerId);
             setIsOwnedByCurrentUser(true);
           }
+          else {
+            setIsOwnedByCurrentUser(false);
+          }
         }
       } catch (e) {
         console.log("bm - error getting user id: ", e);
