@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Text, View, set } from '@gluestack-ui/themed';
 
 import { MaterialIcons } from "react-native-vector-icons";
@@ -115,7 +115,7 @@ const FollowersScreen = ({route, navigation}) => {
   )
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{getTitleText()}</Text>
         <TouchableOpacity style={styles.backButton} onPress={handleBackButtonPress}>
@@ -127,7 +127,7 @@ const FollowersScreen = ({route, navigation}) => {
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
