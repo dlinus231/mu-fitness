@@ -134,7 +134,7 @@ const SearchScreen = ({}) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.topContent}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
             setSearchBar("");
@@ -151,8 +151,8 @@ const SearchScreen = ({}) => {
           }}
         >
           <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity>
-        <View style={{ width: "90%", paddingHorizontal: "5%" }}>
+        </TouchableOpacity> */}
+        <View style={{ width: "100%", paddingHorizontal: "5%" }}>
           <TextInput
             ref={TextInputRef}
             style={styles.text}
