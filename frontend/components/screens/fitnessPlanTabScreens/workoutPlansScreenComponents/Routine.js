@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  SafeAreaView,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios";
 import { Text, View, Button, ButtonText } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
 
-const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUser }) => {
+const Routine = ({
+  routine,
+  onDeleteRoutine,
+  onUpdateRoutine,
+  isOwnedByCurrentUser,
+  setShowRoutineInfo,
+  setRoutineInfoId,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [exercise, setExercise] = useState("");
 
@@ -12,12 +24,15 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUs
   const [rest, setRest] = useState(routine.rest);
   const [weight, setWeight] = useState(routine.weight_lbs);
 
+  const [loading, setLoading] = useState(true);
+
   const fetchExercise = async () => {
     try {
       const result = await axios.get(
         BACKEND_URL + `/exercises/one/${routine.exercise_id}`
       );
-      setExercise(result.data);
+      await setExercise(result.data);
+      setLoading(false);
     } catch (error) {
       if (error.response) {
         "Server Issue: Fetching Exercises Failed",
@@ -63,14 +78,16 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUs
     setIsEditing(false);
 
     // TODO make a put request to update the routine
-      // await the put request so that it saves the new routine before continuing
+    // await the put request so that it saves the new routine before continuing
 
     await onUpdateRoutine(routine.id, updatedRoutineData);
   };
 
   const _renderEditingView = () => {
     return (
-      <View style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}>
+      <View
+        style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}
+      >
         <Text>Editing</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Reps</Text>
@@ -102,7 +119,6 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUs
 
         <View style={styles.bottomContent}>
           <View style={styles.buttonContainer}>
-            
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={_handleEditButtonClick}
@@ -117,55 +133,45 @@ const Routine = ({ routine, onDeleteRoutine, onUpdateRoutine, isOwnedByCurrentUs
             >
               <Text style={{ color: "white" }}>Update</Text>
             </TouchableOpacity>
-
           </View>
         </View>
       </View>
     );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
-  return isEditing ? _renderEditingView() : (
-    <View style={{ marginTop: 15, backgroundColor: "lightgray", padding: 10 }}>
-      <Text>{exercise.name}</Text>
-      <Text>Repetitions: {routine.repetitions}</Text>
-      <Text>Rest: {routine.rest} seconds</Text>
-      <Text>Weight: {routine.weight_lbs} lbs</Text>
-      {/* <Button onPress={_handleEditButtonClick}>
-        <ButtonText> Edit </ButtonText>
-      </Button>
-      <Button onPress={onDeleteRoutine}>
-        <ButtonText> Delete </ButtonText>
-      </Button> */}
-      {isOwnedByCurrentUser &&(
-        <View style={styles.bottomContent}>
-          <View style={styles.buttonContainer}>
-            
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={_handleEditButtonClick}
-            >
-              <Text style={{ color: "white" }}>Edit</Text>
-            </TouchableOpacity>
-            <View style={{ width: 10 }}></View>
-            <TouchableOpacity
-              //Todo conditionally render buttons if this workout belongs to this user
-              style={styles.deleteButton}
-              onPress={onDeleteRoutine}
-            >
-              <Text style={{ color: "lightcoral" }}>Delete</Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      )}
-      
+  return isEditing ? (
+    _renderEditingView()
+  ) : (
+    <View style={styles.container}>
+      <Text>
+        {exercise.name
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")}
+      </Text>
+      <TouchableOpacity
+        onPress={() => {
+          setRoutineInfoId(routine.id);
+          setShowRoutineInfo(true);
+        }}
+      >
+        <Text style={styles.viewInfo}>. . .</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   bottomContent: {
-    display: 'flex',
+    display: "flex",
     alignItems: "flex-end",
     paddingTop: 10,
   },
@@ -190,17 +196,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    // Container styling if needed
-    padding: 10,
+    marginTop: 15,
+    backgroundColor: "lightgray",
+    padding: 15,
+    borderRadius: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   inputContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 10, 
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   label: {
     marginRight: 10,
-    width: 60, 
+    width: 60,
   },
   input: {
     flex: 1, // Take up remaining space
@@ -208,6 +219,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     // Input styling
+  },
+  viewInfo: {
+    lineHeight: 16,
   },
 });
 

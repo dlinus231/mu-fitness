@@ -8,6 +8,8 @@ import {
   DeviceEventEmitter,
   Alert,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BACKEND_URL } from "@env";
@@ -34,6 +36,12 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
       setSelectedWorkoutPlanId(workoutPlanIdFromRoute);
     }
   }, [workoutPlanIdFromRoute]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchWorkoutPlans();
+    }, [])
+  );
 
   const onEnterWorkoutPlanPage = (id) => {
     // console.log("bm - onEnterWorkoutPlanPage called with id: ", id);
@@ -111,18 +119,17 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
   return (
     <View>
       {selectedWorkoutPlanId !== null ? (
-        <>
-        </>
+        <></>
+      ) : (
         // EXPLANATION: now that we are accessing IndividualWorkoutPLanScreen using navigators
-          // it should not be a child of WorkoutPlansScreen
-          // this is because if we render it as a child, it will have no route prop
-          // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
+        // it should not be a child of WorkoutPlansScreen
+        // this is because if we render it as a child, it will have no route prop
+        // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
         // <IndividualWorkoutPlanScreen
         //   onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
         //   workout_id={selectedWorkoutPlanId}
         //   navigation={navigation}
         // />
-      ) : (
         <>
           {/* <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackArrowIcon></BackArrowIcon>
