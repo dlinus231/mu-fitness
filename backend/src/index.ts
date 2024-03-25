@@ -745,6 +745,7 @@ app.get(`/workout/routine/:id`, async (req, res) => {
       where: { id: parseInt(id) },
       include: {
         sets: true,
+        exercise: true,
       },
     });
     res.status(200).send(result);

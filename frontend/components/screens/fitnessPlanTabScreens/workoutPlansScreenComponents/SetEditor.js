@@ -55,6 +55,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
           <View style={styles.inputContainer}>
             <Button
               title="-"
+              color="#695acd"
               onPress={() => {
                 setReps(Math.max(0, parseInt(reps) - 1));
               }}
@@ -69,6 +70,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
             />
             <Button
               title="+"
+              color="#695acd"
               onPress={() => {
                 setReps(parseInt(reps) + 1);
               }}
@@ -78,6 +80,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
           <View style={styles.inputContainer}>
             <Button
               title="-"
+              color="#695acd"
               onPress={() => {
                 setWeight(Math.max(0, parseInt(weight) - 1));
               }}
@@ -92,6 +95,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
             />
             <Button
               title="+"
+              color="#695acd"
               onPress={() => {
                 setWeight(parseInt(weight) + 1);
               }}
@@ -99,7 +103,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <Button title="Save" onPress={handleUpdateSet} />
+          <Button title="Save" onPress={handleUpdateSet} color="#695acd" />
         </View>
       </View>
     </View>

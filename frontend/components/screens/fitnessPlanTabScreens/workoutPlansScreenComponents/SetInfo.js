@@ -26,7 +26,7 @@ const SetInfo = ({
                 setEditingSet(true);
               }}
             >
-              <FontAwesome name="edit" size={18} color="#7EB46B" />
+              <FontAwesome name="edit" size={18} color="#695acd" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {

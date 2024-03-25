@@ -330,11 +330,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
               <View style={styles.workoutInfo}>
                 <Text style={styles.titleText}>{workout.name}</Text>
                 <Text style={styles.subTitleText}>
-                  Difficulty:{" "}
                   {workout.difficulty
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                    .join(" ")} Difficulty
                 </Text>
                 <Text style={styles.notesText}>{workout.description}</Text>
                 {isOwnedByCurrentUser && (
@@ -343,13 +342,13 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                       style={styles.editButton}
                       onPress={handleEditWorkout}
                     >
-                      <Text style={{ color: "black" }}>Edit</Text>
+                      <Text style={{ color: "white", fontWeight: "bold" }}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.deleteButton}
                       onPress={handleDeleteWorkout}
                     >
-                      <Text style={{ color: "#FF0000" }}>Delete</Text>
+                      <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -359,16 +358,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
               <View>
                 {routines.length === 0 &&
-                  (isOwnedByCurrentUser ? (
-                    <>
-                      <Text style={styles.no_exercises_text}>
-                        You haven't added any exercises to this workout yet.
-                      </Text>
-                      <Text style={styles.no_exercises_text}>
-                        Add an exercise by clicking the button below.
-                      </Text>
-                    </>
-                  ) : (
+                  (!isOwnedByCurrentUser && (
                     <Text style={styles.no_exercises_text}>
                       This workout plan does not have any exercises yet.
                     </Text>
@@ -484,14 +474,16 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   addNewButton: {
-    padding: 30,
-    backgroundColor: "#6A5ACD",
+    padding: 15,
+    backgroundColor: "FFCCCC",
+    borderColor: "grey",
+    borderWidth: 3,
     marginTop: 20,
     borderRadius: 10,
   },
   addNewText: {
     textAlign: "center",
-    color: "#FFFFFF",
+    color: "grey",
     fontWeight: "bold",
   },
   bottomContent: {
@@ -508,7 +500,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     paddingHorizontal: "5%",
-    paddingVertical: "3%",
+    paddingTop: "3%",
   },
   container: {
     padding: "3%",
@@ -522,19 +514,21 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderWidth: 2,
-    borderColor: "#FF0000",
+    borderColor: "#cd695a",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    width: "45%",
     alignItems: "center",
   },
   editButton: {
     borderWidth: 2,
-    borderColor: "#90EE90",
+    borderColor: "#695acd",
     borderRadius: 10,
-    backgroundColor: "#90EE90",
+    backgroundColor: "#695acd",
     paddingHorizontal: 10,
     paddingVertical: 5,
+    width: "45%",
     alignItems: "center",
   },
   input: {
@@ -551,18 +545,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   space: {
-    marginTop: 20,
     minWidth: 300,
   },
   submit_button: {
     backgroundColor: "#B0E0E6",
     border: "none",
-    marginTop: 20,
+    marginTop: 10,
   },
   cancel_button: {
     backgroundColor: "#FFCCCC",
     border: "none",
-    marginTop: 20,
+    marginTop: 10,
   },
   no_exercises_text: {
     textAlign: "center",
@@ -584,7 +577,6 @@ const styles = StyleSheet.create({
   notesText: {
     fontSize: 16,
     textAlign: "center",
-    paddingTop: "5%",
   },
   exercisesText: {
     fontSize: 20,
@@ -602,7 +594,7 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   workoutInfo: {
-    backgroundColor: "#CBCBCB",
+    backgroundColor: "lightgrey",
     paddingVertical: 15,
     borderRadius: 10,
     paddingHorizontal: 12,
