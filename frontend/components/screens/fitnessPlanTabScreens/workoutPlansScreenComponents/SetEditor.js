@@ -79,7 +79,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
             <Button
               title="-"
               onPress={() => {
-                setWeight(Math.max(0, parseInt(weight) - 1));
+                setWeight(Math.max(0, parseInt(weight) - 5));
               }}
             />
             <TextInput
@@ -93,7 +93,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
             <Button
               title="+"
               onPress={() => {
-                setWeight(parseInt(weight) + 1);
+                setWeight(parseInt(weight) + 5);
               }}
             />
           </View>
