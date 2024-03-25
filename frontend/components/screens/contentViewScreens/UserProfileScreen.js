@@ -321,7 +321,7 @@ const UserProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
           <MaterialIcons
-            name="favorite-border"
+            name="star-border"
             size={30}
             color={activeTab === 'favoriteExercises' ? '#6A5ACD' : '#aaa'}
           />
@@ -371,7 +371,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: "10%",
     alignItems: "left", // specifies where items are aligned horizontally
-    padding: "6%",
+    paddingTop: "6%",
+    paddingHorizontal: "6%",
+    paddingBottom: "5%"
   },
   profileContainer: {
     flexDirection: "row",
