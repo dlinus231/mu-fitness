@@ -86,7 +86,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
               placeholder="Weight"
               style={styles.input}
               value={weight.toString()}
-              onChange={setWeight}
+              onChangeText={setWeight}
               inputMode="numeric"
               keyboardType="numeric"
             />

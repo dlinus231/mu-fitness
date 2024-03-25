@@ -890,7 +890,7 @@ app.post(`/workout/routine/set/update`, async (req, res) => {
   try {
     const result = await prisma.defaultSet.update({
       where: { id: set_id },
-      data: { repetitions, weight_lbs },
+      data: { repetitions: parseInt(repetitions), weight_lbs: parseInt(weight_lbs)},
     });
     res.status(201).json(result);
   } catch (error) {
