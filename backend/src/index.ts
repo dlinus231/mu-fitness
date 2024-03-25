@@ -273,7 +273,7 @@ app.get("/user/:userId", async (req, res) => {
           saved_exercises: true,
           workouts: {
             orderBy: {
-              time_created: 'desc', // Sort workouts in reverse order by 'created'
+              time_created: "desc", // Sort workouts in reverse order by 'created'
             },
           },
         },
@@ -461,32 +461,44 @@ app.get("/user/following/:userId", async (req, res) => {
   }
 });
 
-// takes in exercise id's separated by "+"
-app.get(`/exercises/recommendations/:exerciseIds`, async (req, res) => {
-  const { exerciseIds } = req.params;
-  const ids = exerciseIds.split("+");
-  // console.log("Exercide IDs in recommendations/:exercideIds: " + ids)
-  let embeddings = [];
-  let exercise_names: string[] = [];
+// Get recommended exercises from centroid vector of workout by id
+app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
+  const { workoutId } = req.params;
 
-  if (exerciseIds == null) {
-    res.sendStatus(400);
-    return;
-  }
   try {
-    for (const id of ids) {
-      const result = await prisma.exercise.findUniqueOrThrow({
-        where: {
-          id: parseInt(id),
-        },
+    const result = await prisma.workout.findUnique({
+      where: { id: parseInt(workoutId) },
+      select: {
+        routines: true,
+      },
+    });
+
+    const embeddings: any[] = [];
+    const exercise_names: any[] = [];
+
+    const routines = result?.routines;
+
+    if (!routines) {
+      res.status(200).json([]);
+      return;
+    }
+
+    const promises = routines.map(async (element) => {
+      const exerciseResult = await prisma.exercise.findUnique({
+        where: { id: element.exercise_id },
         select: {
           embedding: true,
           name: true,
         },
       });
-      embeddings.push(result.embedding);
-      exercise_names.push(result.name);
-    }
+
+      embeddings.push(exerciseResult?.embedding);
+      exercise_names.push(exerciseResult?.name);
+      return exerciseResult;
+    });
+
+    const promiseResult = await Promise.all(promises);
+
     // the average embedding
     const centroid = computeCentroid(embeddings);
 
@@ -505,7 +517,7 @@ app.get(`/exercises/recommendations/:exerciseIds`, async (req, res) => {
       },
     });
 
-    const k = 10;
+    const k = 5;
 
     const kNearest = commonExercises
       .filter((exercise) => !exercise_names.includes(exercise.name)) // remove exercises already in the workout
@@ -521,6 +533,8 @@ app.get(`/exercises/recommendations/:exerciseIds`, async (req, res) => {
       .map((exercise) => {
         return { id: exercise.id, name: exercise.name };
       });
+
+    console.log(kNearest);
 
     res.status(200).json(kNearest);
   } catch (e) {
@@ -611,14 +625,16 @@ app.get(`/exercises/saved/:userId`, async (req, res) => {
 
     const exerciseResult = await Promise.all(
       result.map((item) =>
-        prisma.exercise.findUnique({
-          where: { id: item.exerciseId },
-          select: {
-            id: true,
-            name: true,
-            video_path: true, 
-          },
-        }).then((exercise) => ({ ...exercise, saved: item.saved }))
+        prisma.exercise
+          .findUnique({
+            where: { id: item.exerciseId },
+            select: {
+              id: true,
+              name: true,
+              video_path: true,
+            },
+          })
+          .then((exercise) => ({ ...exercise, saved: item.saved }))
       )
     );
 
@@ -875,7 +891,7 @@ app.post(`/workout/routine/set/update`, async (req, res) => {
   try {
     const result = await prisma.defaultSet.update({
       where: { id: set_id },
-      data: { repetitions, weight_lbs },
+      data: { repetitions: parseInt(repetitions), weight_lbs: parseInt(weight_lbs)},
     });
     res.status(201).json(result);
   } catch (error) {
@@ -1021,7 +1037,7 @@ app.get(`/search/:query`, async (req, res) => {
       select: {
         id: true,
         name: true,
-        video_path: true, 
+        video_path: true,
       },
       take: 5,
     });
@@ -1079,7 +1095,7 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
         id: true,
         name: true,
         embedding: true,
-        video_path: true, 
+        video_path: true,
       },
     });
 
@@ -1093,7 +1109,11 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, k)
       .map((exercise) => {
-        return { id: exercise.id, name: exercise.name, video_path: exercise.video_path};
+        return {
+          id: exercise.id,
+          name: exercise.name,
+          video_path: exercise.video_path,
+        };
       });
 
     res.status(200).json(kNearest);

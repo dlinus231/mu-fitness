@@ -20,6 +20,8 @@ import { BACKEND_URL } from "@env";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import Routine from "./Routine";
 import RoutineInfo from "./RoutineInfo";
+import { AntDesign } from "@expo/vector-icons";
+
 import {
   SelectList,
   MultipleSelectList,
@@ -29,13 +31,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
+  const [loadingReccs, setLoadingReccs] = useState(true);
   const [workout, setWorkout] = useState({});
   const [routines, setRoutines] = useState([]);
   const [edited, setEdited] = useState(false);
   const [addingWorkout, setAddingWorkout] = useState(false);
   const [exercises, setExercises] = useState(false);
   const [selected, setSelected] = useState("");
-  const [exerciseIds, setExerciseIds] = useState([]);
   const [recommendedExercises, setRecommendedExercises] = useState([]);
   // const [updatingRoutineState, setUpdateRoutineState] = useState({});
 
@@ -65,8 +67,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         if (uId !== null) {
           if (uId == workoutOwnerId) {
             setIsOwnedByCurrentUser(true);
-          }  
-          else {
+          } else {
             setIsOwnedByCurrentUser(false);
           }
         }
@@ -82,16 +83,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
     setShowRoutineInfo(false);
     fetchWorkout();
     fetchExercises();
-    setExerciseIds([]); // Clear recommended exercises when a new workout is loaded
   }, [workout_id]);
-
-  useEffect(() => {
-    fetchRecommendations(); // fetchRecommendations() when exerciseIds changes
-  }, [exerciseIds]);
-
-  const addExerciseId = (id) => {
-    setExerciseIds([...exerciseIds, id]);
-  };
 
   const fetchWorkout = async () => {
     try {
@@ -99,6 +91,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
       const result = await axios.get(
         BACKEND_URL + `/workout/one/${workout_id}`
       );
+      fetchRecommendations();
       setWorkout(result.data);
       setRoutines(result.data.routines);
       setWorkoutOwnerId(result.data.user_id);
@@ -153,33 +146,18 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   // TODO: recommendations reset after checking out a different workout, can change implementation
   // to pull in previous exercise_ids whenever the workout_id changes!
   const fetchRecommendations = async () => {
+    setLoadingReccs(true);
     try {
-      if (exerciseIds.length === 0) {
-        return;
-      }
-      const exerciseIdsString = exerciseIds.join("+");
-      console.log(
-        "ENDPOINT: " +
-          BACKEND_URL +
-          `/exercises/recommendations/${exerciseIdsString}`
-      );
-
       const response = await axios.get(
-        BACKEND_URL + `/exercises/recommendations/${exerciseIdsString}`
+        BACKEND_URL + `/exercises/recommendations/${workout_id}`
       );
       if (response.status === 200) {
-        const recommendations = [];
-        response.data.forEach((exercise) => {
-          recommendations.push({
-            key: exercise.id,
-            value: exercise.name,
-          });
-        });
-        setRecommendedExercises(recommendations);
-        // console.log("Recommendations: " + response.data)
+        setRecommendedExercises(response.data);
+        console.log(response.data);
+        setLoadingReccs(false);
       }
     } catch (error) {
-      console.error("Error fetching recommendations:", error);
+      console.error(error);
     }
   };
 
@@ -223,7 +201,29 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
-        addExerciseId(selected); // used to fetchRecommendations
+      }
+    } catch (error) {
+      if (error.response) {
+        Alert.alert("Could not add this exercise to this workout");
+      } else {
+        Alert.alert(
+          "Server Issue: Adding Exercise Failed",
+          error.response?.data?.error || "Please try again later."
+        );
+      }
+    }
+  };
+
+  const handleAddExerciseWithId = async (exercise_id) => {
+    try {
+      const response = await axios.post(BACKEND_URL + `/workout/routine/add`, {
+        workout_id,
+        exercise_id: exercise_id,
+      });
+      if (response.status == 201) {
+        Alert.alert("Exercise added successfully");
+        setAddingWorkout(false);
+        fetchWorkout();
       }
     } catch (error) {
       if (error.response) {
@@ -286,7 +286,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   };
 
   const returnToWorkoutPlans = () => {
-    navigation.navigate(workoutFrom, { prevPage: prevPage, workout_id: workout_id});
+    navigation.navigate(workoutFrom, {
+      prevPage: prevPage,
+      workout_id: workout_id,
+    });
   };
 
   // fetch workout on initial render and if we try to access a new workout (meaning wokrout_id changed)
@@ -429,29 +432,46 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 )
               )}
-              {/* Display the most recently added routine first */}
-              {/* <View>
-              {routines
-                .slice()
-                .reverse()
-                .map((routine) => {
-                  return (
-                    <Routine
-                      routine={routine}
-                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
-                      onUpdateRoutine={onUpdateRoutine}
-                      key={routine.id}
-                    />
-                  );
-                })}
-            </View> */}
 
               {addingWorkout ? (
                 <></>
               ) : (
-                isOwnedByCurrentUser && (
+                isOwnedByCurrentUser &&
+                recommendedExercises.length !== 0 &&
+                !loadingReccs && (
                   <View style={styles.bottomContent}>
-                    <View style={styles.buttonContainer}></View>
+                    <Text style={styles.exercisesText}>
+                      Recommended Exercises:
+                    </Text>
+                    {recommendedExercises.map((exercise) => {
+                      return (
+                        <View
+                          key={exercise.id}
+                          style={styles.recommendationContainer}
+                        >
+                          <Text>
+                            {exercise.name
+                              .split(" ")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(" ")}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              handleAddExerciseWithId(exercise.id);
+                            }}
+                          >
+                            <AntDesign
+                              name="pluscircleo"
+                              size={20}
+                              color="#888888"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      );
+                    })}
                   </View>
                 )
               )}
@@ -488,7 +508,8 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     justifyContent: "center",
-    alignItems: "flex-end",
+    display: "flex",
+    flexDirection: "column",
     paddingRight: "3%",
     paddingBottom: "3%",
   },
@@ -504,6 +525,15 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: "3%",
+  },
+  recommendationContainer: {
+    marginTop: 15,
+    backgroundColor: "lightgray",
+    padding: 15,
+    borderRadius: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   chevron: {
     paddingTop: "3%",

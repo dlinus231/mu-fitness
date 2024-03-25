@@ -82,14 +82,14 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
               title="-"
               color="#695acd"
               onPress={() => {
-                setWeight(Math.max(0, parseInt(weight) - 1));
+                setWeight(Math.max(0, parseInt(weight) - 5));
               }}
             />
             <TextInput
               placeholder="Weight"
               style={styles.input}
               value={weight.toString()}
-              onChange={setWeight}
+              onChangeText={setWeight}
               inputMode="numeric"
               keyboardType="numeric"
             />
@@ -97,7 +97,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
               title="+"
               color="#695acd"
               onPress={() => {
-                setWeight(parseInt(weight) + 1);
+                setWeight(parseInt(weight) + 5);
               }}
             />
           </View>
