@@ -15,13 +15,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const SignupScreen = ({ navigation, handleAuthChange }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [username, setUsername] = useState("");
 
   // makes signin request when signin form is submitted
   const handleSignUp = async () => {
-    // console.log("bm - entering handle sign up function, about to make request");
-
     if (email == "" || password == "" || username == "") {
       Alert.alert("All fields must be filled out");
       return;
@@ -75,37 +72,49 @@ const SignupScreen = ({ navigation, handleAuthChange }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.space}
-      >
-        <BackArrowIcon></BackArrowIcon>
-      </TouchableOpacity>
-      <Text>Create an Account</Text>
-      <View style={styles.space}></View>
-      <Text>Username:</Text>
+      <View style={styles.header}>
+        {/* <TouchableOpacity onPress={() => navigation.goBack()}>
+          <BackArrowIcon />
+        </TouchableOpacity> */}
+        <Text style={styles.headerText}>Create an Account</Text>
+      </View>
       <TextInput
+        placeholder="Username"
         style={styles.input}
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      <Text>Email:</Text>
       <TextInput
+        placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <Text>Password:</Text>
       <TextInput
+        placeholder="Password"
         style={styles.input}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign Up" onPress={handleSignUp} color="#6A5ACD"/>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.backButton]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.signUpButton]}
+          onPress={handleSignUp}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+      {/* <Button title="Sign Up" onPress={handleSignUp} color="#6A5ACD"/> */}
     </View>
   );
 };
@@ -118,14 +127,49 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
+    width: "100%",
     borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    marginBottom: 20,
-    minWidth: 200,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: "#f7f7f7",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 12,
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
   space: {
     marginTop: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+  },
+  button: {
+    width: "45%",
+    padding: '4%',
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  backButton: {
+    backgroundColor: "#b0b0b0",
+  },
+  signUpButton: {
+    backgroundColor: "#6A5ACD",
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
   },
 });
 

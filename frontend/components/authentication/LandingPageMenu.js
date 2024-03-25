@@ -9,7 +9,6 @@ const LandingPageMenu = ({ navigation, handleAuthChange }) => {
         <Text style={styles.titleText}>
           Welcome to Mu, your window into the fitness community
         </Text>
-        <Text></Text>
         {/* <Button onPress={() => navigation.navigate("signupScreen")}>
           <ButtonText>Sign up</ButtonText>
         </Button>
@@ -28,6 +27,12 @@ const LandingPageMenu = ({ navigation, handleAuthChange }) => {
         >
           <Text style={styles.text}>Log in</Text>
         </TouchableOpacity>
+        {/* <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('emailAuthScreen')}
+        >
+          <Text style={styles.text}>email verif screen</Text>
+        </TouchableOpacity> */}
         {/* Comment this button and text out if you need a way to "login" without having a working account */}
         {/* <Text>
           {" "}
@@ -56,9 +61,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   top_text: {
-      textAlign: 'center',
-      paddingHorizontal: '3%',
-      paddingBottom: '10%',
+    textAlign: 'center',
+    paddingHorizontal: '3%',
+    paddingBottom: '10%',
   },
   button: {
       borderColor: '#6A5ACD',

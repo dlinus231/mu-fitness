@@ -52,18 +52,10 @@ const EmailAuthenticationScreen = ({ navigation, handleAuthChange }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.space}
-        >
-          <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity>
-        <Text style={{ textAlign: "center" }}>
+        <Text style={styles.mainText}>
           You're almost there! Please validate the email associated with your
-          account.
+          account by entering the code sent to your email.
         </Text>
-        <View style={styles.space}></View>
-        <Text>Enter the code you recieved via email:</Text>
         <TextInput
           keyboardType="numeric"
           maxLength={6}
@@ -71,13 +63,31 @@ const EmailAuthenticationScreen = ({ navigation, handleAuthChange }) => {
           onChangeText={setCode}
           style={styles.input}
         />
-        <Button title="Submit" onPress={handleSubmit} color="#6A5ACD" />
+        {/* <Button title="Submit" onPress={handleSubmit} color="#6A5ACD" /> */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.backButton]}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.signUpButton]}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
+  mainText: {
+    textAlign: "center",
+    paddingBottom: 12,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -85,15 +95,49 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
+    width: "100%",
     borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    marginVertical: 20,
-    minWidth: 100,
-    textAlign: "center",
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: "#f7f7f7",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 12,
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
   space: {
     marginTop: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+  },
+  button: {
+    width: "45%",
+    padding: '4%',
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  backButton: {
+    backgroundColor: "#b0b0b0",
+  },
+  signUpButton: {
+    backgroundColor: "#6A5ACD",
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
   },
 });
 
