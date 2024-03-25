@@ -311,7 +311,6 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   return (
     <>
       <TouchableWithoutFeedback
-        style={styles.container}
         onPress={dismissKeyboard}
       >
         <ScrollView style={styles.content}>
@@ -345,7 +344,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                       style={styles.editButton}
                       onPress={handleEditWorkout}
                     >
-                      <Text style={{ color: "white", fontWeight: "bold" }}>Edit</Text>
+                      <Text style={{ color: "white", fontWeight: "bold" }}>Edit Info</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.deleteButton}
@@ -494,23 +493,22 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   addNewButton: {
-    padding: 15,
-    backgroundColor: "FFCCCC",
-    borderColor: "grey",
+    padding: 10,
+    backgroundColor: "#695acd",
+    borderColor: "#695acd",
     borderWidth: 3,
     marginTop: 20,
     borderRadius: 10,
   },
   addNewText: {
     textAlign: "center",
-    color: "grey",
+    color: "white",
     fontWeight: "bold",
   },
   bottomContent: {
     justifyContent: "center",
     display: "flex",
     flexDirection: "column",
-    paddingRight: "3%",
     paddingBottom: "3%",
   },
   buttonContainer: {
@@ -525,6 +523,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: "3%",
+    marginTop: -20,
   },
   recommendationContainer: {
     marginTop: 15,
