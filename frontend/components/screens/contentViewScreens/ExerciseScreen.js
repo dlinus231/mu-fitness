@@ -248,6 +248,7 @@ const styles = StyleSheet.create({
   instructions: {
     padding: 5,
     marginTop: 10,
+    borderRadius: 10,
     backgroundColor: "#ebe7f7",
   },
   muscleGroup: {

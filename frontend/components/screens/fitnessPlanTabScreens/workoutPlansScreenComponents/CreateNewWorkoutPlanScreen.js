@@ -65,7 +65,7 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
       }
     } catch (error) {
       console.log(
-        "bm - error occurred in handleCreateWorkout function: ",
+        "error occurred in handleCreateWorkout function: ",
         error.response?.data?.error
       );
       if (error.response) {
@@ -83,7 +83,7 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
             // onPress={() => navigation.goBack()}
             onPress={() => {
               navigation.dispatch(
@@ -96,32 +96,40 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
             // style={styles.space}
           >
             <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
-          <View style={styles.container}>
-            <Text> New Workout Plan </Text>
 
-            <Text style={styles.space}>Name: </Text>
+            <Text style={styles.titleText}> Create New Workout Plan </Text>
+
             <TextInput
-              style={styles.input}
               value={name}
               onChangeText={setName}
-              maxLength={100}
-            ></TextInput>
+              placeholder="Title"
+              style={styles.input}
+            />
 
-            <Text style={styles.space}>Difficulty:</Text>
-            <SelectList
-              setSelected={(val) => setSelected(val)}
-              data={difficulties}
-              save="value"
-              search={false}
-              maxHeight={120}
-              placeholder="beginner"
-            ></SelectList>
+            <TextInput
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Description / Notes"
+              multiline={true}
+              style={[styles.input, styles.descriptionInput]}
+            />
+
+            <Text style={styles.subtitleText}>Difficulty</Text>
+              <SelectList
+                setSelected={(val) => setSelected(val)}
+                data={difficulties}
+                save="value"
+                search={false}
+                minHeight={100}
+                maxHeight={120}
+                placeholder={selected}
+              ></SelectList>
 
             <View style={styles.space}></View>
 
-            <Text style={styles.space}>Notes: </Text>
+            {/* <Text style={styles.space}>Notes: </Text>
             <TextInput
               style={styles.input}
               value={description}
@@ -130,9 +138,9 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
               numberOfLines={10}
               minHeight={100}
               maxHeight={100}
-            ></TextInput>
+            ></TextInput> */}
 
-            <View style={styles.submit_button}>
+            {/* <View style={styles.submit_button}>
               <Button
                 title="Create Workout"
                 onPress={() => {
@@ -144,8 +152,39 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
                 }}
                 color="#6A5ACD"
               ></Button>
+            </View> */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={[styles.button, styles.saveButton]} 
+                onPress={() => {
+                    if (name.length > 0) {
+                      handleCreateWorkout();
+                    } else {
+                      Alert.alert("Workout name cannot be empty");
+                    }
+                  }}
+              >
+                <Text style={styles.saveButtonText}>Create</Text>
+              </TouchableOpacity>
+              {/* onPress={() => {
+              navigation.dispatch(
+                CommonActions.navigate({
+                  name: prevPage,
+                  params: { prevPage: prevPage },
+                })
+              )
+            }} */}
+              <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={
+                () => navigation.dispatch(
+                  CommonActions.navigate({
+                    name: prevPage,
+                    params: { prevPage: prevPage },
+                  })
+                )}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
-          </View>
         </ScrollView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -153,31 +192,67 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  submit_button: {
-    backgroundColor: "#B0E0E6",
-    border: "none",
-    marginTop: 20,
-  },
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    marginTop: 20,
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    marginTop: '10%',
   },
   input: {
+    width: '100%',
+    marginBottom: 15,
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 15,
+    backgroundColor: '#f7f7f7',
+  },
+  descriptionInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 16
+  },
+  button: {
     padding: 10,
-    marginBottom: 20,
-    width: 300,
+    borderRadius: 8,
+    width: '45%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  space: {
-    marginTop: 20,
-    minWidth: 300,
+  saveButton: {
+    backgroundColor: '#695acd',
   },
-  flatlist: {
-    maxHeight: 550, //Todo - make responsive for diff screen sizes
+  cancelButton: {
+    borderColor: '#cd695a',
+    borderWidth: 2,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  cancelButtonText: {
+    color: '#cd695a',
+    fontWeight: 'bold',
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingBottom: "4%",
+    paddingTop: "4%",
+  },
+  subtitleText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    textAlign: "left",
+    paddingBottom: "2%",
   },
 });
 
