@@ -440,7 +440,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                 !loadingReccs && (
                   <View style={styles.bottomContent}>
                     <Text style={styles.exercisesText}>
-                      Recommended Exercises:
+                      Recommended Exercises
                     </Text>
                     {recommendedExercises.map((exercise) => {
                       return (

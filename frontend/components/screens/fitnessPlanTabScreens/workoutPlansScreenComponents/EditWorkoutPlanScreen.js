@@ -120,7 +120,7 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <SafeAreaView style={styles.container}>
         {/* <TouchableOpacity onPress={() => navigation.goBack()}> */}
-        <TouchableOpacity onPress={() => navigation.dispatch(
+        {/* <TouchableOpacity onPress={() => navigation.dispatch(
           CommonActions.navigate({
             name: workoutFrom,
             params: { 
@@ -131,45 +131,51 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
           })
         )}>
           <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         {loading ? (
           <Text>Loading content...</Text>
         ) : (
           <ScrollView automaticallyAdjustKeyboardInsets={true}>
-            <View style={styles.container}>
-              <Text> Edit Workout Plan </Text>
 
-              <Text style={styles.space}>Name: </Text>
-              <TextInput
+              <Text style={styles.titleText}> Edit Workout Plan </Text>
+
+              {/* <Text style={styles.space}>Name: </Text> */}
+              {/* <TextInput
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
                 maxLength={100}
-              ></TextInput>
+              ></TextInput> */}
 
-              <Text style={styles.space}>Difficulty:</Text>
+              <Text style={styles.subtitleText}>Workout Title</Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder="Workout Name"
+                style={styles.input}
+              />
+
+              <Text style={styles.subtitleText}>Description</Text>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Description / Notes"
+                multiline={true}
+                style={[styles.input, styles.descriptionInput]}
+              />
+
+              <Text style={styles.subtitleText}>Difficulty</Text>
               <SelectList
                 setSelected={(val) => setSelected(val)}
                 data={difficulties}
                 save="value"
                 search={false}
+                minHeight={100}
                 maxHeight={120}
                 placeholder={selected}
               ></SelectList>
 
-              <View style={styles.space}></View>
-
-              <Text style={styles.space}>Notes: </Text>
-              <TextInput
-                style={styles.input}
-                value={description}
-                onChangeText={setDescription}
-                multiline={true}
-                numberOfLines={10}
-                minHeight={100}
-                maxHeight={100}
-              ></TextInput>
-              <View style={styles.submit_button}>
+              {/* <View style={styles.submit_button}>
                 <Button
                   title="Edit Workout"
                   onPress={() => {
@@ -181,8 +187,35 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
                   }}
                   color="#6A5ACD"
                 ></Button>
+              </View> */}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[styles.button, styles.saveButton]} 
+                  onPress={() => {
+                      if (name.length > 0) {
+                        handleEditWorkout();
+                      } else {
+                        Alert.alert("Workout name cannot be empty");
+                      }
+                    }}
+                >
+                  <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={
+                  () => navigation.dispatch(
+                    CommonActions.navigate({
+                      name: workoutFrom,
+                      params: { 
+                        workoutFrom: workoutFromFrom,
+                        prevPage: prevPage,
+                        workout_id: workout_id
+                      },
+                    })
+                  )}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
               </View>
-            </View>
           </ScrollView>
         )}
       </SafeAreaView>
@@ -191,27 +224,67 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  submit_button: {
-    backgroundColor: "#B0E0E6",
-    border: "none",
-    marginTop: 20,
-  },
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
+    marginTop: '10%',
   },
   input: {
+    width: '100%',
+    marginBottom: 15,
     borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    marginBottom: 20,
-    width: 300,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 15,
+    backgroundColor: '#f7f7f7',
   },
-  space: {
-    marginTop: 20,
-    minWidth: 300,
+  descriptionInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 16
+  },
+  button: {
+    padding: 10,
+    borderRadius: 8,
+    width: '45%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveButton: {
+    backgroundColor: '#695acd',
+  },
+  cancelButton: {
+    borderColor: '#cd695a',
+    borderWidth: 2,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  cancelButtonText: {
+    color: '#cd695a',
+    fontWeight: 'bold',
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingBottom: "4%",
+    paddingTop: "4%",
+  },
+  subtitleText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "left",
+    paddingBottom: "4%",
+    paddingTop: "1%",
   },
 });
 
