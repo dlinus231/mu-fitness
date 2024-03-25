@@ -478,7 +478,8 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
 
     const routines = result?.routines;
 
-    if (!routines) {
+    if (!routines || (routines && routines.length === 0)) {
+      console.log("inside if")
       res.status(200).json([]);
       return;
     }
