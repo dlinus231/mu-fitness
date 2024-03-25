@@ -176,7 +176,7 @@ const SearchScreen = ({}) => {
       </View>
       <ScrollView
         contentContainerStyle={styles.filterScroll}
-        style={{ flexGrow: 0 }}
+        style={{ flexGrow: 0, paddingTop: 12 }}
       >
         {focus.length === 0 ? (
           <>
@@ -207,6 +207,7 @@ const SearchScreen = ({}) => {
             <SearchFilterBubble
               text={focus}
               setFocus={setFocus}
+              pressed={true}
             ></SearchFilterBubble>
           </>
         )}
