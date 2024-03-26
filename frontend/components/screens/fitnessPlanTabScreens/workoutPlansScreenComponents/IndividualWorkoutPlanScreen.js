@@ -95,8 +95,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/one/${workout_id}`
       );
       fetchRecommendations();
-      console.log("bm - workout data: ", result.data);
-      console.log("bm - username: ", result.data.user.username);
+      // console.log("bm - workout data: ", result.data);
+      // console.log("bm - username: ", result.data.user.username);
       setWorkout(result.data);
       setRoutines(result.data.routines);
       setWorkoutOwnerId(result.data.user_id);
@@ -162,7 +162,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
       );
       if (response.status === 200) {
         setRecommendedExercises(response.data);
-        console.log(response.data);
+        // console.log(response.data);
         setLoadingReccs(false);
       }
     } catch (error) {
