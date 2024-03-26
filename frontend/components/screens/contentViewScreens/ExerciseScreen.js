@@ -24,6 +24,9 @@ const ExerciseScreen = ({ route, navigation }) => {
   const exercise_id = route.params?.exercise_id;
   const prevPage = route.params?.prevPage;
   const exerciseFrom = route.params?.exerciseFrom;
+  const workoutFromFrom = route.params?.workoutFromFrom;
+
+  console.log("bm - workoutFromFrom in ExerciseScreen: ", workoutFromFrom)
 
   // if we come to this from a workout page, we save the id so that we can navigate back to it
   const workoutId = route.params?.workout_id;
@@ -111,7 +114,7 @@ const ExerciseScreen = ({ route, navigation }) => {
           navigation.dispatch(
             CommonActions.navigate({
               name: exerciseFrom,
-              params: { prevPage: prevPage, workout_id: workoutId },
+              params: { prevPage: prevPage, workout_id: workoutId, workoutFrom: workoutFromFrom },
             })
           );
         }}

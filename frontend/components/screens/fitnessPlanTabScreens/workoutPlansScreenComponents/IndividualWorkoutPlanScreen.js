@@ -55,6 +55,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const prevPage = route.params?.prevPage;
   const workoutFrom = route.params?.workoutFrom;
 
+  console.log("bm - workoutFrom in individual workout plan screen: ", workoutFrom);
+
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
   });
@@ -491,6 +493,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
           fetchWorkout={fetchWorkout}
           workoutId={workout_id}
           isOwnedByCurrentUser={isOwnedByCurrentUser}
+          workoutFromFrom={workoutFrom}
         ></RoutineInfo>
       )}
     </>

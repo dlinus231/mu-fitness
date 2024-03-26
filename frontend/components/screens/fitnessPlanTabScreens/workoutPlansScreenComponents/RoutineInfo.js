@@ -23,12 +23,15 @@ const RoutineInfo = ({
   fetchWorkout,
   isOwnedByCurrentUser,
   workoutId,
+  workoutFromFrom,
 }) => {
   const [sets, setSets] = useState([]);
   const [editing, setEditing] = useState(false);
   const [exerciseName, setExerciseName] = useState("Exercise Info"); // default val if we can't find name
   const [editingSetToplLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
   const [exerciseId, setExerciseId] = useState(null);
+
+  console.log("bm - workoutFromFrom in RoutineInfo: ", workoutFromFrom)
 
   const navigation = useNavigation();
 
@@ -116,6 +119,7 @@ const RoutineInfo = ({
       exercise_id: exerciseId,
       exerciseData: exerciseData,
       workout_id: workoutId,
+      workoutFromFrom: workoutFromFrom,
     });
   }
 
