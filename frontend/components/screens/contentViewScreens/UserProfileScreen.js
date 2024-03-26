@@ -185,8 +185,8 @@ const UserProfileScreen = ({ route, navigation }) => {
           userId: parseInt(currentUserId),
         }
       );
-      console.log("bm - response from handleFollow: ", response.data);
-      console.log("bm - about to set isFollowing to true");
+      // console.log("bm - response from handleFollow: ", response.data);
+      // console.log("bm - about to set isFollowing to true");
       setIsFollowing(true);
     } catch (e) {
       console.log("bm - error following user: ", e);
@@ -243,27 +243,42 @@ const UserProfileScreen = ({ route, navigation }) => {
   const renderExerciseItem = ({item}) => {
     return (
       <TouchableOpacity
-        key={item.id}
-        style={styles.exerciseContainer}
+        style={styles.workoutPlan}
         onPress={() => {
           goToExercise(item.id);
         }}
       >
-        <Image source={image} style={styles.exerciseImage} />
-        <Text
-          style={styles.exerciseName}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {item.name
-            .split(" ")
-            .map(
-              (word) => word.charAt(0).toUpperCase() + word.slice(1)
-            )
-            .join(" ")}
-        </Text>
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</Text>
+        </View>
+        
+        <Text style={styles.workoutTime}>favorited {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+
       </TouchableOpacity>
-    )
+    );
+    // return (
+    //   <TouchableOpacity
+    //     key={item.id}
+    //     style={styles.exerciseContainer}
+    //     onPress={() => {
+    //       goToExercise(item.id);
+    //     }}
+    //   >
+    //     <Image source={image} style={styles.exerciseImage} />
+    //     <Text
+    //       style={styles.exerciseName}
+    //       numberOfLines={1}
+    //       ellipsizeMode="tail"
+    //     >
+    //       {item.name
+    //         .split(" ")
+    //         .map(
+    //           (word) => word.charAt(0).toUpperCase() + word.slice(1)
+    //         )
+    //         .join(" ")}
+    //     </Text>
+    //   </TouchableOpacity>
+    // )
   }
 
   const onRefresh = async () => {
