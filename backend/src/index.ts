@@ -1088,7 +1088,7 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
     const vector = normalizeL2(embeddings.data[0].embedding.slice(0, 256));
 
     const commonExercises = await prisma.exercise.findMany({
-      take: 200,
+      take: 500,
       orderBy: { log_search_results: "desc" },
       select: {
         id: true,
