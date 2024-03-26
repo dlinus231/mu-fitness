@@ -43,6 +43,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
   // we will use this to check if the workout belongs to the current user
   const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
+  const [workoutOwnerUsername, setWorkoutOwnerUsername] = useState("");
   const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
 
   const [showRoutineInfo, setShowRoutineInfo] = useState(false);
@@ -92,9 +93,12 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/one/${workout_id}`
       );
       fetchRecommendations();
+      console.log("bm - workout data: ", result.data);
+      console.log("bm - username: ", result.data.user.username);
       setWorkout(result.data);
       setRoutines(result.data.routines);
       setWorkoutOwnerId(result.data.user_id);
+      setWorkoutOwnerUsername(result.data.user.username)
       setLoading(false);
     } catch (error) {
       if (error.response) {
@@ -331,6 +335,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
             <View style={styles.container}>
               <View style={styles.workoutInfo}>
                 <Text style={styles.titleText}>{workout.name}</Text>
+                <Text style={styles.notesText}>Created by {workoutOwnerUsername}</Text>
                 <Text style={styles.subTitleText}>
                   {workout.difficulty
                     .split(" ")
@@ -484,6 +489,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
           setShowRoutineInfo={setShowRoutineInfo}
           routineInfoId={routineInfoId}
           fetchWorkout={fetchWorkout}
+          workoutId={workout_id}
           isOwnedByCurrentUser={isOwnedByCurrentUser}
         ></RoutineInfo>
       )}

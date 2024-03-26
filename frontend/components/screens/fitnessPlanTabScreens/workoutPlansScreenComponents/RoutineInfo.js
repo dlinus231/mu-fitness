@@ -10,6 +10,8 @@ import {
 import { BACKEND_URL } from "@env";
 import axios from "axios";
 
+import { useNavigation } from "@react-navigation/native";
+
 import { MaterialIcons } from "@expo/vector-icons";
 
 import SetInfo from "./SetInfo";
@@ -20,11 +22,15 @@ const RoutineInfo = ({
   routineInfoId,
   fetchWorkout,
   isOwnedByCurrentUser,
+  workoutId,
 }) => {
   const [sets, setSets] = useState([]);
   const [editing, setEditing] = useState(false);
   const [exerciseName, setExerciseName] = useState("Exercise Info"); // default val if we can't find name
   const [editingSetToplLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
+  const [exerciseId, setExerciseId] = useState(null);
+
+  const navigation = useNavigation();
 
   const fetchRoutineInfo = async () => {
     try {
@@ -38,6 +44,7 @@ const RoutineInfo = ({
       if (response.data.exercise.name) {
         setExerciseName(response.data.exercise.name);
       }
+      setExerciseId(response.data.exercise.id);
     } catch (error) {
       Alert.alert("Error fetching exercise info", "Please try again later");
       console.error(error);
@@ -97,6 +104,21 @@ const RoutineInfo = ({
     );
   };
 
+  const handleSeeMoreDetails = async (id) => {
+    const response = await axios.get(
+      BACKEND_URL + `/exercises/one/${id}`
+    );
+    const exerciseData = response.data;
+
+    navigation.navigate("ExerciseScreen", {
+      prevPage: "IndividualWorkoutScreen",
+      exerciseFrom: "IndividualWorkoutScreen",
+      exercise_id: exerciseId,
+      exerciseData: exerciseData,
+      workout_id: workoutId,
+    });
+  }
+
   useEffect(() => {
     fetchRoutineInfo();
   }, []);
@@ -153,8 +175,8 @@ const RoutineInfo = ({
           </>
         )}
       </View>
-      {isOwnedByCurrentUser && !editing && (
-        <View style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
+        {(isOwnedByCurrentUser && !editing) && (
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => {
@@ -163,14 +185,24 @@ const RoutineInfo = ({
           >
             <Text style={{ color: "white", fontWeight: "bold" }}>Edit</Text>
           </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.seeDetailsButton}
+          onPress={() => handleSeeMoreDetails(exerciseId)}
+        >
+          <Text style={{ color: "#000000", fontWeight: "bold" }}>See Details</Text>
+        </TouchableOpacity>
+        {(isOwnedByCurrentUser && !editing) && (
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={handleDeleteRoutine}
           >
             <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
           </TouchableOpacity>
-        </View>
-      )}
+        )}
+        
+      </View>
+
     </View>
   );
 };
@@ -248,6 +280,15 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
     backgroundColor: "white",
   },
+  seeDetailsButton: {
+    borderWidth: 2,
+    borderColor: "#000000",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: "center",
+    width: '30%',
+  },
   deleteButton: {
     borderWidth: 2,
     borderColor: "#cd695a",
@@ -255,14 +296,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
-    width: '45%',
+    width: '30%',
   },
   editButton: {
     borderWidth: 2,
     borderColor: "#695acd",
     borderRadius: 10,
     backgroundColor: "#695acd",
-    width: '45%',
+    width: '30%',
     paddingVertical: 5,
     alignItems: "center",
   },

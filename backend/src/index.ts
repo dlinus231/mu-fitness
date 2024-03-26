@@ -698,6 +698,7 @@ app.get(`/workout/one/:workoutId`, async (req, res) => {
       },
       include: {
         routines: true,
+        user: true,
       },
     });
     res.status(200).json(result);

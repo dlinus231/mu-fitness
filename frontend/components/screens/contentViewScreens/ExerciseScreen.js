@@ -24,6 +24,9 @@ const ExerciseScreen = ({ route, navigation }) => {
   const exercise_id = route.params?.exercise_id;
   const prevPage = route.params?.prevPage;
   const exerciseFrom = route.params?.exerciseFrom;
+
+  // if we come to this from a workout page, we save the id so that we can navigate back to it
+  const workoutId = route.params?.workout_id;
   // const isFocused = useIsFocused();
 
   const toggleExpanded = () => {
@@ -108,7 +111,7 @@ const ExerciseScreen = ({ route, navigation }) => {
           navigation.dispatch(
             CommonActions.navigate({
               name: exerciseFrom,
-              params: { prevPage: prevPage },
+              params: { prevPage: prevPage, workout_id: workoutId },
             })
           );
         }}
