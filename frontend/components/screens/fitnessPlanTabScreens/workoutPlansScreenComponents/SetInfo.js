@@ -10,6 +10,7 @@ const SetInfo = ({
   handleRemoveSet,
   editing,
   fetchRoutineInfo,
+  setEditingSetTopLevel
 }) => {
   const [editingSet, setEditingSet] = useState(false);
 
@@ -24,6 +25,7 @@ const SetInfo = ({
             <TouchableOpacity
               onPress={() => {
                 setEditingSet(true);
+                setEditingSetTopLevel(true);
               }}
             >
               <FontAwesome name="edit" size={18} color="#695acd" />
@@ -42,6 +44,7 @@ const SetInfo = ({
         <SetEditor
           setId={item.id}
           setEditingSet={setEditingSet}
+          setEditingSetTopLevel={setEditingSetTopLevel}
           fetchRoutineInfo={fetchRoutineInfo}
         ></SetEditor>
       )}

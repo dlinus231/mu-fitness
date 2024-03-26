@@ -3,7 +3,7 @@ import { View, TextInput, Button, StyleSheet } from "react-native";
 import { BACKEND_URL } from "@env";
 import axios from "axios";
 
-const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
+const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo, setEditingSetTopLevel }) => {
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
   const [loading, setLoading] = useState(true);
@@ -32,6 +32,7 @@ const SetEditor = ({ setId, setEditingSet, fetchRoutineInfo }) => {
           weight_lbs: weight,
         }
       );
+      setEditingSetTopLevel(false);
       setEditingSet(false);
       fetchRoutineInfo();
     } catch (error) {

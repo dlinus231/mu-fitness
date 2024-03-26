@@ -24,6 +24,7 @@ const RoutineInfo = ({
   const [sets, setSets] = useState([]);
   const [editing, setEditing] = useState(false);
   const [exerciseName, setExerciseName] = useState("Exercise Info"); // default val if we can't find name
+  const [editingSetToplLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
 
   const fetchRoutineInfo = async () => {
     try {
@@ -91,6 +92,7 @@ const RoutineInfo = ({
         handleRemoveSet={handleRemoveSet}
         editing={editing}
         fetchRoutineInfo={fetchRoutineInfo}
+        setEditingSetTopLevel={setEditingSetTopLevel}
       ></SetInfo>
     );
   };
@@ -130,20 +132,24 @@ const RoutineInfo = ({
         />
         {editing && (
           <>
-            <TouchableOpacity
-              style={styles.addNewButton}
-              onPress={handleAddSet}
-            >
-              <Text style={styles.addNewText}>Create New Set</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.transparentButton}
-              onPress={() => {
-                setEditing(false);
-              }}
-            >
-              <Text style={styles.transparentButtonText}>Save Changes</Text>
-            </TouchableOpacity>
+            {!editingSetToplLevel && (
+              <>
+                <TouchableOpacity
+                style={styles.addNewButton}
+                onPress={handleAddSet}
+                >
+                  <Text style={styles.addNewText}>Create New Set</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.transparentButton}
+                  onPress={() => {
+                    setEditing(false);
+                  }}
+                >
+                  <Text style={styles.transparentButtonText}>Save Changes</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </>
         )}
       </View>
