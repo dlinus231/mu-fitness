@@ -78,26 +78,36 @@ const EditWorkoutPlanScreen = ({ navigation }) => {
       });
       if (response.status == 200) {
         DeviceEventEmitter.emit("editWorkoutEvent");
-        Alert.alert("Workout edited successfully", "", [
-          {
-            text: "Ok",
-            onPress: navigation.dispatch(
-              CommonActions.navigate({
-                name: workoutFrom,
-                params: { 
-                  workoutFrom: workoutFromFrom,
-                  prevPage: prevPage,
-                  workout_id: workout_id
-                },
-              })
-            ),
-            // onPress: () => navigation.navigate("IndividualWorkoutScreen", { 
-            //   workout_id: workout_id, 
-            //   workoutFrom: "PersonalProfile", 
-            //   prevPage: "PersonalProfile"
-            // }),
-          },
-        ]);
+        navigation.dispatch(
+          CommonActions.navigate({
+            name: workoutFrom,
+            params: { 
+              workoutFrom: workoutFromFrom,
+              prevPage: prevPage,
+              workout_id: workout_id
+            },
+          })
+        )
+        // Alert.alert("Workout edited successfully", "", [
+        //   {
+        //     text: "Ok",
+        //     onPress: navigation.dispatch(
+        //       CommonActions.navigate({
+        //         name: workoutFrom,
+        //         params: { 
+        //           workoutFrom: workoutFromFrom,
+        //           prevPage: prevPage,
+        //           workout_id: workout_id
+        //         },
+        //       })
+        //     ),
+        //     // onPress: () => navigation.navigate("IndividualWorkoutScreen", { 
+        //     //   workout_id: workout_id, 
+        //     //   workoutFrom: "PersonalProfile", 
+        //     //   prevPage: "PersonalProfile"
+        //     // }),
+        //   },
+        // ]);
       }
     } catch (error) {
       if (error.response) {

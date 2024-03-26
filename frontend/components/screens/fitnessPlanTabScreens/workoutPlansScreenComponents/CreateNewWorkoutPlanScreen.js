@@ -56,12 +56,13 @@ const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
       });
       if (response.status == 201) {
         DeviceEventEmitter.emit("createWorkoutEvent");
-        Alert.alert("Workout created successfully", "", [
-          {
-            text: "Ok",
-            onPress: () => navigation.navigate("PersonalProfile"),
-          },
-        ]);
+        navigation.navigate("PersonalProfile")
+        // Alert.alert("Workout created successfully", "", [
+        //   {
+        //     text: "Ok",
+        //     onPress: () => navigation.navigate("PersonalProfile"),
+        //   },
+        // ]);
       }
     } catch (error) {
       console.log(

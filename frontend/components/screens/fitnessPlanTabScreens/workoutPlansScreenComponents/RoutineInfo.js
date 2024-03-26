@@ -179,34 +179,38 @@ const RoutineInfo = ({
           </>
         )}
       </View>
-      <View style={styles.buttonContainer}>
-        {(isOwnedByCurrentUser && !editing) && (
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => {
-              setEditing(true);
-            }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold" }}>Edit</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={styles.seeDetailsButton}
-          onPress={() => handleSeeMoreDetails(exerciseId)}
-        >
-          <Text style={{ color: "#000000", fontWeight: "bold" }}>See Details</Text>
-        </TouchableOpacity>
-        {(isOwnedByCurrentUser && !editing) && (
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDeleteRoutine}
-          >
-            <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
-          </TouchableOpacity>
-        )}
-        
-      </View>
-
+      {!editing && (
+        <View style={styles.buttonContainer}>
+          {(isOwnedByCurrentUser && !editing) && (
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => {
+                setEditing(true);
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>Edit</Text>
+            </TouchableOpacity>
+          )}
+          {!editing && (
+            <TouchableOpacity
+              style={styles.seeDetailsButton}
+              onPress={() => handleSeeMoreDetails(exerciseId)}
+            >
+              <Text style={{ color: "#000000", fontWeight: "bold" }}>See Details</Text>
+            </TouchableOpacity>
+          )}
+          {(isOwnedByCurrentUser && !editing) && (
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDeleteRoutine}
+            >
+              <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
+            </TouchableOpacity>
+          )}
+          
+        </View>
+      )}
+      
     </View>
   );
 };

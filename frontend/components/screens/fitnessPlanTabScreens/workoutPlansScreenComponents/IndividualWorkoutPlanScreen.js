@@ -120,13 +120,16 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/delete/${workout_id}`
       );
       if (result.status == 200) {
-        Alert.alert("Workout deleted successfully", "", [
-          {
-            text: "Ok",
-            onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
-          },
-        ]);
+        navigation.navigate(workoutFrom, { prevPage: prevPage })
       }
+      // if (result.status == 200) {
+      //   Alert.alert("Workout deleted successfully", "", [
+      //     {
+      //       text: "Ok",
+      //       onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
+      //     },
+      //   ]);
+      // }
     } catch (error) {
       if (error.response) {
         Alert.alert("Could not find this workout");
@@ -204,7 +207,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         exercise_id: selected,
       });
       if (response.status == 201) {
-        Alert.alert("Exercise added successfully");
+        // Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
       }
@@ -227,7 +230,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         exercise_id: exercise_id,
       });
       if (response.status == 201) {
-        Alert.alert("Exercise added successfully");
+        //  Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
       }
@@ -249,7 +252,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/routine/delete/${routineId}`
       );
       if (response.status === 200) {
-        Alert.alert("Exercise deleted successfully");
+        // Alert.alert("Exercise deleted successfully");
         // re-fetch workouts to re-render list
         fetchWorkout();
       }
@@ -275,7 +278,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
       if (response.status === 201) {
         // TODO this is never being called
-        Alert.alert("Exercise updated successfully");
+        // Alert.alert("Exercise updated successfully");
         // re-fetch workouts to re-render list w updated data
         fetchWorkout();
       }
