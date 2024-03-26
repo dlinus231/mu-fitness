@@ -12,9 +12,7 @@ import {getYoutubeMeta} from "react-native-youtube-iframe";
 
 const SearchScroller = ({ category, data, handleItemPress }) => {
   const [thumbnails, setThumbnails] = useState({});
-  // const placeHolderImage = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
   const placeHolderImage = require("../../../assets/Weightlifter.jpeg")
-  // const placeHolderImage = require("../../../assets/xIcon2.png")
 
   useEffect(() => {
       // Function to fetch thumbnails for each video
