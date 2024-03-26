@@ -243,6 +243,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
+    maxWidth: '100%',
     marginBottom: 15,
     borderWidth: 1,
     borderColor: '#ddd',

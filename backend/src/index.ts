@@ -873,7 +873,7 @@ const setDefaultSetOrder = async (req: any, res: any, next: any) => {
 //Create a set
 app.post(`/workout/routine/addSet`, setDefaultSetOrder, async (req, res) => {
   const { routine_id, set_order } = req.body;
-  console.log(set_order);
+  // console.log(set_order);
 
   try {
     const result = await prisma.defaultSet.create({
