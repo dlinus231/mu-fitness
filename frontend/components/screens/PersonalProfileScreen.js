@@ -129,27 +129,19 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   const renderExerciseItem = ({item}) => {
     return (
       <TouchableOpacity
-        key={item.id}
-        style={styles.exerciseContainer}
+        style={styles.workoutPlan}
         onPress={() => {
           goToExercise(item.id);
         }}
       >
-        <Image source={image} style={styles.exerciseImage} />
-        <Text
-          style={styles.exerciseName}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {item.name
-            .split(" ")
-            .map(
-              (word) => word.charAt(0).toUpperCase() + word.slice(1)
-            )
-            .join(" ")}
-        </Text>
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</Text>
+        </View>
+        
+        <Text style={styles.workoutTime}>favorited {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+
       </TouchableOpacity>
-    )
+    );
   }
 
   const handleAddMoreButtonPress = async () => {
@@ -216,7 +208,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
           <MaterialIcons
-            name="favorite-border"
+            name="star-border"
             size={30}
             color={activeTab === 'favoriteExercises' ? '#6A5ACD' : '#aaa'}
           />
@@ -269,7 +261,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: "10%",
     alignItems: "left", // specifies where items are aligned horizontally
-    padding: "6%",
+    paddingTop: "6%",
+    paddingHorizontal: "6%",
+    paddingBottom: "5%"
   },
   profileContainer: {
     flexDirection: "row",

@@ -43,6 +43,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
   // we will use this to check if the workout belongs to the current user
   const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
+  const [workoutOwnerUsername, setWorkoutOwnerUsername] = useState("");
   const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
 
   const [showRoutineInfo, setShowRoutineInfo] = useState(false);
@@ -53,6 +54,8 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   const workout_id = route.params?.workout_id;
   const prevPage = route.params?.prevPage;
   const workoutFrom = route.params?.workoutFrom;
+
+  console.log("bm - workoutFrom in individual workout plan screen: ", workoutFrom);
 
   DeviceEventEmitter.addListener("editWorkoutEvent", (eventData) => {
     setEdited(true);
@@ -92,9 +95,12 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/one/${workout_id}`
       );
       fetchRecommendations();
+      console.log("bm - workout data: ", result.data);
+      console.log("bm - username: ", result.data.user.username);
       setWorkout(result.data);
       setRoutines(result.data.routines);
       setWorkoutOwnerId(result.data.user_id);
+      setWorkoutOwnerUsername(result.data.user.username)
       setLoading(false);
     } catch (error) {
       if (error.response) {
@@ -114,13 +120,16 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/delete/${workout_id}`
       );
       if (result.status == 200) {
-        Alert.alert("Workout deleted successfully", "", [
-          {
-            text: "Ok",
-            onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
-          },
-        ]);
+        navigation.navigate(workoutFrom, { prevPage: prevPage })
       }
+      // if (result.status == 200) {
+      //   Alert.alert("Workout deleted successfully", "", [
+      //     {
+      //       text: "Ok",
+      //       onPress: navigation.navigate(workoutFrom, { prevPage: prevPage }),
+      //     },
+      //   ]);
+      // }
     } catch (error) {
       if (error.response) {
         Alert.alert("Could not find this workout");
@@ -198,7 +207,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         exercise_id: selected,
       });
       if (response.status == 201) {
-        Alert.alert("Exercise added successfully");
+        // Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
       }
@@ -221,7 +230,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         exercise_id: exercise_id,
       });
       if (response.status == 201) {
-        Alert.alert("Exercise added successfully");
+        //  Alert.alert("Exercise added successfully");
         setAddingWorkout(false);
         fetchWorkout();
       }
@@ -243,7 +252,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
         BACKEND_URL + `/workout/routine/delete/${routineId}`
       );
       if (response.status === 200) {
-        Alert.alert("Exercise deleted successfully");
+        // Alert.alert("Exercise deleted successfully");
         // re-fetch workouts to re-render list
         fetchWorkout();
       }
@@ -269,7 +278,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
       if (response.status === 201) {
         // TODO this is never being called
-        Alert.alert("Exercise updated successfully");
+        // Alert.alert("Exercise updated successfully");
         // re-fetch workouts to re-render list w updated data
         fetchWorkout();
       }
@@ -311,7 +320,6 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
   return (
     <>
       <TouchableWithoutFeedback
-        style={styles.container}
         onPress={dismissKeyboard}
       >
         <ScrollView style={styles.content}>
@@ -332,12 +340,12 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
             <View style={styles.container}>
               <View style={styles.workoutInfo}>
                 <Text style={styles.titleText}>{workout.name}</Text>
+                <Text style={styles.notesText}>Created by {workoutOwnerUsername}</Text>
                 <Text style={styles.subTitleText}>
-                  Difficulty:{" "}
                   {workout.difficulty
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                    .join(" ")} Difficulty
                 </Text>
                 <Text style={styles.notesText}>{workout.description}</Text>
                 {isOwnedByCurrentUser && (
@@ -346,13 +354,13 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                       style={styles.editButton}
                       onPress={handleEditWorkout}
                     >
-                      <Text style={{ color: "black" }}>Edit</Text>
+                      <Text style={{ color: "white", fontWeight: "bold" }}>Edit Info</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.deleteButton}
                       onPress={handleDeleteWorkout}
                     >
-                      <Text style={{ color: "#FF0000" }}>Delete</Text>
+                      <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -362,16 +370,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
               <View>
                 {routines.length === 0 &&
-                  (isOwnedByCurrentUser ? (
-                    <>
-                      <Text style={styles.no_exercises_text}>
-                        You haven't added any exercises to this workout yet.
-                      </Text>
-                      <Text style={styles.no_exercises_text}>
-                        Add an exercise by clicking the button below.
-                      </Text>
-                    </>
-                  ) : (
+                  (!isOwnedByCurrentUser && (
                     <Text style={styles.no_exercises_text}>
                       This workout plan does not have any exercises yet.
                     </Text>
@@ -451,7 +450,7 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
                 !loadingReccs && (
                   <View style={styles.bottomContent}>
                     <Text style={styles.exercisesText}>
-                      Recommended Exercises:
+                      Recommended Exercises
                     </Text>
                     {recommendedExercises.map((exercise) => {
                       return (
@@ -495,7 +494,9 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
           setShowRoutineInfo={setShowRoutineInfo}
           routineInfoId={routineInfoId}
           fetchWorkout={fetchWorkout}
+          workoutId={workout_id}
           isOwnedByCurrentUser={isOwnedByCurrentUser}
+          workoutFromFrom={workoutFrom}
         ></RoutineInfo>
       )}
     </>
@@ -504,21 +505,22 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   addNewButton: {
-    padding: 30,
-    backgroundColor: "#6A5ACD",
+    padding: 10,
+    backgroundColor: "#695acd",
+    borderColor: "#695acd",
+    borderWidth: 3,
     marginTop: 20,
     borderRadius: 10,
   },
   addNewText: {
     textAlign: "center",
-    color: "#FFFFFF",
+    color: "white",
     fontWeight: "bold",
   },
   bottomContent: {
     justifyContent: "center",
     display: "flex",
     flexDirection: "column",
-    paddingRight: "3%",
     paddingBottom: "3%",
   },
   buttonContainer: {
@@ -529,10 +531,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     paddingHorizontal: "5%",
-    paddingVertical: "3%",
+    paddingTop: "3%",
   },
   container: {
     padding: "3%",
+    marginTop: -20,
   },
   recommendationContainer: {
     marginTop: 15,
@@ -552,19 +555,21 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderWidth: 2,
-    borderColor: "#FF0000",
+    borderColor: "#cd695a",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    width: "45%",
     alignItems: "center",
   },
   editButton: {
     borderWidth: 2,
-    borderColor: "#90EE90",
+    borderColor: "#695acd",
     borderRadius: 10,
-    backgroundColor: "#90EE90",
+    backgroundColor: "#695acd",
     paddingHorizontal: 10,
     paddingVertical: 5,
+    width: "45%",
     alignItems: "center",
   },
   input: {
@@ -581,18 +586,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   space: {
-    marginTop: 20,
     minWidth: 300,
   },
   submit_button: {
     backgroundColor: "#B0E0E6",
     border: "none",
-    marginTop: 20,
+    marginTop: 10,
   },
   cancel_button: {
     backgroundColor: "#FFCCCC",
     border: "none",
-    marginTop: 20,
+    marginTop: 10,
   },
   no_exercises_text: {
     textAlign: "center",
@@ -614,7 +618,6 @@ const styles = StyleSheet.create({
   notesText: {
     fontSize: 16,
     textAlign: "center",
-    paddingTop: "5%",
   },
   exercisesText: {
     fontSize: 20,
@@ -632,7 +635,7 @@ const styles = StyleSheet.create({
     marginBottom: "4%",
   },
   workoutInfo: {
-    backgroundColor: "#CBCBCB",
+    backgroundColor: "lightgrey",
     paddingVertical: 15,
     borderRadius: 10,
     paddingHorizontal: 12,

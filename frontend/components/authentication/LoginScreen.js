@@ -71,32 +71,53 @@ const LoginScreen = ({ navigation, handleAuthChange }) => {
     }
   };
 
+{/* <TextInput
+        placeholder="Email"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      /> */}
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.space}
-      >
-        <BackArrowIcon></BackArrowIcon>
-      </TouchableOpacity>
-      <Text>Sign Into Your Account</Text>
+      <View style={styles.header}>
+        {/* <TouchableOpacity onPress={() => navigation.goBack()}>
+          <BackArrowIcon />
+        </TouchableOpacity> */}
+        <Text style={styles.headerText}>Log in</Text>
+      </View>
       <View style={styles.space}></View>
-      <Text>Email:</Text>
       <TextInput
+        placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <Text>Password:</Text>
       <TextInput
+        placeholder="Password"
         style={styles.input}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign In" onPress={handleLogin} color="#6A5ACD" />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.backButton]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.signUpButton]}
+          onPress={handleLogin}
+        >
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -109,14 +130,49 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
+    width: "100%",
     borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    marginBottom: 20,
-    minWidth: 200,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: "#f7f7f7",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 0,
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
   space: {
     marginTop: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
+  },
+  button: {
+    width: "45%",
+    padding: '4%',
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  backButton: {
+    backgroundColor: "#b0b0b0",
+  },
+  signUpButton: {
+    backgroundColor: "#6A5ACD",
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
   },
 });
 

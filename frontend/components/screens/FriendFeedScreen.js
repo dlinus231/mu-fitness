@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Text, View, FlatList, RefreshControl } from "@gluestack-ui/themed";
 import TopBarMenu from "../TopBarMenu";
 
 import axios from "axios";
 import { BACKEND_URL } from "@env";
-import { formatDistanceToNow } from "date-fns";
-
+import { formatDistanceToNow, set } from "date-fns";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FriendFeedScreen = ({ navigation }) => {
@@ -17,6 +18,7 @@ const FriendFeedScreen = ({ navigation }) => {
   const [workouts, setWorkouts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // fetch workouts in initial load
   // in the future, we can grab other types of data (journal entries, favorited exercises?) and display them
@@ -26,6 +28,17 @@ const FriendFeedScreen = ({ navigation }) => {
     };
     getUserId();
   }, []);
+
+  // fetch workouts when page is navigated to
+  useFocusEffect(
+    useCallback(() => {
+      console.log("bm - in useFocusEffect useCallback")
+      if (currentUserId) {
+        console.log("bm - in useFocusEffect currentUserId: ", currentUserId)
+        fetchFriendWorkouts();
+      }
+    }, [])
+  )
 
   // fetch friend workouts (after user id is fetched)
   useEffect(() => {
@@ -50,6 +63,7 @@ const FriendFeedScreen = ({ navigation }) => {
       });
       // console.log("bm - parsedWorkouts: ", parsedWorkouts)
       setWorkouts(parsedWorkouts);
+      setLoading(false);
     } catch (e) {
       console.log("error fetching friend workouts for friendFeed page: ", e);
     }
@@ -94,6 +108,27 @@ const FriendFeedScreen = ({ navigation }) => {
     setRefreshing(false);
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!loading && workouts.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <MaterialCommunityIcons
+          name="weight-lifter"
+          size={48}
+          color={"black"}
+        />
+        <Text style={styles.welcomeText}>Welcome to your Feed!</Text>
+        <Text style={styles.subWelcomeText}> Workout plans created by accounts that you follow will be displayed here</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <>
@@ -119,7 +154,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 10,
+    alignItems: "center",
     paddingTop: '17%',
   },
   workoutPlan: {
@@ -159,7 +194,21 @@ const styles = StyleSheet.create({
   },
   username: {
     fontWeight: 'bold',
-  }
+  },
+  welcomeText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'black', 
+    textAlign: 'center',
+    marginBottom: 10,
+    marginTop: 15
+  },
+  subWelcomeText: {
+    fontSize: 16, 
+    color: 'black',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
 });
 
 export default FriendFeedScreen;

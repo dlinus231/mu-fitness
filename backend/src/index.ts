@@ -478,7 +478,8 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
 
     const routines = result?.routines;
 
-    if (!routines) {
+    if (!routines || (routines && routines.length === 0)) {
+      console.log("inside if")
       res.status(200).json([]);
       return;
     }
@@ -697,6 +698,7 @@ app.get(`/workout/one/:workoutId`, async (req, res) => {
       },
       include: {
         routines: true,
+        user: true,
       },
     });
     res.status(200).json(result);
@@ -761,6 +763,7 @@ app.get(`/workout/routine/:id`, async (req, res) => {
       where: { id: parseInt(id) },
       include: {
         sets: true,
+        exercise: true,
       },
     });
     res.status(200).send(result);

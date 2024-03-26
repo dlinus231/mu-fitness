@@ -8,6 +8,7 @@ import {
 import axios from "axios";
 import { Text, View, Button, ButtonText } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Routine = ({
   routine,
@@ -163,7 +164,7 @@ const Routine = ({
           setShowRoutineInfo(true);
         }}
       >
-        <Text style={styles.viewInfo}>. . .</Text>
+        <MaterialIcons name="info-outline" size={24} color="grey" />
       </TouchableOpacity>
     </View>
   );
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginTop: 15,
-    backgroundColor: "lightgray",
+    backgroundColor: "#ebe7f7",
     padding: 15,
     borderRadius: 10,
     display: "flex",

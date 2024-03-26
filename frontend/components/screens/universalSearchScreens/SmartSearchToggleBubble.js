@@ -11,11 +11,11 @@ const SmartSearchToggleBubble = ({ smartSearch, setSmartSearch }) => {
       <View
         style={[
           styles.bubble,
-          { backgroundColor: smartSearch ? "#7FFFD4" : "#525252" },
+          { backgroundColor: smartSearch ? "#695acd" : "#525252" },
         ]}
       >
         <Text
-          style={[styles.text, { color: smartSearch ? "#000000" : "#FFFFFF" }]}
+          style={[styles.text, { color: '#FFFFFF' }]}
         >
           Smart Search
         </Text>

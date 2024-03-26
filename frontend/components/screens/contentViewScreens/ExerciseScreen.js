@@ -24,6 +24,12 @@ const ExerciseScreen = ({ route, navigation }) => {
   const exercise_id = route.params?.exercise_id;
   const prevPage = route.params?.prevPage;
   const exerciseFrom = route.params?.exerciseFrom;
+  const workoutFromFrom = route.params?.workoutFromFrom;
+
+  console.log("bm - workoutFromFrom in ExerciseScreen: ", workoutFromFrom)
+
+  // if we come to this from a workout page, we save the id so that we can navigate back to it
+  const workoutId = route.params?.workout_id;
   // const isFocused = useIsFocused();
 
   const toggleExpanded = () => {
@@ -108,7 +114,7 @@ const ExerciseScreen = ({ route, navigation }) => {
           navigation.dispatch(
             CommonActions.navigate({
               name: exerciseFrom,
-              params: { prevPage: prevPage },
+              params: { prevPage: prevPage, workout_id: workoutId, workoutFrom: workoutFromFrom },
             })
           );
         }}
@@ -129,20 +135,19 @@ const ExerciseScreen = ({ route, navigation }) => {
             <TouchableOpacity onPress={handleSave}>
               <View style={styles.star}>
                 {saved ? (
-                  <FontAwesome name="star" size={20} color="gold" />
+                  <FontAwesome name="star" size={24} color="gold" />
                 ) : (
-                  <FontAwesome name="star-o" size={20} color="gray" />
+                  <FontAwesome name="star-o" size={24} color="gray" />
                 )}
               </View>
             </TouchableOpacity>
           </View>
           <YoutubePlayer
-            height={220}
+            height={195}
             play={false}
             videoId={exerciseData.video_path}
             onChangeState={onStateChange}
           />
-
           <ScrollView contentContainerStyle={styles.horizontalScroll}>
             {exerciseData.muscles.map((muscle) => {
               return (
@@ -150,7 +155,7 @@ const ExerciseScreen = ({ route, navigation }) => {
                   key={muscle.id}
                   style={[styles.bubble, styles.muscleGroup]}
                 >
-                  <Text>
+                  <Text style={styles.muscleGroupText}>
                     {muscle.name
                       .split("_")
                       .map(
@@ -167,7 +172,7 @@ const ExerciseScreen = ({ route, navigation }) => {
                   key={tag.id}
                   style={[styles.bubble, styles.tag]}
                 >
-                  <Text>
+                  <Text style={styles.tagText}>
                     {tag.name
                       .split("_")
                       .map(
@@ -196,20 +201,23 @@ const ExerciseScreen = ({ route, navigation }) => {
               ? exerciseData.equipment.replace(/^\w/, (c) => c.toUpperCase())
               : "None"}
           </Text>
-          <View style={styles.instructions}>
-            <TouchableOpacity
-              onPress={toggleExpanded}
-              style={styles.toggleButton}
-            >
-              <Text numberOfLines={expanded ? undefined : 4}>
-                Instructions: {exerciseData.description}
-              </Text>
+          {(exerciseData.description.length) > 0 && (
+            <View style={styles.instructions}>
+              <TouchableOpacity
+                onPress={toggleExpanded}
+                style={styles.toggleButton}
+              >
+                <Text numberOfLines={expanded ? undefined : 4}>
+                  Instructions: {exerciseData.description}
+                </Text>
 
-              <Text style={styles.toggleButtonText}>
-                {expanded ? "Show Less▲" : "Show More▼"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Text style={styles.toggleButtonText}>
+                  {expanded ? "Show Less▲" : "Show More▼"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          
         </View>
       )}
     </ScrollView>
@@ -246,10 +254,20 @@ const styles = StyleSheet.create({
   instructions: {
     padding: 5,
     marginTop: 10,
-    backgroundColor: "#E0F7FA",
+    borderRadius: 10,
+    backgroundColor: "#ebe7f7",
   },
   muscleGroup: {
-    backgroundColor: "#ADD8E6",
+    backgroundColor: "#695acd",
+  },
+  muscleGroupText: {
+    color: "white",
+  },
+  tag: {
+    backgroundColor: "#cd695a",
+  },
+  tagText: {
+    color: "#FFFFFF",
   },
   star: {
     width: 24,
@@ -258,9 +276,6 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     backgroundColor: "transparent",
   },
-  tag: {
-    backgroundColor: "#FFFACD",
-  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -268,9 +283,10 @@ const styles = StyleSheet.create({
   titleContainer: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 10,
+    marginTop: -10,
   },
   toggleButtonText: {
     marginTop: 3,

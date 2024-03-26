@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-const SearchFilterBubble = ({ text, setFocus }) => {
+const SearchFilterBubble = ({ text, setFocus, pressed }) => {
   const onPress = () => {
     setFocus(text);
   };
@@ -17,9 +17,16 @@ const SearchFilterBubble = ({ text, setFocus }) => {
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
-      <View style={styles.bubble}>
-        <Text style={styles.text}>{text}</Text>
-      </View>
+      { !pressed ? (
+        <View style={styles.bubble}>
+          <Text style={styles.text}>{text}</Text>
+        </View>
+      ) : (
+        <View style={styles.pressedBubble}>
+          <Text style={styles.text}>{text}</Text>
+        </View>
+      )}
+      
     </TouchableOpacity>
   );
 };
@@ -35,11 +42,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
+  pressedBubble: {
+    borderRadius: 20,
+    backgroundColor: "#a99ee1",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
   clearFocusBubble: {
     backgroundColor: "#AAAAAA",
   },
   text: {
-    color: "#AAAAAA",
+    color: "#FFFFFF",
     fontSize: 14,
   },
   clearFocusText: {

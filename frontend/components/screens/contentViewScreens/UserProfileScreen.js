@@ -24,6 +24,8 @@ import { BACKEND_URL } from "@env";
 const UserProfileScreen = ({ route, navigation }) => {
   const userIdFromRoute = route.params?.userId;
 
+  console.log("bm - userIdFromRoute: ", userIdFromRoute);
+
   const [userId, setUserId] = useState(userIdFromRoute); // id of user we want to display profile for (empty string means current user's profile)
   const [currentUserId, setCurrentUserId] = useState(""); // id of currently logged in user
 
@@ -48,6 +50,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
     if (userIdFromRoute) {
+      console.log("bm - setting userId to: ", userIdFromRoute)
       setUserId(userIdFromRoute);
     }
   }, [userIdFromRoute]);
@@ -92,7 +95,7 @@ const UserProfileScreen = ({ route, navigation }) => {
 
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
-    // console.log("bm - fetching user data useEffect reached");
+    console.log("bm - fetching user data useEffect reached");
     if (userId) {
       // fetch user data
       fetchUserData();
@@ -101,11 +104,14 @@ const UserProfileScreen = ({ route, navigation }) => {
   }, [userId]);
 
   // if userId is populated, then we should be re-fetching data every time the page is navigated to
+  // TODO: I think this is causing an error by running before the userId has been updated
   useFocusEffect(
     useCallback(() => {
-      fetchUserData();
-      getFavoriteExercises();
-    }, [])
+      if (userId) {
+        fetchUserData();
+        getFavoriteExercises();
+      }
+    }, [userId])
   )
 
   useEffect(() => {
@@ -185,8 +191,8 @@ const UserProfileScreen = ({ route, navigation }) => {
           userId: parseInt(currentUserId),
         }
       );
-      console.log("bm - response from handleFollow: ", response.data);
-      console.log("bm - about to set isFollowing to true");
+      // console.log("bm - response from handleFollow: ", response.data);
+      // console.log("bm - about to set isFollowing to true");
       setIsFollowing(true);
     } catch (e) {
       console.log("bm - error following user: ", e);
@@ -243,27 +249,42 @@ const UserProfileScreen = ({ route, navigation }) => {
   const renderExerciseItem = ({item}) => {
     return (
       <TouchableOpacity
-        key={item.id}
-        style={styles.exerciseContainer}
+        style={styles.workoutPlan}
         onPress={() => {
           goToExercise(item.id);
         }}
       >
-        <Image source={image} style={styles.exerciseImage} />
-        <Text
-          style={styles.exerciseName}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {item.name
-            .split(" ")
-            .map(
-              (word) => word.charAt(0).toUpperCase() + word.slice(1)
-            )
-            .join(" ")}
-        </Text>
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</Text>
+        </View>
+        
+        <Text style={styles.workoutTime}>favorited {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
+
       </TouchableOpacity>
-    )
+    );
+    // return (
+    //   <TouchableOpacity
+    //     key={item.id}
+    //     style={styles.exerciseContainer}
+    //     onPress={() => {
+    //       goToExercise(item.id);
+    //     }}
+    //   >
+    //     <Image source={image} style={styles.exerciseImage} />
+    //     <Text
+    //       style={styles.exerciseName}
+    //       numberOfLines={1}
+    //       ellipsizeMode="tail"
+    //     >
+    //       {item.name
+    //         .split(" ")
+    //         .map(
+    //           (word) => word.charAt(0).toUpperCase() + word.slice(1)
+    //         )
+    //         .join(" ")}
+    //     </Text>
+    //   </TouchableOpacity>
+    // )
   }
 
   const onRefresh = async () => {
@@ -321,7 +342,7 @@ const UserProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
           <MaterialIcons
-            name="favorite-border"
+            name="star-border"
             size={30}
             color={activeTab === 'favoriteExercises' ? '#6A5ACD' : '#aaa'}
           />
@@ -371,7 +392,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: "10%",
     alignItems: "left", // specifies where items are aligned horizontally
-    padding: "6%",
+    paddingTop: "6%",
+    paddingHorizontal: "6%",
+    paddingBottom: "5%"
   },
   profileContainer: {
     flexDirection: "row",
