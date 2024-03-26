@@ -42,7 +42,9 @@ const FriendFeedScreen = ({ navigation }) => {
 
   // fetch friend workouts (after user id is fetched)
   useEffect(() => {
+    console.log("bm - in currentUserId useEffect")
     if (currentUserId) {
+      console.log("in currentUserId useEffect if statement with currentUserId: ", currentUserId)
       fetchFriendWorkouts();
     }
   }, [currentUserId]);
