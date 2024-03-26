@@ -148,7 +148,7 @@ const ExerciseScreen = ({ route, navigation }) => {
             videoId={exerciseData.video_path}
             onChangeState={onStateChange}
           />
-          <ScrollView contentContainerStyle={styles.horizontalScroll}>
+          <ScrollView contentContainerStyle={styles.horizontalScroll} horizontal={true}>
             {exerciseData.muscles.map((muscle) => {
               return (
                 <TouchableOpacity
