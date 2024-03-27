@@ -535,8 +535,6 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
         return { id: exercise.id, name: exercise.name };
       });
 
-    console.log(kNearest);
-
     res.status(200).json(kNearest);
   } catch (e) {
     console.error(e);

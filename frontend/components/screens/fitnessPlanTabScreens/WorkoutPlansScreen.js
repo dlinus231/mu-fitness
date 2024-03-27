@@ -1,4 +1,4 @@
-import React, { lazy, useEffect, useState } from "react";
+import React, { lazy, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import {
   StyleSheet,
@@ -19,6 +19,7 @@ import WorkoutPlan from "./workoutPlansScreenComponents/WorkoutPlan";
 import IndividualWorkoutPlanScreen from "./workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
 // import BackArrowIcon from "../../icons/BackArrowIcon";
 import TopBarMenu from "../../TopBarMenu";
+import FooterTab from "../../FooterTab";
 
 const WorkoutPlansScreen = ({ route, navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
@@ -38,7 +39,8 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
   }, [workoutPlanIdFromRoute]);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
+      setLoading(true);
       fetchWorkoutPlans();
     }, [])
   );
@@ -48,7 +50,6 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     // setSelectedWorkoutPlanId(id);
     navigation.navigate("IndividualWorkoutScreen", {
       workout_id: id,
-      workoutFrom: "FitnessPlans",
     });
   };
 
@@ -109,76 +110,77 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     fetchWorkoutPlans();
   }, [created]);
 
-  const handleSwitchPage = (page) => {
-    navigation.navigate(page, { prevPage: "FitnessPlans" });
-  };
-
   // render the infinite scroll list unless the user has clicked a workout plan
   // then render individual page for that workout plan until they click back
 
   return (
-    <View>
-      {selectedWorkoutPlanId !== null ? (
-        <></>
-      ) : (
-        // EXPLANATION: now that we are accessing IndividualWorkoutPLanScreen using navigators
-        // it should not be a child of WorkoutPlansScreen
-        // this is because if we render it as a child, it will have no route prop
-        // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
-        // <IndividualWorkoutPlanScreen
-        //   onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
-        //   workout_id={selectedWorkoutPlanId}
-        //   navigation={navigation}
-        // />
-        <>
-          {/* <TouchableOpacity onPress={() => navigation.goBack()}>
+    <>
+      <SafeAreaView>
+        {selectedWorkoutPlanId !== null ? (
+          <></>
+        ) : (
+          // EXPLANATION: now that we are accessing IndividualWorkoutPLanScreen using navigators
+          // it should not be a child of WorkoutPlansScreen
+          // this is because if we render it as a child, it will have no route prop
+          // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
+          // <IndividualWorkoutPlanScreen
+          //   onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
+          //   workout_id={selectedWorkoutPlanId}
+          //   navigation={navigation}
+          // />
+          <>
+            {/* <TouchableOpacity onPress={() => navigation.goBack()}>
             <BackArrowIcon></BackArrowIcon>
           </TouchableOpacity> */}
-          <TopBarMenu onSwitchPage={handleSwitchPage} />
-          <Text style={styles.text}>Your Workout Plans</Text>
+            {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
+            <Text style={styles.text}>Your Workout Plans</Text>
 
-          <TouchableOpacity
-            style={styles.createNewWorkoutPlanButton}
-            onPress={() => {
-              setCreated(false);
-              navigation.navigate("CreateNewWorkoutPlan", { prevPage: "FitnessPlans" });
-            }}
-          >
-            <MaterialIcons name="post-add" size={48} color="black" />
-            <Text> Create new workout plan</Text>
-          </TouchableOpacity>
-          {loading ? (
-            <Text>Loading workouts...</Text>
-          ) : workoutPlans.length > 0 ? (
-            <FlatList
-              style={styles.flatlist}
-              data={workoutPlans}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              onEndReached={() => {}} // TODO in the future this is where we would put logic to fetch more workout plans from the backend
-              onEndReachedThreshold={0.3} // determines how close to end to call the onEndReached function, will probably adjust this later
-            />
-          ) : (
-            <View style={styles.container}>
-              <Text style={styles.space}>
-                You currently have no workout plans.
-              </Text>
-              <Text style={styles.space}>
-                Workout plans are lists of exercises (sets) that you can create
-                and track your progress with.
-              </Text>
-              <Text style={styles.space}>
-                You can also share your workout plans with others, or use
-                workout plans that others have shared with you.
-              </Text>
-              <Text style={styles.space}>
-                Click the button to create your first one!
-              </Text>
-            </View>
-          )}
-        </>
-      )}
-    </View>
+            <TouchableOpacity
+              style={styles.createNewWorkoutPlanButton}
+              onPress={() => {
+                setCreated(false);
+                navigation.navigate("CreateNewWorkoutPlan", {
+                  prevPage: "FitnessPlans",
+                });
+              }}
+            >
+              <MaterialIcons name="post-add" size={48} color="black" />
+              <Text> Create new workout plan</Text>
+            </TouchableOpacity>
+            {loading ? (
+              <Text>Loading workouts...</Text>
+            ) : workoutPlans.length > 0 ? (
+              <FlatList
+                style={styles.flatlist}
+                data={workoutPlans}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                onEndReached={() => {}} // TODO in the future this is where we would put logic to fetch more workout plans from the backend
+                onEndReachedThreshold={0.3} // determines how close to end to call the onEndReached function, will probably adjust this later
+              />
+            ) : (
+              <View style={styles.container}>
+                <Text style={styles.space}>
+                  You currently have no workout plans.
+                </Text>
+                <Text style={styles.space}>
+                  Workout plans are lists of exercises (sets) that you can
+                  create and track your progress with.
+                </Text>
+                <Text style={styles.space}>
+                  You can also share your workout plans with others, or use
+                  workout plans that others have shared with you.
+                </Text>
+                <Text style={styles.space}>
+                  Click the button to create your first one!
+                </Text>
+              </View>
+            )}
+          </>
+        )}
+      </SafeAreaView>
+      <FooterTab focused={"FitnessPlans"}></FooterTab>
+    </>
   );
 };
 

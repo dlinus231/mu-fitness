@@ -26,7 +26,7 @@ const ExerciseScreen = ({ route, navigation }) => {
   const exerciseFrom = route.params?.exerciseFrom;
   const workoutFromFrom = route.params?.workoutFromFrom;
 
-  console.log("bm - workoutFromFrom in ExerciseScreen: ", workoutFromFrom)
+  console.log("bm - workoutFromFrom in ExerciseScreen: ", workoutFromFrom);
 
   // if we come to this from a workout page, we save the id so that we can navigate back to it
   const workoutId = route.params?.workout_id;
@@ -111,12 +111,7 @@ const ExerciseScreen = ({ route, navigation }) => {
       <TouchableOpacity
         style={styles.backArrow}
         onPress={() => {
-          navigation.dispatch(
-            CommonActions.navigate({
-              name: exerciseFrom,
-              params: { prevPage: prevPage, workout_id: workoutId, workoutFrom: workoutFromFrom },
-            })
-          );
+          navigation.goBack();
         }}
       >
         <BackArrowIcon></BackArrowIcon>
@@ -148,7 +143,10 @@ const ExerciseScreen = ({ route, navigation }) => {
             videoId={exerciseData.video_path}
             onChangeState={onStateChange}
           />
-          <ScrollView contentContainerStyle={styles.horizontalScroll} horizontal={true}>
+          <ScrollView
+            contentContainerStyle={styles.horizontalScroll}
+            horizontal={true}
+          >
             {exerciseData.muscles.map((muscle) => {
               return (
                 <TouchableOpacity
@@ -201,7 +199,7 @@ const ExerciseScreen = ({ route, navigation }) => {
               ? exerciseData.equipment.replace(/^\w/, (c) => c.toUpperCase())
               : "None"}
           </Text>
-          {(exerciseData.description.length) > 0 && (
+          {exerciseData.description.length > 0 && (
             <View style={styles.instructions}>
               <TouchableOpacity
                 onPress={toggleExpanded}
@@ -217,7 +215,6 @@ const ExerciseScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           )}
-          
         </View>
       )}
     </ScrollView>

@@ -6,13 +6,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import TopBarMenu from "../TopBarMenu";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-import {getYoutubeMeta} from "react-native-youtube-iframe";
+import { getYoutubeMeta } from "react-native-youtube-iframe";
+import FooterTab from "../FooterTab";
 
 const SavedExercisesScreen = ({ navigation }) => {
   const placeHolderImage = require("../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
@@ -20,7 +22,7 @@ const SavedExercisesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [savedExercises, setSavedExercises] = useState([]);
   const [thumbnails, setThumbnails] = useState({});
-  
+
   const fetchThumbnails = async (data) => {
     const thumbnailData = {};
     for (const item of data) {
@@ -69,8 +71,8 @@ const SavedExercisesScreen = ({ navigation }) => {
   );
 
   return (
-    <View>
-      <TopBarMenu onSwitchPage={handleSwitchPage} />
+    <SafeAreaView>
+      {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
       <ScrollView contentContainerStyle={styles.container}>
         {loading ? (
           <Text>Loading... </Text>
@@ -90,14 +92,14 @@ const SavedExercisesScreen = ({ navigation }) => {
                     handlePress(exercise.id);
                   }}
                 >
-                <Image
-                  source={
-                    thumbnails[exercise.id]
-                      ? { uri: thumbnails[exercise.id] }
-                      : placeHolderImage
-                  }
-                  style={styles.exerciseImage}
-                />
+                  <Image
+                    source={
+                      thumbnails[exercise.id]
+                        ? { uri: thumbnails[exercise.id] }
+                        : placeHolderImage
+                    }
+                    style={styles.exerciseImage}
+                  />
                   <Text
                     style={styles.exerciseName}
                     numberOfLines={1}
@@ -116,7 +118,8 @@ const SavedExercisesScreen = ({ navigation }) => {
           </ScrollView>
         )}
       </ScrollView>
-    </View>
+      <FooterTab focused={"SavedExercises"}></FooterTab>
+    </SafeAreaView>
   );
 };
 

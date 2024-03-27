@@ -9,6 +9,7 @@ import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FooterTab from "../FooterTab";
 
 const FriendFeedScreen = ({ navigation }) => {
   const handleSwitchPage = (page) => {
@@ -32,26 +33,31 @@ const FriendFeedScreen = ({ navigation }) => {
   // fetch workouts when page is navigated to
   useFocusEffect(
     useCallback(() => {
-      console.log("bm - in useFocusEffect useCallback")
+      console.log("bm - in useFocusEffect useCallback");
       if (currentUserId) {
-        console.log("bm - in useFocusEffect currentUserId: ", currentUserId)
+        console.log("bm - in useFocusEffect currentUserId: ", currentUserId);
         fetchFriendWorkouts();
       }
     }, [])
-  )
+  );
 
   // fetch friend workouts (after user id is fetched)
   useEffect(() => {
-    console.log("bm - in currentUserId useEffect")
+    console.log("bm - in currentUserId useEffect");
     if (currentUserId) {
-      console.log("in currentUserId useEffect if statement with currentUserId: ", currentUserId)
+      console.log(
+        "in currentUserId useEffect if statement with currentUserId: ",
+        currentUserId
+      );
       fetchFriendWorkouts();
     }
   }, [currentUserId]);
 
   const fetchFriendWorkouts = async () => {
     try {
-      const response = await axios.get(BACKEND_URL + `/feed/workouts/${currentUserId}`);
+      const response = await axios.get(
+        BACKEND_URL + `/feed/workouts/${currentUserId}`
+      );
       const parsedWorkouts = response.data.map((workout) => {
         return {
           type: "workout",
@@ -61,7 +67,7 @@ const FriendFeedScreen = ({ navigation }) => {
           difficulty: workout.difficulty,
           description: workout.description,
           timeCreated: workout.time_created,
-        }
+        };
       });
       // console.log("bm - parsedWorkouts: ", parsedWorkouts)
       setWorkouts(parsedWorkouts);
@@ -74,25 +80,36 @@ const FriendFeedScreen = ({ navigation }) => {
   // function to render cells in flatlist
   const renderItem = ({ item }) => {
     // NOTE: we give each piece of data an item.type
-      // if we want to add the ability for this page to show more than just workouts in the future
-      // it will be as simple as adding another switch case here and adding the new data type to the data we fetch
-    switch(item.type) {
+    // if we want to add the ability for this page to show more than just workouts in the future
+    // it will be as simple as adding another switch case here and adding the new data type to the data we fetch
+    switch (item.type) {
       case "workout":
         return (
           <TouchableOpacity
             style={styles.workoutPlan}
-            onPress={() => navigation.navigate("IndividualWorkoutScreen", { workout_id: item.id, workoutFrom: "FriendFeed" })}
+            onPress={() =>
+              navigation.navigate("IndividualWorkoutScreen", {
+                workout_id: item.id,
+                workoutFrom: "FriendFeed",
+              })
+            }
           >
             <View style={styles.workoutMainContent}>
               <Text>
                 <Text style={styles.username}>{item.username}</Text>
-                <Text style={styles.workoutDescription}> created a new workout plan</Text>
+                <Text style={styles.workoutDescription}>
+                  {" "}
+                  created a new workout plan
+                </Text>
               </Text>
               <Text style={styles.workoutName}>{item.name}</Text>
             </View>
-            
-            <Text style={styles.workoutTime}>{formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
 
+            <Text style={styles.workoutTime}>
+              {formatDistanceToNow(new Date(item.timeCreated), {
+                addSuffix: true,
+              })}
+            </Text>
           </TouchableOpacity>
         );
       default:
@@ -127,7 +144,11 @@ const FriendFeedScreen = ({ navigation }) => {
           color={"black"}
         />
         <Text style={styles.welcomeText}>Welcome to your Feed!</Text>
-        <Text style={styles.subWelcomeText}> Workout plans created by accounts that you follow will be displayed here</Text>
+        <Text style={styles.subWelcomeText}>
+          {" "}
+          Workout plans created by accounts that you follow will be displayed
+          here
+        </Text>
       </SafeAreaView>
     );
   }
@@ -138,16 +159,14 @@ const FriendFeedScreen = ({ navigation }) => {
       <SafeAreaView style={styles.container}>
         <FlatList
           data={workouts}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         />
       </SafeAreaView>
+      <FooterTab focused="FriendFeed"></FooterTab>
     </>
   );
 };
@@ -157,17 +176,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: '17%',
+    paddingTop: "17%",
   },
   workoutPlan: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingTop: 10,
     paddingBottom: 15,
     paddingHorizontal: 20,
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 2,
       height: 2,
@@ -179,36 +198,34 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   workoutName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
     fontSize: 23,
   },
-  workoutMainContent: {
-
-  },
+  workoutMainContent: {},
   workoutDetail: {
     fontSize: 14,
   },
   workoutTime: {
     fontSize: 12,
-    color: '#666', 
-    alignSelf: 'flex-end', 
+    color: "#666",
+    alignSelf: "flex-end",
   },
   username: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   welcomeText: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: 'black', 
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "black",
+    textAlign: "center",
     marginBottom: 10,
-    marginTop: 15
+    marginTop: 15,
   },
   subWelcomeText: {
-    fontSize: 16, 
-    color: 'black',
-    textAlign: 'center',
+    fontSize: 16,
+    color: "black",
+    textAlign: "center",
     paddingHorizontal: 10,
   },
 });

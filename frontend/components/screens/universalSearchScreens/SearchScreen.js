@@ -118,8 +118,8 @@ const SearchScreen = ({}) => {
         // if the user is trying to navigate to their own profile, navigate to the personal profile tab
         if (id == currentUserId) {
           navigation.navigate("PersonalProfile");
-        }
-        else { // else just go to normal user profile tab
+        } else {
+          // else just go to normal user profile tab
           navigation.navigate("UserProfile", { userId: id });
         }
         break;
@@ -140,7 +140,7 @@ const SearchScreen = ({}) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.topContent}>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
             setSearchBar("");
@@ -152,12 +152,11 @@ const SearchScreen = ({}) => {
             });
             setFocus("");
             prevSearch.current = "";
-            console.log(prevPage);
-            navigation.navigate(prevPage);
+            navigation.goBack();
           }}
         >
           <BackArrowIcon></BackArrowIcon>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <View style={{ width: "100%", paddingHorizontal: "5%" }}>
           <TextInput
             ref={TextInputRef}
@@ -177,6 +176,7 @@ const SearchScreen = ({}) => {
       <ScrollView
         contentContainerStyle={styles.filterScroll}
         style={{ flexGrow: 0, paddingTop: 12 }}
+        horizontal={true}
       >
         {focus.length === 0 ? (
           <>
