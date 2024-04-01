@@ -40,11 +40,22 @@ const FriendFeedScreen = ({ navigation }) => {
     }, [])
   )
 
+  // fetch workouts when page is navigated to
+  useFocusEffect(
+    useCallback(() => {
+      console.log("bm - in useFocusEffect useCallback")
+      if (currentUserId) {
+        console.log("bm - in useFocusEffect currentUserId: ", currentUserId)
+        fetchFriendWorkouts();
+      }
+    }, [currentUserId])
+  )
+
   // fetch friend workouts (after user id is fetched)
   useEffect(() => {
     console.log("bm - in currentUserId useEffect")
     if (currentUserId) {
-      console.log("in currentUserId useEffect if statement with currentUserId: ", currentUserId)
+      console.log("in currentUserId useEffect if statement withcurrentUserId: ", currentUserId)
       fetchFriendWorkouts();
     }
   }, [currentUserId]);
