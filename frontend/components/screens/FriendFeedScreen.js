@@ -149,6 +149,7 @@ const FriendFeedScreen = ({ navigation }) => {
           Workout plans created by accounts that you follow will be displayed
           here
         </Text>
+        <FooterTab focused="FriendFeed"></FooterTab>
       </SafeAreaView>
     );
   }

@@ -71,20 +71,19 @@ const SavedExercisesScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView>
-      {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
-      <ScrollView contentContainerStyle={styles.container}>
-        {loading ? (
-          <Text>Loading... </Text>
-        ) : (
-          <ScrollView>
-            {savedExercises.length === 0 ? (
-              <Text style={styles.placeholder}>
-                You have not saved any exercises yet. Click the star icon when
-                you search for an exercise to save it.
-              </Text>
-            ) : (
-              savedExercises.map((exercise) => (
+    <SafeAreaView style={{ minHeight: "100%" }}>
+      {loading ? (
+        <Text>Loading... </Text>
+      ) : (
+        <ScrollView contentContainerStyle={styles.container}>
+          {savedExercises.length === 0 ? (
+            <Text style={styles.placeholder}>
+              You have not saved any exercises yet. Click the star icon when you
+              search for an exercise to save it.
+            </Text>
+          ) : (
+            <ScrollView>
+              {savedExercises.map((exercise) => (
                 <TouchableOpacity
                   key={exercise.id}
                   style={styles.exerciseContainer}
@@ -113,11 +112,12 @@ const SavedExercisesScreen = ({ navigation }) => {
                       .join(" ")}
                   </Text>
                 </TouchableOpacity>
-              ))
-            )}
-          </ScrollView>
-        )}
-      </ScrollView>
+              ))}
+            </ScrollView>
+          )}
+        </ScrollView>
+      )}
+
       <FooterTab focused={"SavedExercises"}></FooterTab>
     </SafeAreaView>
   );

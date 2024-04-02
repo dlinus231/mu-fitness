@@ -479,7 +479,7 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
     const routines = result?.routines;
 
     if (!routines || (routines && routines.length === 0)) {
-      console.log("inside if")
+      // console.log("inside if");
       res.status(200).json([]);
       return;
     }
@@ -541,8 +541,8 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
     res.sendStatus(400);
   }
 });
+
 // Get all exercise names
-// FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
 app.get(`/exercises/names`, async (req, res) => {
   try {
     const exerciseNames = await prisma.exercise.findMany({
@@ -719,6 +719,7 @@ app.get(`/workout/many/:userId`, async (req, res) => {
       where: {
         user_id: parseInt(userId),
       },
+      include: { routines: true },
     });
     res.status(200).json(result);
   } catch (e) {
@@ -753,6 +754,7 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
+// get routine by id
 app.get(`/workout/routine/:id`, async (req, res) => {
   const { id } = req.params;
 
@@ -891,7 +893,10 @@ app.post(`/workout/routine/set/update`, async (req, res) => {
   try {
     const result = await prisma.defaultSet.update({
       where: { id: set_id },
-      data: { repetitions: parseInt(repetitions), weight_lbs: parseInt(weight_lbs)},
+      data: {
+        repetitions: parseInt(repetitions),
+        weight_lbs: parseInt(weight_lbs),
+      },
     });
     res.status(201).json(result);
   } catch (error) {

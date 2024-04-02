@@ -19,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SmartSearchToggleBubble from "./SmartSearchToggleBubble";
+import { Entypo } from "@expo/vector-icons";
 
 const SearchScreen = ({}) => {
   const navigation = useNavigation();
@@ -53,12 +54,12 @@ const SearchScreen = ({}) => {
     setSearchBar(newText.replace(/\n/g, ""));
   };
 
-  useEffect(() => {
-    Alert.alert(
-      "Try our AI-Powered Smart Search!",
-      "Type in a general search prompt, e.g. 'Body only ab exercises'"
-    );
-  }, []);
+  // useEffect(() => {
+  //   Alert.alert(
+  //     "Try our AI-Powered Smart Search!",
+  //     "Type in a general search prompt, e.g. 'Body only ab exercises'"
+  //   );
+  // }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -157,19 +158,28 @@ const SearchScreen = ({}) => {
         >
           <BackArrowIcon></BackArrowIcon>
         </TouchableOpacity>
-        <View style={{ width: "100%", paddingHorizontal: "5%" }}>
-          <TextInput
-            ref={TextInputRef}
-            style={styles.text}
-            placeholder="Search for exercises, workouts, users, and more..."
-            multiline={true}
-            numberOfLines={2}
-            textAlignVertical="top"
-            placeholderTextColor="#525252"
-            value={searchBar}
-            onChangeText={onChangeText}
-            onKeyPress={onKeyPress}
-          ></TextInput>
+        <View style={{ width: "95%", paddingHorizontal: "5%" }}>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              ref={TextInputRef}
+              style={styles.text}
+              placeholder="Search for exercises, workouts, users, and more..."
+              multiline={true}
+              numberOfLines={2}
+              textAlignVertical="top"
+              placeholderTextColor="#525252"
+              value={searchBar}
+              onChangeText={onChangeText}
+              onKeyPress={onKeyPress}
+            ></TextInput>
+            <TouchableOpacity
+              onPress={() => {
+                setSearchBar("");
+              }}
+            >
+              <Entypo name="cross" size={24} color="#828282" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.hr}></View>
         </View>
       </View>
@@ -263,10 +273,11 @@ const styles = StyleSheet.create({
   },
   topContent: {
     flexDirection: "row",
-    padding: 10,
-    alignItems: "flex-start",
+    paddingVertical: 10,
+    alignItems: "center",
     width: "95%",
     marginTop: "5%",
+    justifyContent: "flex-start",
   },
   filterScroll: {
     display: "flex",
@@ -298,6 +309,12 @@ const styles = StyleSheet.create({
     width: "90%",
     flexWrap: "wrap",
     color: "#FFFFFF",
+  },
+  textInputContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
 

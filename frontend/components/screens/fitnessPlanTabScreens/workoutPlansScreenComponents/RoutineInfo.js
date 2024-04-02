@@ -31,7 +31,7 @@ const RoutineInfo = ({
   const [editingSetToplLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
   const [exerciseId, setExerciseId] = useState(null);
 
-  console.log("bm - workoutFromFrom in RoutineInfo: ", workoutFromFrom)
+  console.log("bm - workoutFromFrom in RoutineInfo: ", workoutFromFrom);
 
   const navigation = useNavigation();
 
@@ -108,9 +108,7 @@ const RoutineInfo = ({
   };
 
   const handleSeeMoreDetails = async (id) => {
-    const response = await axios.get(
-      BACKEND_URL + `/exercises/one/${id}`
-    );
+    const response = await axios.get(BACKEND_URL + `/exercises/one/${id}`);
     const exerciseData = response.data;
 
     navigation.navigate("ExerciseScreen", {
@@ -121,7 +119,7 @@ const RoutineInfo = ({
       workout_id: workoutId,
       workoutFromFrom: workoutFromFrom,
     });
-  }
+  };
 
   useEffect(() => {
     fetchRoutineInfo();
@@ -133,8 +131,10 @@ const RoutineInfo = ({
         {/* <Text style={styles.title}>Exercise Info</Text> */}
         <View style={styles.headerContainer}>
           <Text style={styles.title}>
-            {exerciseName.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
-          }
+            {exerciseName
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}
           </Text>
           {!editing && (
             <TouchableOpacity
@@ -143,11 +143,7 @@ const RoutineInfo = ({
               }}
               style={styles.closeButton}
             >
-              <MaterialIcons
-                name="close"
-                size={32}
-                color="#000" 
-              />
+              <MaterialIcons name="close" size={32} color="#000" />
             </TouchableOpacity>
           )}
         </View>
@@ -161,8 +157,8 @@ const RoutineInfo = ({
             {!editingSetToplLevel && (
               <>
                 <TouchableOpacity
-                style={styles.addNewButton}
-                onPress={handleAddSet}
+                  style={styles.addNewButton}
+                  onPress={handleAddSet}
                 >
                   <Text style={styles.addNewText}>Create New Set</Text>
                 </TouchableOpacity>
@@ -181,7 +177,7 @@ const RoutineInfo = ({
       </View>
       {!editing && (
         <View style={styles.buttonContainer}>
-          {(isOwnedByCurrentUser && !editing) && (
+          {isOwnedByCurrentUser && !editing && (
             <TouchableOpacity
               style={styles.editButton}
               onPress={() => {
@@ -196,30 +192,32 @@ const RoutineInfo = ({
               style={styles.seeDetailsButton}
               onPress={() => handleSeeMoreDetails(exerciseId)}
             >
-              <Text style={{ color: "#000000", fontWeight: "bold" }}>See Details</Text>
+              <Text style={{ color: "#000000", fontWeight: "bold" }}>
+                See Details
+              </Text>
             </TouchableOpacity>
           )}
-          {(isOwnedByCurrentUser && !editing) && (
+          {isOwnedByCurrentUser && !editing && (
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={handleDeleteRoutine}
             >
-              <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
+              <Text style={{ color: "#cd695a", fontWeight: "bold" }}>
+                Delete
+              </Text>
             </TouchableOpacity>
           )}
-          
         </View>
       )}
-      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', 
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   addNewButton: {
     padding: 16,
@@ -272,7 +270,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginHorizontal: 16,
-    marginBottom: 10,  
+    marginBottom: 10,
   },
   closeButtonText: {
     fontSize: 16,
@@ -284,7 +282,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     // paddingHorizontal: "20%",
-    paddingHorizontal: '5%',
+    paddingHorizontal: "5%",
     marginBottom: "5%",
     backgroundColor: "white",
   },
@@ -295,7 +293,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
-    width: '30%',
+    width: "30%",
   },
   deleteButton: {
     borderWidth: 2,
@@ -304,14 +302,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     alignItems: "center",
-    width: '30%',
+    width: "30%",
   },
   editButton: {
     borderWidth: 2,
     borderColor: "#695acd",
     borderRadius: 10,
     backgroundColor: "#695acd",
-    width: '30%',
+    width: "30%",
     paddingVertical: 5,
     alignItems: "center",
   },
