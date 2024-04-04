@@ -1,3 +1,5 @@
+//NOW HAS BOTH WORKOUT PLANS AND SAVED EXERCISES
+
 import React, { lazy, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import {

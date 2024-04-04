@@ -4,7 +4,7 @@ import {
   MaterialIcons,
   Ionicons,
   MaterialCommunityIcons,
-  Feather,
+  AntDesign,
   SimpleLineIcons,
 } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -55,13 +55,13 @@ const FooterTab = ({ focused }) => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("SavedExercises");
+          navigation.navigate("Calendar");
         }}
       >
-        <SimpleLineIcons
-          name="layers"
+        <AntDesign
+          name="calendar"
           size={24}
-          color={focused === "SavedExercises" ? "#6A5ACD" : "grey"}
+          color={focused === "Calendar" ? "#6A5ACD" : "grey"}
         />
       </TouchableOpacity>
       <TouchableOpacity
