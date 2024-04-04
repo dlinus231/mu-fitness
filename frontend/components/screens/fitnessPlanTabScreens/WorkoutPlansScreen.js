@@ -7,30 +7,27 @@ import {
   SafeAreaView,
   DeviceEventEmitter,
   Alert,
+  RefreshControl,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { LinkingContext, useFocusEffect } from "@react-navigation/native";
 
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BACKEND_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-import WorkoutPlan from "./workoutPlansScreenComponents/WorkoutPlan";
-import IndividualWorkoutPlanScreen from "./workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
-// import BackArrowIcon from "../../icons/BackArrowIcon";
-import TopBarMenu from "../../TopBarMenu";
+import { formatDistanceToNow } from "date-fns";
 import FooterTab from "../../FooterTab";
 
 const WorkoutPlansScreen = ({ route, navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [created, setCreated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // TODO set this to be back to null when the user clicks back on individual workout plan page
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
 
   const workoutPlanIdFromRoute = route.params?.workout_id;
-  // console.log("bm - WorkoutPlansScreen workoutPlanIdFromRoute: ", workoutPlanIdFromRoute);
 
   useEffect(() => {
     if (workoutPlanIdFromRoute) {
@@ -45,27 +42,37 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     }, [])
   );
 
-  const onEnterWorkoutPlanPage = (id) => {
-    // console.log("bm - onEnterWorkoutPlanPage called with id: ", id);
-    // setSelectedWorkoutPlanId(id);
-    navigation.navigate("IndividualWorkoutScreen", {
-      workout_id: id,
-    });
+  const handleAddMoreButtonPress = async () => {
+    navigation.navigate("CreateNewWorkoutPlan");
   };
 
-  const onLeaveWorkoutPlanPage = () => {
-    navigation.navigate("FitnessPlans");
-    setSelectedWorkoutPlanId(null);
-    fetchWorkoutPlans();
-  };
+  // const onLeaveWorkoutPlanPage = () => {
+  //   navigation.navigate("FitnessPlans");
+  //   setSelectedWorkoutPlanId(null);
+  //   fetchWorkoutPlans();
+  // };
 
-  const renderItem = ({ item }) => {
+  const renderWorkoutItem = ({ item }) => {
     return (
-      <WorkoutPlan
-        title={item.name}
-        id={item.id}
-        onEnterWorkoutPlanPage={onEnterWorkoutPlanPage}
-      />
+      <TouchableOpacity
+        style={styles.workoutPlan}
+        onPress={() =>
+          navigation.navigate("IndividualWorkoutScreen", {
+            workout_id: item.id,
+          })
+        }
+      >
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name}</Text>
+        </View>
+
+        <Text style={styles.workoutTime}>
+          created{" "}
+          {formatDistanceToNow(new Date(item.time_created), {
+            addSuffix: true,
+          })}
+        </Text>
+      </TouchableOpacity>
     );
   };
 
@@ -99,6 +106,13 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     fetchWorkoutPlans();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchUserData();
+    await getFavoriteExercises();
+    setRefreshing(false);
+  };
+
   //Event listener for when new workout is created so that we update the list of workouts
   DeviceEventEmitter.addListener("createWorkoutEvent", () => {
     setCreated(true);
@@ -119,44 +133,32 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
         {selectedWorkoutPlanId !== null ? (
           <></>
         ) : (
-          // EXPLANATION: now that we are accessing IndividualWorkoutPLanScreen using navigators
-          // it should not be a child of WorkoutPlansScreen
-          // this is because if we render it as a child, it will have no route prop
-          // so route.params will be undefined in IndividualWorkoutPlanScreen, which will cause the app to crash
-          // <IndividualWorkoutPlanScreen
-          //   onLeaveWorkoutPlanPage={onLeaveWorkoutPlanPage}
-          //   workout_id={selectedWorkoutPlanId}
-          //   navigation={navigation}
-          // />
           <>
-            {/* <TouchableOpacity onPress={() => navigation.goBack()}>
-            <BackArrowIcon></BackArrowIcon>
-          </TouchableOpacity> */}
-            {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
-            <Text style={styles.text}>Your Workout Plans</Text>
-
-            <TouchableOpacity
-              style={styles.createNewWorkoutPlanButton}
-              onPress={() => {
-                setCreated(false);
-                navigation.navigate("CreateNewWorkoutPlan", {
-                  prevPage: "FitnessPlans",
-                });
-              }}
-            >
-              <MaterialIcons name="post-add" size={48} color="black" />
-              <Text> Create new workout plan</Text>
-            </TouchableOpacity>
+            <View style={styles.contentContainerHeader}>
+              <TouchableOpacity style={{ width: 28 }}></TouchableOpacity>
+              <Text style={styles.contentContainerText}>
+                Your Workout Plans
+              </Text>
+              <TouchableOpacity
+                style={styles.contentContainerButton}
+                onPress={handleAddMoreButtonPress}
+              >
+                <MaterialIcons name="add-circle" size={28} color="#6A5ACD" />
+              </TouchableOpacity>
+            </View>
             {loading ? (
               <Text>Loading workouts...</Text>
             ) : workoutPlans.length > 0 ? (
               <FlatList
-                style={styles.flatlist}
                 data={workoutPlans}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                onEndReached={() => {}} // TODO in the future this is where we would put logic to fetch more workout plans from the backend
-                onEndReachedThreshold={0.3} // determines how close to end to call the onEndReached function, will probably adjust this later
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={renderWorkoutItem}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
               />
             ) : (
               <View style={styles.container}>
@@ -210,6 +212,61 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "black",
+  },
+  contentContainerHeader: {
+    flexDirection: "row",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginBottom: "4%",
+    width: "100%",
+  },
+  contentContainerText: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  contentContainerButton: {
+    marginTop: 3,
+  },
+  workoutName: {
+    fontWeight: "bold",
+    marginTop: 8,
+    fontSize: 23,
+  },
+  workoutMainContent: {},
+  workoutDetail: {
+    fontSize: 14,
+  },
+  workoutTime: {
+    fontSize: 12,
+    color: "#666",
+    alignSelf: "flex-end",
+  },
+  workoutPlan: {
+    backgroundColor: "#FFF",
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginLeft: 16,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  workoutName: {
+    fontWeight: "bold",
+    marginTop: 8,
+    fontSize: 23,
   },
 });
 

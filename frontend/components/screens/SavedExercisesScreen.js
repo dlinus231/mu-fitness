@@ -14,6 +14,7 @@ import { BACKEND_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { getYoutubeMeta } from "react-native-youtube-iframe";
+import { MaterialIcons } from "@expo/vector-icons";
 import FooterTab from "../FooterTab";
 
 const SavedExercisesScreen = ({ navigation }) => {
@@ -35,6 +36,11 @@ const SavedExercisesScreen = ({ navigation }) => {
       }
     }
     setThumbnails(thumbnailData);
+    setLoading(false);
+  };
+
+  const handleAddMoreButtonPress = async () => {
+    navigation.navigate("search");
   };
 
   const loadSavedExercises = async () => {
@@ -44,7 +50,6 @@ const SavedExercisesScreen = ({ navigation }) => {
           `/exercises/saved/${await AsyncStorage.getItem("user_id")}`
       );
       setSavedExercises(response.data);
-      setLoading(false);
       fetchThumbnails(response.data);
     } catch (error) {
       console.error(error);
@@ -76,6 +81,16 @@ const SavedExercisesScreen = ({ navigation }) => {
         <Text>Loading... </Text>
       ) : (
         <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.contentContainerHeader}>
+            <TouchableOpacity style={{ width: 28 }}></TouchableOpacity>
+            <Text style={styles.contentContainerText}>Favorite Exercises</Text>
+            <TouchableOpacity
+              style={styles.contentContainerButton}
+              onPress={handleAddMoreButtonPress}
+            >
+              <MaterialIcons name="add-circle" size={28} color="#6A5ACD" />
+            </TouchableOpacity>
+          </View>
           {savedExercises.length === 0 ? (
             <Text style={styles.placeholder}>
               You have not saved any exercises yet. Click the star icon when you
@@ -152,6 +167,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     textAlign: "center",
     lineHeight: 30,
+  },
+  contentContainerHeader: {
+    flexDirection: "row",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginBottom: "4%",
+    width: "100%",
+  },
+  contentContainerText: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  contentContainerButton: {
+    marginTop: 3,
   },
 });
 
