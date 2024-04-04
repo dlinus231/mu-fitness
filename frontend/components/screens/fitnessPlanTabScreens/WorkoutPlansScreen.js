@@ -3,13 +3,14 @@ import axios from "axios";
 import {
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   SafeAreaView,
   DeviceEventEmitter,
   Alert,
-  RefreshControl,
+  ScrollView,
+  Image,
 } from "react-native";
-import { LinkingContext, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
+import { getYoutubeMeta } from "react-native-youtube-iframe";
 
 import { Text, View } from "@gluestack-ui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -22,18 +23,9 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [created, setCreated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // TODO set this to be back to null when the user clicks back on individual workout plan page
-  const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState(null);
-
-  const workoutPlanIdFromRoute = route.params?.workout_id;
-
-  useEffect(() => {
-    if (workoutPlanIdFromRoute) {
-      setSelectedWorkoutPlanId(workoutPlanIdFromRoute);
-    }
-  }, [workoutPlanIdFromRoute]);
+  const [activeTab, setActiveTab] = useState("workouts"); // 'workouts' or 'favoriteExercises'
+  const [savedExercises, setSavedExercises] = useState([]);
+  const [thumbnails, setThumbnails] = useState({});
 
   useFocusEffect(
     useCallback(() => {
@@ -42,39 +34,14 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     }, [])
   );
 
-  const handleAddMoreButtonPress = async () => {
-    navigation.navigate("CreateNewWorkoutPlan");
-  };
-
-  // const onLeaveWorkoutPlanPage = () => {
-  //   navigation.navigate("FitnessPlans");
-  //   setSelectedWorkoutPlanId(null);
-  //   fetchWorkoutPlans();
-  // };
-
-  const renderWorkoutItem = ({ item }) => {
-    return (
-      <TouchableOpacity
-        style={styles.workoutPlan}
-        onPress={() =>
-          navigation.navigate("IndividualWorkoutScreen", {
-            workout_id: item.id,
-          })
-        }
-      >
-        <View style={styles.workoutMainContent}>
-          <Text style={styles.workoutName}>{item.name}</Text>
-        </View>
-
-        <Text style={styles.workoutTime}>
-          created{" "}
-          {formatDistanceToNow(new Date(item.time_created), {
-            addSuffix: true,
-          })}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
+  useEffect(() => {
+    setLoading(true);
+    if (activeTab === "workouts") {
+      fetchWorkoutPlans();
+    } else {
+      loadSavedExercises();
+    }
+  }, [activeTab]);
 
   const fetchWorkoutPlans = async () => {
     const userId = await AsyncStorage.getItem("user_id");
@@ -101,16 +68,66 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    setLoading(true);
-    fetchWorkoutPlans();
-  }, []);
+  const fetchThumbnails = async (data) => {
+    const thumbnailData = {};
+    for (const item of data) {
+      if (!item.video_path) continue;
+      try {
+        const meta = await getYoutubeMeta(item.video_path);
+        thumbnailData[item.id] = meta.thumbnail_url;
+      } catch (error) {
+        console.error("Error fetching YouTube meta:", error);
+      }
+    }
+    setThumbnails(thumbnailData);
+    setLoading(false);
+  };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchUserData();
-    await getFavoriteExercises();
-    setRefreshing(false);
+  const loadSavedExercises = async () => {
+    try {
+      const response = await axios.get(
+        BACKEND_URL +
+          `/exercises/saved/${await AsyncStorage.getItem("user_id")}`
+      );
+      setSavedExercises(response.data);
+      fetchThumbnails(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAddMoreButtonPress = async () => {
+    if (activeTab === "workouts") {
+      navigation.navigate("CreateNewWorkoutPlan");
+    }
+    if (activeTab === "favoriteExercises") {
+      navigation.navigate("search");
+    }
+  };
+
+  const renderWorkoutItem = (item) => {
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.workoutPlan}
+        onPress={() =>
+          navigation.navigate("IndividualWorkoutScreen", {
+            workout_id: item.id,
+          })
+        }
+      >
+        <View style={styles.workoutMainContent}>
+          <Text style={styles.workoutName}>{item.name}</Text>
+        </View>
+
+        <Text style={styles.workoutTime}>
+          created{" "}
+          {formatDistanceToNow(new Date(item.time_created), {
+            addSuffix: true,
+          })}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   //Event listener for when new workout is created so that we update the list of workouts
@@ -130,10 +147,34 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
   return (
     <>
       <SafeAreaView>
-        {selectedWorkoutPlanId !== null ? (
-          <></>
-        ) : (
-          <>
+        <View style={styles.buttonsAndIconsContainer}>
+          <TouchableOpacity
+            style={activeTab === "workouts" ? styles.iconSelected : styles.icon}
+            onPress={() => setActiveTab("workouts")}
+          >
+            <MaterialIcons
+              name="fitness-center"
+              size={30}
+              color={activeTab === "workouts" ? "#6A5ACD" : "#aaa"} //
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={
+              activeTab === "favoriteExercises"
+                ? styles.iconSelected
+                : styles.icon
+            }
+            onPress={() => setActiveTab("favoriteExercises")}
+          >
+            <MaterialIcons
+              name="star-border"
+              size={30}
+              color={activeTab === "favoriteExercises" ? "#6A5ACD" : "#aaa"}
+            />
+          </TouchableOpacity>
+        </View>
+        {activeTab === "workouts" ? (
+          <ScrollView>
             <View style={styles.contentContainerHeader}>
               <TouchableOpacity style={{ width: 28 }}></TouchableOpacity>
               <Text style={styles.contentContainerText}>
@@ -149,17 +190,9 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
             {loading ? (
               <Text>Loading workouts...</Text>
             ) : workoutPlans.length > 0 ? (
-              <FlatList
-                data={workoutPlans}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderWorkoutItem}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-              />
+              workoutPlans.map((item) => {
+                return renderWorkoutItem(item);
+              })
             ) : (
               <View style={styles.container}>
                 <Text style={styles.space}>
@@ -178,6 +211,69 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
                 </Text>
               </View>
             )}
+          </ScrollView>
+        ) : (
+          <>
+            {loading ? (
+              <Text>Loading... </Text>
+            ) : (
+              <ScrollView contentContainerStyle={styles.container}>
+                <View style={styles.contentContainerHeader}>
+                  <TouchableOpacity style={{ width: 28 }}></TouchableOpacity>
+                  <Text style={styles.contentContainerText}>
+                    Favorite Exercises
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.contentContainerButton}
+                    onPress={handleAddMoreButtonPress}
+                  >
+                    <MaterialIcons
+                      name="add-circle"
+                      size={28}
+                      color="#6A5ACD"
+                    />
+                  </TouchableOpacity>
+                </View>
+                {savedExercises.length === 0 ? (
+                  <Text style={styles.placeholder}>
+                    You have not saved any exercises yet. Click the star icon
+                    when you search for an exercise to save it.
+                  </Text>
+                ) : (
+                  savedExercises.map((exercise) => (
+                    <TouchableOpacity
+                      key={exercise.id}
+                      style={styles.exerciseContainer}
+                      onPress={() => {
+                        handlePress(exercise.id);
+                      }}
+                    >
+                      <Image
+                        source={
+                          thumbnails[exercise.id]
+                            ? { uri: thumbnails[exercise.id] }
+                            : placeHolderImage
+                        }
+                        style={styles.exerciseImage}
+                      />
+                      <Text
+                        style={styles.exerciseName}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {exercise.name
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                )}
+              </ScrollView>
+            )}
           </>
         )}
       </SafeAreaView>
@@ -188,8 +284,7 @@ const WorkoutPlansScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    justifyContent: "center",
+    paddingBottom: "30%",
     alignItems: "center",
   },
   createNewWorkoutPlanButton: {
@@ -267,6 +362,41 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 8,
     fontSize: 23,
+  },
+  buttonsAndIconsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    alignSelf: "center", // center icons horitzontally
+    marginBottom: 10,
+  },
+  icon: {
+    marginTop: 10,
+    width: "25%",
+    alignItems: "center",
+    paddingBottom: 10,
+  },
+  iconSelected: {
+    marginTop: 10,
+    borderBottomColor: "#6A5ACD",
+    borderBottomWidth: 1,
+    width: "25%",
+    alignItems: "center",
+    paddingBottom: 10,
+  },
+  exerciseContainer: {
+    marginBottom: 16,
+  },
+  exerciseImage: {
+    width: 300,
+    height: 175,
+    borderRadius: 10,
+  },
+  exerciseName: {
+    marginTop: 8,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
