@@ -28,7 +28,7 @@ const RoutineInfo = ({
   const [sets, setSets] = useState([]);
   const [editing, setEditing] = useState(false);
   const [exerciseName, setExerciseName] = useState("Exercise Info"); // default val if we can't find name
-  const [editingSetToplLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
+  const [editingSetTopLevel, setEditingSetTopLevel] = useState(false); // if this is true, we don't want to give option to add a set
   const [exerciseId, setExerciseId] = useState(null);
 
   console.log("bm - workoutFromFrom in RoutineInfo: ", workoutFromFrom);
@@ -40,9 +40,7 @@ const RoutineInfo = ({
       const response = await axios.get(
         BACKEND_URL + `/workout/routine/${routineInfoId}`
       );
-      const setData = response.data.sets.sort(
-        (a, b) => a.set_order - b.set_order
-      );
+      const setData = response.data.sets.sort((a, b) => a.id - b.id);
       setSets(setData);
       if (response.data.exercise.name) {
         setExerciseName(response.data.exercise.name);
@@ -102,6 +100,7 @@ const RoutineInfo = ({
         handleRemoveSet={handleRemoveSet}
         editing={editing}
         fetchRoutineInfo={fetchRoutineInfo}
+        editingSetTopLevel={editingSetTopLevel}
         setEditingSetTopLevel={setEditingSetTopLevel}
       ></SetInfo>
     );
@@ -154,7 +153,7 @@ const RoutineInfo = ({
         />
         {editing && (
           <>
-            {!editingSetToplLevel && (
+            {!editingSetTopLevel && (
               <>
                 <TouchableOpacity
                   style={styles.addNewButton}
