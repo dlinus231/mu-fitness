@@ -400,11 +400,10 @@ const IndividualWorkoutPlanScreen = ({ route, navigation }) => {
 
               <View>
                 {routines.length === 0 &&
-                  (!isOwnedByCurrentUser && (
                     <Text style={styles.no_exercises_text}>
                       This workout plan does not have any exercises yet.
                     </Text>
-                  ))}
+                  }
               </View>
 
               <View>
@@ -706,7 +705,8 @@ const styles = StyleSheet.create({
   },
   workoutInfo: {
     backgroundColor: "lightgrey",
-    paddingVertical: 15,
+    paddingTop: 15,
+    paddingBottom: 15,
     borderRadius: 10,
     paddingHorizontal: 12,
   },
