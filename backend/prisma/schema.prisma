@@ -20,6 +20,7 @@ model User {
   followers       Follow[]             @relation("UserFollowing")
   following       Follow[]             @relation("UserFollowers")
   saved_exercises UserSavedExercises[]
+  scheduled_workouts        ScheduledWorkout[]
 }
 
 model UserSavedExercises {
@@ -63,6 +64,23 @@ model Workout {
   routines     Routine[]
   tags         Tag[]
   user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  scheduled_workouts ScheduledWorkout[]
+}
+
+//Create copies of workout, routines, sets
+//Change api endpoints to keep changes consistent for all uncompleted scheduledworkouts
+model ScheduledWorkout {
+  id Int @id @default(autoincrement())
+  date DateTime @db.Date
+  user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id      Int
+  workout Workout? @relation(fields: [workout_id], references: [id])
+  workout_id Int?
+  completion CompletionStatus @default(scheduled)
+  routines ScheduledRoutine[]
+  name         String     @db.VarChar(255)
+  difficulty   Difficulty
+  description  String
 }
 
 model Routine {
@@ -75,6 +93,16 @@ model Routine {
   sets        DefaultSet[]
 }
 
+model ScheduledRoutine {
+  id Int @id @default(autoincrement())
+  workout ScheduledWorkout @relation(fields: [workout_id], references: [id], onDelete: Cascade)
+  exercise_id Int
+  rest        Int @default(60)
+  workout_id  Int
+  exercise    Exercise     @relation(fields: [exercise_id], references: [id], onDelete: Cascade)
+  sets ScheduledSet[]
+}
+
 model DefaultSet {
   id           Int          @id @default(autoincrement())
   repetitions  Int @default(8)
@@ -82,7 +110,16 @@ model DefaultSet {
   // duration_set DurationSet?
   routine      Routine      @relation(fields: [routine_id], references: [id], onDelete: Cascade)
   routine_id   Int
-  set_order Int
+}
+
+model ScheduledSet {
+  id           Int          @id @default(autoincrement())
+  repetitions  Int 
+  weight_lbs   Int 
+  routine      ScheduledRoutine      @relation(fields: [routine_id], references: [id], onDelete: Cascade)
+  routine_id   Int
+  completed Boolean
+  rpe Int?
 }
 
 // model DurationSet {
@@ -99,6 +136,7 @@ model Exercise {
   description        String
   video_path         String
   routines           Routine[]
+  scheduled_routines           ScheduledRoutine[]
   muscles            Muscle[]
   tags               Tag[]                @relation("ExerciseToTag")
   embedding          Float[]
@@ -139,4 +177,12 @@ enum Difficulty {
 enum RoutineType {
   default
   duration
+}
+
+enum CompletionStatus {
+  scheduled
+  inProgress
+  complete
+  incomplete //ended but did not complete
+  skipped
 }

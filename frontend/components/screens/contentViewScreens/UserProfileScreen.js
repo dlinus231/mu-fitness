@@ -31,7 +31,7 @@ const UserProfileScreen = ({ route, navigation }) => {
 
   const [userData, setUserData] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('workouts'); // 'workouts' or 'favoriteExercises'
+  const [activeTab, setActiveTab] = useState("workouts"); // 'workouts' or 'favoriteExercises'
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -50,7 +50,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
     if (userIdFromRoute) {
-      console.log("bm - setting userId to: ", userIdFromRoute)
+      console.log("bm - setting userId to: ", userIdFromRoute);
       setUserId(userIdFromRoute);
     }
   }, [userIdFromRoute]);
@@ -68,7 +68,6 @@ const UserProfileScreen = ({ route, navigation }) => {
         if (userId === "") {
           setUserId(uId);
         }
-
       } catch (e) {
         console.log("bm - error getting user id: ", e);
       }
@@ -112,7 +111,7 @@ const UserProfileScreen = ({ route, navigation }) => {
         getFavoriteExercises();
       }
     }, [userId])
-  )
+  );
 
   useEffect(() => {
     // console.log("bm - setIsLoading useEffect reached");
@@ -132,29 +131,31 @@ const UserProfileScreen = ({ route, navigation }) => {
         id: workout.id,
         name: workout.name,
         timeCreated: workout.time_created,
-      }
-    })
+      };
+    });
     setWorkouts(parsedWorkouts);
 
     getFavoriteExercises();
-  }, [userData])
+  }, [userData]);
 
   const getFavoriteExercises = async () => {
     try {
-      const response = await axios.get(BACKEND_URL + `/exercises/saved/${userId}`);
+      const response = await axios.get(
+        BACKEND_URL + `/exercises/saved/${userId}`
+      );
       const parsedExercises = response.data.map((exercise) => {
         return {
           id: exercise.id,
           name: exercise.name,
           timeCreated: exercise.saved,
-        }
-      })
+        };
+      });
       // console.log("bm - setting favorite exercises to: ", parsedExercises)
       setFavoriteExercises(parsedExercises);
     } catch (e) {
       console.log("bm - error fetching favorite exercises: ", e);
     }
-  }
+  };
 
   // fetch dat associated with current user and populate the userData state
   const fetchUserData = async () => {
@@ -176,7 +177,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
     fetchUserData();
     getFavoriteExercises();
-  }
+  };
 
   const handleFollow = async () => {
     const curUserId = await AsyncStorage.getItem("user_id");
@@ -210,7 +211,7 @@ const UserProfileScreen = ({ route, navigation }) => {
         }
       );
       console.log("bm - response from handleUnfollow: ", response.data);
-      console.log("bm - about to set isFollowing to false")
+      console.log("bm - about to set isFollowing to false");
       // now need to update the isFollowing state
       setIsFollowing(false);
     } catch (e) {
@@ -218,21 +219,27 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  const renderWorkoutItem = ({item}) => {
+  const renderWorkoutItem = ({ item }) => {
     return (
       <TouchableOpacity
         style={styles.workoutPlan}
-        onPress={() => navigation.navigate("IndividualWorkoutScreen", { workout_id: item.id, workoutFrom: "UserProfile" })}
+        onPress={() =>
+          navigation.navigate("IndividualWorkoutScreen", {
+            workout_id: item.id,
+          })
+        }
       >
         <View style={styles.workoutMainContent}>
           <Text style={styles.workoutName}>{item.name}</Text>
         </View>
-        
-        <Text style={styles.workoutTime}>created {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
 
+        <Text style={styles.workoutTime}>
+          created{" "}
+          {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
+        </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
   const goToExercise = async (id) => {
     const response = await axios.get(BACKEND_URL + `/exercises/one/${id}`);
@@ -246,7 +253,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   // silly guy image lol
   const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
 
-  const renderExerciseItem = ({item}) => {
+  const renderExerciseItem = ({ item }) => {
     return (
       <TouchableOpacity
         style={styles.workoutPlan}
@@ -255,11 +262,18 @@ const UserProfileScreen = ({ route, navigation }) => {
         }}
       >
         <View style={styles.workoutMainContent}>
-          <Text style={styles.workoutName}>{item.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</Text>
+          <Text style={styles.workoutName}>
+            {item.name
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}
+          </Text>
         </View>
-        
-        <Text style={styles.workoutTime}>favorited {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}</Text>
 
+        <Text style={styles.workoutTime}>
+          favorited{" "}
+          {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
+        </Text>
       </TouchableOpacity>
     );
     // return (
@@ -285,7 +299,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     //     </Text>
     //   </TouchableOpacity>
     // )
-  }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -308,43 +322,60 @@ const UserProfileScreen = ({ route, navigation }) => {
         <MaterialIcons
           name="account-circle"
           size={95}
-          color="#000" 
+          color="#000"
           style={styles.avatar}
         />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{userData.username}</Text>
           <View style={styles.stats}>
             <TouchableOpacity
-              onPress={() => navigation.navigate("followersList", { userId: userData.id, navigatingFrom: "UserProfile"})}
+              onPress={() =>
+                navigation.navigate("followersList", {
+                  userId: userData.id,
+                  navigatingFrom: "UserProfile",
+                })
+              }
             >
               <Text style={styles.statText}>{followers} Followers</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
-              onPress={() => navigation.navigate("followingList", { userId: userData.id, navigatingFrom: "UserProfile"})}
+              onPress={() =>
+                navigation.navigate("followingList", {
+                  userId: userData.id,
+                  navigatingFrom: "UserProfile",
+                })
+              }
             >
               <Text style={styles.statText}>{following} Following</Text>
             </TouchableOpacity>
-            
           </View>
         </View>
       </View>
       <View style={styles.buttonsAndIconsContainer}>
         <TouchableOpacity style={styles.button} onPress={handleFollowUnfollow}>
-          <Text style={styles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
+          <Text style={styles.buttonText}>
+            {isFollowing ? "Unfollow" : "Follow"}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('workouts')}>
+        <TouchableOpacity
+          style={styles.icon}
+          onPress={() => setActiveTab("workouts")}
+        >
           <MaterialIcons
             name="fitness-center"
             size={30}
-            color={activeTab === 'workouts' ? '#6A5ACD' : '#aaa'} //
+            color={activeTab === "workouts" ? "#6A5ACD" : "#aaa"} //
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon} onPress={() => setActiveTab('favoriteExercises')}>
+        <TouchableOpacity
+          style={styles.icon}
+          onPress={() => setActiveTab("favoriteExercises")}
+        >
           <MaterialIcons
             name="star-border"
             size={30}
-            color={activeTab === 'favoriteExercises' ? '#6A5ACD' : '#aaa'}
+            color={activeTab === "favoriteExercises" ? "#6A5ACD" : "#aaa"}
           />
         </TouchableOpacity>
       </View>
@@ -352,33 +383,29 @@ const UserProfileScreen = ({ route, navigation }) => {
       <View style={styles.divider} />
 
       <View style={styles.contentContainerHeader}>
-        <Text style={styles.contentContainerText}>{(activeTab === 'workouts') ? "Workout Plans" : "Favorite Exercises"}</Text>
+        <Text style={styles.contentContainerText}>
+          {activeTab === "workouts" ? "Workout Plans" : "Favorite Exercises"}
+        </Text>
       </View>
 
       <View style={styles.contentContainer}>
-        {(activeTab === 'workouts' && workouts.length > 0) && (
+        {activeTab === "workouts" && workouts.length > 0 && (
           <FlatList
             data={workouts}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={renderWorkoutItem}
             refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-              />
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
-        )} 
-        {(activeTab === 'favoriteExercises' && favoriteExercises.length > 0) && (
+        )}
+        {activeTab === "favoriteExercises" && favoriteExercises.length > 0 && (
           <FlatList
             data={favoriteExercises}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={renderExerciseItem}
             refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-              />
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
         )}
@@ -394,46 +421,44 @@ const styles = StyleSheet.create({
     alignItems: "left", // specifies where items are aligned horizontally
     paddingTop: "6%",
     paddingHorizontal: "6%",
-    paddingBottom: "5%"
+    paddingBottom: "5%",
   },
   profileContainer: {
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: "center",
   },
   userInfo: {
-    flexDirection: 'column',
-    marginLeft: '5%',
+    flexDirection: "column",
+    marginLeft: "5%",
   },
   contentContainerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 10,
-    marginBottom: 0, 
+    marginBottom: 0,
   },
   contentContainerText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
-    flex: 1, 
+    flex: 1,
   },
   contentContainerButton: {
     marginTop: 3,
   },
   username: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 18,
   },
   stats: {
-    flexDirection: 'col',
+    flexDirection: "col",
     marginTop: 5,
   },
   statText: {
     marginRight: 15,
     fontSize: 16,
   },
-  avatar: {
-
-  },
+  avatar: {},
   buttonContainer: {
     justifyContent: "space-around",
     paddingHorizontal: 10,
@@ -453,7 +478,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#6A5ACD",
     padding: 10,
     borderRadius: 5,
-    width: '60%',
+    width: "60%",
     marginTop: 5,
   },
   buttonText: {
@@ -466,40 +491,38 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   divider: {
-    height: 1, 
-    backgroundColor: '#D3D3D3',
-    width: '100%',
-    marginTop: 20, 
+    height: 1,
+    backgroundColor: "#D3D3D3",
+    width: "100%",
+    marginTop: 20,
     marginBottom: 10,
   },
   buttonsAndIconsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    alignSelf: 'center', // center icons horitzontally
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    alignSelf: "center", // center icons horitzontally
   },
   contentContainer: {
     marginTop: 5,
-    marginBottom: '60%' // contols how close to the footerNavigator that the content (FlatLists) is
+    marginBottom: "60%", // contols how close to the footerNavigator that the content (FlatLists) is
   },
   workoutName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
     fontSize: 23,
   },
-  workoutMainContent: {
-
-  },
+  workoutMainContent: {},
   workoutDetail: {
     fontSize: 14,
   },
   workoutTime: {
     fontSize: 12,
-    color: '#666', 
-    alignSelf: 'flex-end', 
+    color: "#666",
+    alignSelf: "flex-end",
   },
   workoutPlan: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingTop: 10,
     paddingBottom: 15,
     paddingHorizontal: 20,
@@ -507,7 +530,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 20,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 2,
       height: 2,
@@ -519,7 +542,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   workoutName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
     fontSize: 23,
   },
@@ -530,7 +553,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 175,
     borderRadius: 10,
-    marginLeft: '2%', // controls where the image is horizontally (how close to either side of screen)
+    marginLeft: "2%", // controls where the image is horizontally (how close to either side of screen)
   },
   exerciseName: {
     marginTop: 8,

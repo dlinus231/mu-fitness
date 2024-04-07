@@ -479,7 +479,7 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
     const routines = result?.routines;
 
     if (!routines || (routines && routines.length === 0)) {
-      console.log("inside if")
+      // console.log("inside if");
       res.status(200).json([]);
       return;
     }
@@ -535,16 +535,14 @@ app.get(`/exercises/recommendations/:workoutId`, async (req, res) => {
         return { id: exercise.id, name: exercise.name };
       });
 
-    console.log(kNearest);
-
     res.status(200).json(kNearest);
   } catch (e) {
     console.error(e);
     res.sendStatus(400);
   }
 });
+
 // Get all exercise names
-// FOR NOW: IT RETURNS THE FIRST 100 EXERCISES
 app.get(`/exercises/names`, async (req, res) => {
   try {
     const exerciseNames = await prisma.exercise.findMany({
@@ -721,6 +719,7 @@ app.get(`/workout/many/:userId`, async (req, res) => {
       where: {
         user_id: parseInt(userId),
       },
+      include: { routines: true },
     });
     res.status(200).json(result);
   } catch (e) {
@@ -755,6 +754,7 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
+// get routine by id
 app.get(`/workout/routine/:id`, async (req, res) => {
   const { id } = req.params;
 
@@ -787,7 +787,6 @@ app.post(`/workout/routine/add`, async (req, res) => {
     const setResult = await prisma.defaultSet.create({
       data: {
         routine_id: result.id,
-        set_order: 0,
       },
     });
 
@@ -861,8 +860,6 @@ const setDefaultSetOrder = async (req: any, res: any, next: any) => {
       include: { sets: true },
     });
 
-    req.body.set_order = routine?.sets.length;
-
     next();
   } catch (error) {
     console.error(error);
@@ -872,12 +869,11 @@ const setDefaultSetOrder = async (req: any, res: any, next: any) => {
 
 //Create a set
 app.post(`/workout/routine/addSet`, setDefaultSetOrder, async (req, res) => {
-  const { routine_id, set_order } = req.body;
-  // console.log(set_order);
+  const { routine_id } = req.body;
 
   try {
     const result = await prisma.defaultSet.create({
-      data: { routine_id, set_order },
+      data: { routine_id },
     });
     res.status(201).json(result);
   } catch (error) {
@@ -893,7 +889,10 @@ app.post(`/workout/routine/set/update`, async (req, res) => {
   try {
     const result = await prisma.defaultSet.update({
       where: { id: set_id },
-      data: { repetitions: parseInt(repetitions), weight_lbs: parseInt(weight_lbs)},
+      data: {
+        repetitions: parseInt(repetitions),
+        weight_lbs: parseInt(weight_lbs),
+      },
     });
     res.status(201).json(result);
   } catch (error) {
