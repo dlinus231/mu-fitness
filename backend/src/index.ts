@@ -1186,7 +1186,11 @@ app.delete("/posts/:postId", async (req, res) => {
 // make a post
 app.post("/posts", upload.single('image'), async (req, res) => {
   const { userId, caption } = req.body;
-  const { file } = (req as any).file; // image file
+  let file = null;
+  if ((req as any).file) {
+    file = (req as any).file; // image file
+  }
+  
 
   try {
     let imageBuffer = null;
@@ -1226,10 +1230,13 @@ app.get('/user/:userId/posts', async (req, res) => {
       include: {
         user: true, // Optionally include user data
         likes: true, // Optionally include likes data
+      },
+      orderBy: {
+        createdAt: 'desc',
       }
     });
 
-    // Convert binary image data to Base64
+    // Convert binary image data to Base64 (will need to use this if we get images working)
     const postsWithBase64Images = userPosts.map(post => ({
       ...post,
       image: post.image ? Buffer.from(post.image).toString('base64') : null,
