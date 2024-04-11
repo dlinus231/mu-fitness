@@ -1012,6 +1012,85 @@ app.delete(`/workout/delete/:workoutId`, async (req, res) => {
   }
 });
 
+//Schedule a workout - copies routines and sets for this object
+app.post(`/workout/schedule`, async (req, res) => {
+  const { day, month, year, workoutId } = req.body;
+
+  try {
+    const workout = await prisma.workout.findUnique({
+      where: { id: workoutId },
+      include: { routines: true },
+    });
+
+    if (!workout) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const result = await prisma.scheduledWorkout.create({
+      data: {
+        name: workout.name,
+        difficulty: workout.difficulty,
+        description: workout.description,
+        user_id: workout.user_id,
+        date: new Date(year, month, day),
+        workout_id: workoutId,
+      },
+    });
+
+    workout.routines.forEach(async (item) => {
+      const routine = await prisma.routine.findUnique({
+        where: { id: item.id },
+        include: { sets: true },
+      });
+
+      if (!routine) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const scheduledRoutine = await prisma.scheduledRoutine.create({
+        data: {
+          rest: routine.rest,
+          exercise_id: routine.exercise_id,
+          workout_id: result.id,
+        },
+      });
+
+      routine.sets.forEach(async (item) => {
+        const scheduledSet = await prisma.scheduledSet.create({
+          data: {
+            repetitions: item.repetitions,
+            weight_lbs: item.weight_lbs,
+            completed: false,
+            routine_id: scheduledRoutine.id,
+          },
+        });
+      });
+    });
+
+    res.status(200).send(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
+
+//Get all scheduled workouts for a user
+app.get(`/workout/scheduled/:userId`, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await prisma.scheduledWorkout.findMany({
+      where: { user_id: parseInt(userId) },
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
 //Universal search based on textual similarity to query
 app.get(`/search/:query`, async (req, res) => {
   const { query } = req.params;
