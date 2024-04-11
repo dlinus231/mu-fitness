@@ -9,6 +9,9 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
 const prisma = new PrismaClient();
 
 const app = express();
@@ -1123,6 +1126,128 @@ app.get(`/search/smartsearch/:query`, async (req, res) => {
     res.sendStatus(400);
   }
 });
+
+
+// like a post
+app.post("/posts/:postId/like", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const { userId } = req.body;
+
+  try {
+    const like = await prisma.like.create({
+      data: {
+        userId,
+        postId,
+      },
+    });
+    res.json(like);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// unlike a post
+app.delete("/posts/:postId/like", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const { userId } = req.body;
+
+  try {
+    await prisma.like.deleteMany({
+      where: {
+        userId,
+        postId,
+      },
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// delete a post
+app.delete("/posts/:postId", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+
+  try {
+    await prisma.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// make a post
+app.post("/posts", upload.single('image'), async (req, res) => {
+  const { userId, caption } = req.body;
+  const { file } = (req as any).file; // image file
+
+  try {
+    let imageBuffer = null;
+    
+    if (file) {
+      imageBuffer = file.buffer;
+    }
+
+    // Ensure at least one of image or caption is provided
+    if (!imageBuffer && !caption) {
+      return res.status(400).json({ message: "Please provide either an image or a caption." });
+    }
+
+    const post = await prisma.post.create({
+      data: {
+        userId: parseInt(userId),
+        caption,
+        image: imageBuffer, 
+      },
+    });
+    res.json(post);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Failed to create post." });
+  }
+});
+
+// get all posts from a user
+app.get('/user/:userId/posts', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const userPosts = await prisma.post.findMany({
+      where: {
+        userId: parseInt(userId),
+      },
+      include: {
+        user: true, // Optionally include user data
+        likes: true, // Optionally include likes data
+      }
+    });
+
+    // Convert binary image data to Base64
+    const postsWithBase64Images = userPosts.map(post => ({
+      ...post,
+      image: post.image ? Buffer.from(post.image).toString('base64') : null,
+    }));
+
+    res.json(userPosts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to retrieve posts." });
+  }
+});
+
+
+
+// =================================================================================================
+// HELPER FUNCTIONS
+// =================================================================================================
+
 
 //Hash and salt password
 async function hashPassword(password: string): Promise<string> {
