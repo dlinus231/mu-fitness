@@ -8,7 +8,9 @@ import {
   RefreshControl,
   Image,
   TextInput,
-  Button
+  Button,
+  KeyboardAvoidingView,
+  Keyboard
 } from "react-native";
 import {
   View,
@@ -20,7 +22,7 @@ import {
 } from "@gluestack-ui/themed";
 import { formatDistanceToNow } from "date-fns";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -52,6 +54,30 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [caption, setCaption] = useState('');
   const [image, setImage] = useState(null);
+
+  // use this so that we don't display the footer bar when the keyboard is visible
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // Keyboard is visible
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // Keyboard is hidden
+      }
+    );
+
+    // Cleanup function
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
@@ -205,10 +231,19 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     );
   };
 
+  const deletePost = async (postId) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/posts/${postId}`);
+      getPosts();
+    } catch (e) {
+      console.error("error deleting post: ", e);
+    }
+  }
+
   const renderPostItem = ({ item }) => {
     const handleLikePress = async () => {
-      print("bm - pressed like")
-      print("bm - TODO implement this later")
+      console.log("bm - pressed like")
+      console.log("bm - TODO implement this later")
     }
 
     return (
@@ -216,8 +251,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         style={styles.post}
         onPress={() => {}}
       >
-        <View>
+        <View style={styles.postTopContent}>
           <Text style={styles.postCaption}>{item.caption}</Text>
+          <TouchableOpacity styles={styles.postDeleteIcon} onPress={() => deletePost(item.id)}>
+            <MaterialCommunityIcons name="trash-can-outline" size={24} color="grey" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.postBottomContent}>
@@ -411,30 +449,31 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
         {isCreatingPost ? (
           <View style={styles.createPostContainer}>
-            <TextInput
-              style={styles.input}
-              onChangeText={setCaption}
-              value={caption}
-              placeholder="What's on your mind?"
-            />
-            {/* <Button
-              title="Upload Image"
-              onPress={pickImage}
-              color="#6A5ACD"
-            /> */}
-            {image && (
-                <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />
-            )}
-            <Button
-              title="Post"
-              onPress={submitPost}
-              color="#6A5ACD"
-            />
-            <Button
-              title="Cancel"
-              onPress={() => setIsCreatingPost(false)}
-              color="#6A5ACD"
-            />
+            <View style={styles.createPostTopRow}>
+              <TextInput
+                style={styles.postInput}
+                onChangeText={setCaption}
+                value={caption}
+                placeholder="What's on your mind?"
+              />
+              {/* TODO: the image button should call pickImage once we get that working */}
+              <TouchableOpacity style={styles.postIconButton} onPress={() => {}}>
+                <MaterialCommunityIcons name={'file-image-plus'} size={28} color={'#666666'}/>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postIconButton} onPress={submitPost}>
+                <FontAwesome name={'send'} size={28} color={'#695acd'}/>
+              </TouchableOpacity>
+            </View>
+
+            <View styles={styles.addImageToPostRow}>
+              
+            </View>
+            
+            {/* {image && (
+              <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />
+            )} */}
+            
+            
           </View>
         ) : (
           <>
@@ -496,7 +535,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
         
       </SafeAreaView>
-      <FooterTab focused={"PersonalProfile"}></FooterTab>
+
+      {/* Footer Tab shouldn't get in the way when making a new post */}
+      {!keyboardVisible && (
+        <FooterTab focused={"PersonalProfile"}></FooterTab>
+      )}
     </>
   );
 };
@@ -648,18 +691,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  createPostContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
-    width: '100%',
-  },
   postDetail: {
     fontSize: 14,
   },
@@ -697,6 +728,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  postTopContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   postLikesContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -706,6 +742,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "black",
   },
+  createPostContainer: {
+    padding: '3%',
+  },
+  createPostTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  postInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+    width: '70%',
+    backgroundColor: "#f7f7f7",
+  },
+  postIconButton: {
+    paddingTop: '4%',
+    marginHorizontal: 2,
+  },
+  addImageToPostRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  postDeleteIcon: {
+    marginTop: 5,
+  }
 });
 
 export default PersonalProfileScreen;
