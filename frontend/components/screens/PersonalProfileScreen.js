@@ -124,8 +124,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           likeCount: post.likes.length,
         };
       });
-      console.log("bm - getPosts returned: ", response.data)
-      console.log("bm - getPosts parsedPosts: ", parsedPosts)
       setPosts(parsedPosts);
     } catch (e) {
       console.log("error fetching posts by user ", e)

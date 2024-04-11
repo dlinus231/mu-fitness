@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-native";
 import { View, VStack, Button, ButtonText, set } from "@gluestack-ui/themed";
-import { MaterialIcons } from "react-native-vector-icons";
+import { MaterialIcons, Entypo, MaterialCommunityIcons } from "react-native-vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { formatDistanceToNow } from "date-fns";
 
@@ -31,12 +31,13 @@ const UserProfileScreen = ({ route, navigation }) => {
 
   const [userData, setUserData] = useState(null);
 
-  const [activeTab, setActiveTab] = useState("workouts"); // 'workouts' or 'favoriteExercises'
+  const [activeTab, setActiveTab] = useState("workouts"); // 'workouts' or 'favoriteExercises' or 'posts'
 
   const [refreshing, setRefreshing] = useState(false);
 
   const [workouts, setWorkouts] = useState([]);
   const [favoriteExercises, setFavoriteExercises] = useState([]);
+  const [posts, setPosts] = useState([]);
 
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
@@ -109,6 +110,7 @@ const UserProfileScreen = ({ route, navigation }) => {
       if (userId) {
         fetchUserData();
         getFavoriteExercises();
+        getPosts();
       }
     }, [userId])
   );
@@ -250,8 +252,58 @@ const UserProfileScreen = ({ route, navigation }) => {
     });
   };
 
+  const getPosts = async () => {
+    try {
+      const response = await axios.get(
+        BACKEND_URL + `/user/${userId}/posts`
+      );
+      const parsedPosts = response.data.map((post) => {
+        return {
+          id: post.id,
+          caption: post.caption,
+          timeCreated: post.createdAt,
+          likeCount: post.likes.length,
+        };
+      });
+      console.log("bm - UserProfileScreen parsedPosts: ", parsedPosts);
+      setPosts(parsedPosts);
+    } catch (e) {
+      console.log("error fetching posts by user ", e)
+    }
+  };
+
+  const renderPostItem = ({ item }) => {
+    const handleLikePress = async () => {
+      print("bm - pressed like")
+      print("bm - TODO implement this later")
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.post}
+        onPress={() => {}}
+      >
+        <View>
+          <Text style={styles.postCaption}>{item.caption}</Text>
+        </View>
+
+        <View style={styles.postBottomContent}>
+          <View style={styles.postLikesContainer} onPress={handleLikePress}>
+            <MaterialCommunityIcons name="heart-outline" size={24} />
+            <Text style={styles.postLikesCount}>{item.likeCount}</Text>
+          </View>
+          
+          <Text style={styles.postTime}>
+            {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
+          </Text>
+        </View>
+        
+      </TouchableOpacity>
+    );
+  }
+
   // silly guy image lol
-  const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
+  // const image = require("../../../assets/Man-Doing-Air-Squats-A-Bodyweight-Exercise-for-Legs.png");
 
   const renderExerciseItem = ({ item }) => {
     return (
@@ -359,32 +411,51 @@ const UserProfileScreen = ({ route, navigation }) => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.icon}
-          onPress={() => setActiveTab("workouts")}
-        >
-          <MaterialIcons
-            name="fitness-center"
-            size={30}
-            color={activeTab === "workouts" ? "#6A5ACD" : "#aaa"} //
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.icon}
-          onPress={() => setActiveTab("favoriteExercises")}
-        >
-          <MaterialIcons
-            name="star-border"
-            size={30}
-            color={activeTab === "favoriteExercises" ? "#6A5ACD" : "#aaa"}
-          />
-        </TouchableOpacity>
+            style={styles.icon}
+            onPress={() => {
+              setActiveTab("workouts")
+            }}
+          >
+            <MaterialIcons
+              name="fitness-center"
+              size={30}
+              color={activeTab === "workouts" ? "#6A5ACD" : "#aaa"} 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={() => {
+              getPosts()
+              setActiveTab("posts")
+            }}
+          >
+            <Entypo
+              name="camera"
+              size={30}
+              color={activeTab === "posts" ? "#6A5ACD" : "#aaa"}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={() => {
+              setActiveTab("favoriteExercises")
+            }}
+          >
+            <MaterialIcons
+              name="star-border"
+              size={30}
+              color={activeTab === "favoriteExercises" ? "#6A5ACD" : "#aaa"}
+            />
+          </TouchableOpacity>
       </View>
 
       <View style={styles.divider} />
 
       <View style={styles.contentContainerHeader}>
         <Text style={styles.contentContainerText}>
-          {activeTab === "workouts" ? "Workout Plans" : "Favorite Exercises"}
+          {activeTab === "workouts" && "Workout Plans"}
+          {activeTab === "favoriteExercises" && "Favorite Exercises"}
+          {activeTab === "posts" && "Posts"}
         </Text>
       </View>
 
@@ -406,6 +477,19 @@ const UserProfileScreen = ({ route, navigation }) => {
             renderItem={renderExerciseItem}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        )}
+        {activeTab === "posts" && posts.length > 0 &&(
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderPostItem}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
             }
           />
         )}
@@ -478,7 +562,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#6A5ACD",
     padding: 10,
     borderRadius: 5,
-    width: "60%",
+    width: "50%",
     marginTop: 5,
   },
   buttonText: {
@@ -560,6 +644,52 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  postDetail: {
+    fontSize: 14,
+  },
+  postTime: {
+    fontSize: 12,
+    color: "#666",
+    // alignSelf: "flex-end",
+  },
+  post: {
+    backgroundColor: "#FFF",
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginLeft: 16,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    // flexDirection: "column",
+    // justifyContent: "space-between",
+  },
+  postCaption: {
+    fontSize: 16,
+  },
+  postBottomContent: {
+    marginTop: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  postLikesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  postLikesCount: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: "black",
   },
 });
 
