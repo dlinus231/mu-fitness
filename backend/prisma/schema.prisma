@@ -21,6 +21,28 @@ model User {
   following       Follow[]             @relation("UserFollowers")
   saved_exercises UserSavedExercises[]
   scheduled_workouts        ScheduledWorkout[]
+  posts          Post[]
+  likes          Like[]
+}
+
+model Post {
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  imageUrl     String?   // image is optional (url field will be used if we decide to move image storage to S3 or similar service)
+  image        Bytes?    // image is optional
+  caption      String?   // caption also optional, but we enforce on frontend that at least one of imageUrl or caption is present 
+  userId       Int       
+  user         User      @relation(fields: [userId], references: [id])
+  likes        Like[]
+}
+
+model Like {
+  id         Int   @id @default(autoincrement())
+  userId     Int   
+  postId     Int  
+  user       User  @relation(fields: [userId], references: [id])
+  post       Post  @relation(fields: [postId], references: [id])
+  @@unique([userId, postId]) // prevents duplicate likes from the same user for the same post
 }
 
 model UserSavedExercises {
