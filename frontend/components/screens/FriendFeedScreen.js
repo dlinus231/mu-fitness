@@ -17,6 +17,8 @@ const FriendFeedScreen = ({ navigation }) => {
   };
 
   const [workouts, setWorkouts] = useState([]);
+  const [posts, setPosts] = useState([]);
+
   const [refreshing, setRefreshing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,7 @@ const FriendFeedScreen = ({ navigation }) => {
       if (currentUserId) {
         console.log("bm - in useFocusEffect currentUserId: ", currentUserId);
         fetchFriendWorkouts();
+        fetchFriendPosts();
       }
     }, [])
   );
@@ -48,6 +51,7 @@ const FriendFeedScreen = ({ navigation }) => {
       if (currentUserId) {
         console.log("bm - in useFocusEffect currentUserId: ", currentUserId)
         fetchFriendWorkouts();
+        fetchFriendPosts();
       }
     }, [currentUserId])
   )
@@ -58,6 +62,7 @@ const FriendFeedScreen = ({ navigation }) => {
     if (currentUserId) {
       console.log("in currentUserId useEffect if statement withcurrentUserId: ", currentUserId)
       fetchFriendWorkouts();
+      fetchFriendPosts();
     }
   }, [currentUserId]);
 
@@ -77,13 +82,46 @@ const FriendFeedScreen = ({ navigation }) => {
           timeCreated: workout.time_created,
         };
       });
-      // console.log("bm - parsedWorkouts: ", parsedWorkouts)
       setWorkouts(parsedWorkouts);
-      setLoading(false);
+      setLoading(false)
     } catch (e) {
       console.log("error fetching friend workouts for friendFeed page: ", e);
     }
   };
+
+  const fetchFriendPosts = async () => {
+    try {
+      const response = await axios.get(
+        BACKEND_URL + `/feed/posts/${currentUserId}`
+      );
+      const parsedPosts = response.data.map((post) => {
+        return {
+          type: "post",
+          id: post.id,
+          title: post.title,
+          caption: post.caption,
+          timeCreated: post.createdAt,
+          username: post.user.username
+        };
+      });
+      setPosts(parsedPosts);
+      setLoading(false)
+    } catch (e) {
+      console.log("error fetching friend posts for friendFeed page: ", e);
+    }
+  }
+
+  // sort all data (workouts and posts) by time created - newest first
+  const sortData = (data) => {
+    return data.sort((a, b) => {
+      return new Date(b.timeCreated) - new Date(a.timeCreated);
+    });
+  }
+
+  const handleLikePress = async () => {
+    print("bm - pressed like")
+    print("bm - TODO implement this later")
+  }
 
   // function to render cells in flatlist
   const renderItem = ({ item }) => {
@@ -120,6 +158,32 @@ const FriendFeedScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         );
+      case "post": 
+        return (
+          <TouchableOpacity
+            style={styles.post}
+            onPress={() => {}}
+          >
+            <View>
+              <Text>
+                <Text style={styles.username}>{item.username}:</Text>
+                <Text style={styles.workoutDescription}> {item.caption}</Text>
+              </Text>
+            </View>
+    
+            <View style={styles.postBottomContent}>
+              <View style={styles.postLikesContainer} onPress={handleLikePress}>
+                <MaterialCommunityIcons name="heart-outline" size={24} />
+                <Text style={styles.postLikesCount}>{item.likeCount}</Text>
+              </View>
+              
+              <Text style={styles.postTime}>
+                {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
+              </Text>
+            </View>
+            
+          </TouchableOpacity>
+        );
       default:
         return (
           <View>
@@ -132,6 +196,7 @@ const FriendFeedScreen = ({ navigation }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchFriendWorkouts();
+    await fetchFriendPosts();
     setRefreshing(false);
   };
 
@@ -143,7 +208,7 @@ const FriendFeedScreen = ({ navigation }) => {
     );
   }
 
-  if (!loading && workouts.length === 0) {
+  if (!loading && workouts.length === 0 && posts.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <MaterialCommunityIcons
@@ -154,7 +219,7 @@ const FriendFeedScreen = ({ navigation }) => {
         <Text style={styles.welcomeText}>Welcome to your Feed!</Text>
         <Text style={styles.subWelcomeText}>
           {" "}
-          Workout plans created by accounts that you follow will be displayed
+          Workout plans or Posts created by accounts that you follow will be displayed
           here
         </Text>
         <FooterTab focused="FriendFeed"></FooterTab>
@@ -167,7 +232,7 @@ const FriendFeedScreen = ({ navigation }) => {
       {/* <TopBarMenu onSwitchPage={handleSwitchPage} /> */}
       <SafeAreaView style={styles.container}>
         <FlatList
-          data={workouts}
+          data={sortData([...workouts, ...posts])}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           refreshControl={
@@ -236,6 +301,52 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
     paddingHorizontal: 10,
+  },
+  postDetail: {
+    fontSize: 14,
+  },
+  postTime: {
+    fontSize: 12,
+    color: "#666",
+    // alignSelf: "flex-end",
+  },
+  post: {
+    backgroundColor: "#FFF",
+    paddingTop: 10,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    marginLeft: 16,
+    marginRight: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    // flexDirection: "column",
+    // justifyContent: "space-between",
+  },
+  postCaption: {
+    fontSize: 16,
+  },
+  postBottomContent: {
+    marginTop: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  postLikesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  postLikesCount: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: "black",
   },
 });
 

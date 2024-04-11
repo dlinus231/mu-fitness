@@ -919,7 +919,7 @@ app.delete(`/workout/routine/deleteSet/:id`, async (req, res) => {
   }
 });
 
-// follower feed endpoint
+// follower feed endpoint 1
 // get all workouts from users that the user is following
 app.get(`/feed/workouts/:userId`, async (req, res) => {
   const { userId } = req.params;
@@ -951,6 +951,52 @@ app.get(`/feed/workouts/:userId`, async (req, res) => {
         time_created: "desc",
       },
     });
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
+
+// follower feed endpoint 2
+// get all posts from users that the user is following
+app.get(`/feed/posts/:userId`, async (req, res) => {
+  const { userId } = req.params;
+
+  if (userId == null) {
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    const result = await prisma.post.findMany({
+      where: {
+        user: {
+          followers: {
+            some: {
+              followerId: parseInt(userId),
+            },
+          },
+        },
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        likes: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    // Convert binary image data to Base64 (only needed if we can get images working)
+    // const postsWithBase64Images = result.map(post => ({
+    //   ...post,
+    //   image: post.image ? Buffer.from(post.image).toString('base64') : null,
+    // }));
+
     res.status(200).json(result);
   } catch (e) {
     console.error(e);
