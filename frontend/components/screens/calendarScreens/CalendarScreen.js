@@ -77,7 +77,11 @@ const CalendarScreen = ({ navigation }) => {
       const currentDate = new Date();
       const offset = currentDate.getTimezoneOffset();
       const todayDate = new Date(currentDate.getTime() - offset * 60000);
-      setToday(todayDate.toISOString().split("T")[0]);
+      const todayStr = todayDate.toISOString().split("T")[0];
+      setToday(todayStr);
+      setSelectedDateWorkouts(
+        scheduledWorkouts.filter((item) => item.date.split("T")[0] === todayStr)
+      );
       setSelected(todayDate);
     }, [])
   );
@@ -115,7 +119,7 @@ const CalendarScreen = ({ navigation }) => {
     setSelectedDateWorkouts(
       scheduledWorkouts.filter((item) => item.date.split("T")[0] === todayStr)
     );
-  }, [selected]);
+  }, [selected, scheduledWorkouts]);
 
   return (
     <>
@@ -145,19 +149,47 @@ const CalendarScreen = ({ navigation }) => {
       ) : (
         <View style={styles.agendaContainer}>
           <Text style={styles.agendaHeaderText}>
-            Workouts on{" "}
+            Workouts Scheduled{" "}
             {selected.toISOString().split("T")[0] === today
               ? "Today"
               : formatDate(selected.toISOString().split("T")[0])}
           </Text>
-          <ScrollView>
-            {selectedDateWorkouts.map((item) => {
-              return (
-                <TouchableOpacity key={item.id}>
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              );
-            })}
+          <ScrollView style={styles.agendaItems}>
+            {selected.toISOString().split("T")[0] === today
+              ? selectedDateWorkouts.map((item) => {
+                  return (
+                    <View key={item.id} style={styles.scheduledWorkoutCluster}>
+                      <TouchableOpacity
+                        style={styles.todayScheduledWorkoutContainer}
+                        onPress={() =>
+                          navigation.navigate("IndividualWorkoutScreen", {
+                            workout_id: item.workout_id,
+                          })
+                        }
+                      >
+                        <Text style={styles.workoutName}>{item.name}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.startWorkoutButton}>
+                        <Text style={styles.startText}>Start</Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })
+              : selectedDateWorkouts.map((item) => {
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={styles.scheduledWorkoutContainer}
+                      onPress={() =>
+                        navigation.navigate("IndividualWorkoutScreen", {
+                          workout_id: item.workout_id,
+                        })
+                      }
+                    >
+                      <Text style={styles.workoutName}>{item.name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
           </ScrollView>
         </View>
       )}
@@ -176,7 +208,6 @@ const CalendarScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   calendar: {
     width: "100%",
-    // height
     marginTop: "3%",
   },
   calendarTheme: {
@@ -204,16 +235,67 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     height: "52%",
+    width: "100%",
   },
   agendaHeaderText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
+    marginBottom: 16,
+    paddingHorizontal: "3%",
   },
   addNewButton: {
     position: "absolute",
     right: "5%",
     bottom: "10%",
+  },
+  agendaItems: {
+    width: "100%",
+    paddingHorizontal: "5%",
+    paddingVertical: "3%",
+  },
+  scheduledWorkoutContainer: {
+    width: "100%",
+    backgroundColor: "#b9aae7",
+    paddingTop: 15,
+    paddingBottom: 15,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  workoutName: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "black",
+  },
+  scheduledWorkoutCluster: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+  },
+  todayScheduledWorkoutContainer: {
+    backgroundColor: "#b9aae7",
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    width: "80%",
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  startWorkoutButton: {
+    backgroundColor: "#89ef72",
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    width: "20%",
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  startText: {
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
 
