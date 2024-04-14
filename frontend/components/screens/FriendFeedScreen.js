@@ -137,6 +137,7 @@ const FriendFeedScreen = ({ navigation }) => {
             item={item}
             currentUserId={currentUserId}
             handleWorkoutPress={handleWorkoutPress}
+            fromProfilePage={false}
           />
         );
       case "post": 

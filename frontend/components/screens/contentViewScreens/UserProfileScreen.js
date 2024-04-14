@@ -19,12 +19,13 @@ import { formatDistanceToNow } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
+import FriendFeedWorkout from "../../buildingBlocks/FriendFeedWorkout";
+
 import { BACKEND_URL } from "@env";
 
 const UserProfileScreen = ({ route, navigation }) => {
   const userIdFromRoute = route.params?.userId;
 
-  console.log("bm - userIdFromRoute: ", userIdFromRoute);
 
   const [userId, setUserId] = useState(userIdFromRoute); // id of user we want to display profile for (empty string means current user's profile)
   const [currentUserId, setCurrentUserId] = useState(""); // id of currently logged in user
@@ -51,7 +52,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
     if (userIdFromRoute) {
-      console.log("bm - setting userId to: ", userIdFromRoute);
       setUserId(userIdFromRoute);
     }
   }, [userIdFromRoute]);
@@ -84,7 +84,6 @@ const UserProfileScreen = ({ route, navigation }) => {
         const response = await axios.get(
           BACKEND_URL + `/user/follows/${currentUserId}/${userId}`
         );
-        console.log("bm - response from isFollowing: ", response.data);
         setIsFollowing(response.data.follows);
       } catch (e) {
         console.log("bm - error checking if following: ", e);
@@ -95,7 +94,6 @@ const UserProfileScreen = ({ route, navigation }) => {
 
   // when userId is not null and has changed, we need to fetch the user's data
   useEffect(() => {
-    console.log("bm - fetching user data useEffect reached");
     if (userId) {
       // fetch user data
       fetchUserData();
@@ -104,7 +102,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   }, [userId]);
 
   // if userId is populated, then we should be re-fetching data every time the page is navigated to
-  // TODO: I think this is causing an error by running before the userId has been updated
   useFocusEffect(
     useCallback(() => {
       if (userId) {
@@ -116,7 +113,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   );
 
   useEffect(() => {
-    // console.log("bm - setIsLoading useEffect reached");
     if (currentUserId !== "" && userData !== null && userId) {
       setIsLoading(false);
     }
@@ -131,8 +127,12 @@ const UserProfileScreen = ({ route, navigation }) => {
     const parsedWorkouts = userData.workouts.map((workout) => {
       return {
         id: workout.id,
+        username: workout.user.username,
         name: workout.name,
+        difficulty: workout.difficulty,
+        description: workout.description,
         timeCreated: workout.time_created,
+        likes: workout.likes
       };
     });
     setWorkouts(parsedWorkouts);
@@ -152,20 +152,18 @@ const UserProfileScreen = ({ route, navigation }) => {
           timeCreated: exercise.saved,
         };
       });
-      // console.log("bm - setting favorite exercises to: ", parsedExercises)
       setFavoriteExercises(parsedExercises);
     } catch (e) {
       console.log("bm - error fetching favorite exercises: ", e);
     }
   };
 
-  // fetch dat associated with current user and populate the userData state
+  // fetch data associated with current user and populate the userData state
   const fetchUserData = async () => {
     try {
       // fetch user data
       const response = await axios.get(BACKEND_URL + `/user/${userId}`);
       setUserData(response.data);
-      // console.log("bm - set user data: ", response.data);
     } catch (e) {
       console.log("bm - error fetching user data: ", e);
     }
@@ -194,8 +192,6 @@ const UserProfileScreen = ({ route, navigation }) => {
           userId: parseInt(currentUserId),
         }
       );
-      // console.log("bm - response from handleFollow: ", response.data);
-      // console.log("bm - about to set isFollowing to true");
       setIsFollowing(true);
     } catch (e) {
       console.log("bm - error following user: ", e);
@@ -203,8 +199,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   };
 
   const handleUnfollow = async () => {
-    console.log("bm - handleUnfollow reached");
-    console.log("bm - currentUserId: ", currentUserId);
     try {
       const response = await axios.post(
         BACKEND_URL + `/user/unfollow/${userId}`,
@@ -212,8 +206,6 @@ const UserProfileScreen = ({ route, navigation }) => {
           userId: parseInt(currentUserId),
         }
       );
-      console.log("bm - response from handleUnfollow: ", response.data);
-      console.log("bm - about to set isFollowing to false");
       // now need to update the isFollowing state
       setIsFollowing(false);
     } catch (e) {
@@ -222,25 +214,20 @@ const UserProfileScreen = ({ route, navigation }) => {
   };
 
   const renderWorkoutItem = ({ item }) => {
-    return (
-      <TouchableOpacity
-        style={styles.workoutPlan}
-        onPress={() =>
-          navigation.navigate("IndividualWorkoutScreen", {
-            workout_id: item.id,
-          })
-        }
-      >
-        <View style={styles.workoutMainContent}>
-          <Text style={styles.workoutName}>{item.name}</Text>
-        </View>
+    const handleWorkoutPress = () => {
+      navigation.navigate("IndividualWorkoutScreen", {
+        workout_id: item.id,
+      });
+    }
 
-        <Text style={styles.workoutTime}>
-          created{" "}
-          {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-        </Text>
-      </TouchableOpacity>
-    );
+    return (
+      <FriendFeedWorkout 
+        item={item}
+        currentUserId={currentUserId}
+        handleWorkoutPress={handleWorkoutPress}
+        fromProfilePage={true}
+      />
+    )
   };
 
   const goToExercise = async (id) => {
@@ -265,7 +252,6 @@ const UserProfileScreen = ({ route, navigation }) => {
           likeCount: post.likes.length,
         };
       });
-      console.log("bm - UserProfileScreen parsedPosts: ", parsedPosts);
       setPosts(parsedPosts);
     } catch (e) {
       console.log("error fetching posts by user ", e)
@@ -328,29 +314,6 @@ const UserProfileScreen = ({ route, navigation }) => {
         </Text>
       </TouchableOpacity>
     );
-    // return (
-    //   <TouchableOpacity
-    //     key={item.id}
-    //     style={styles.exerciseContainer}
-    //     onPress={() => {
-    //       goToExercise(item.id);
-    //     }}
-    //   >
-    //     <Image source={image} style={styles.exerciseImage} />
-    //     <Text
-    //       style={styles.exerciseName}
-    //       numberOfLines={1}
-    //       ellipsizeMode="tail"
-    //     >
-    //       {item.name
-    //         .split(" ")
-    //         .map(
-    //           (word) => word.charAt(0).toUpperCase() + word.slice(1)
-    //         )
-    //         .join(" ")}
-    //     </Text>
-    //   </TouchableOpacity>
-    // )
   };
 
   const onRefresh = async () => {

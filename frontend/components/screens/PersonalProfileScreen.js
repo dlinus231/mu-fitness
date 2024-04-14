@@ -24,6 +24,7 @@ import { formatDistanceToNow } from "date-fns";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
+import FriendFeedWorkout from "../buildingBlocks/FriendFeedWorkout";
 
 
 // import TopBarMenu from "../TopBarMenu";
@@ -99,24 +100,21 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     setFollowers(userData.followers.length);
     setFollowing(userData.following.length);
 
-    // setWorkouts(userData.workouts);
-    // setFavoriteExercises(userData.favoriteExercises);
-
     const parsedWorkouts = userData.workouts.map((workout) => {
       return {
         id: workout.id,
+        username: workout.user.username,
         name: workout.name,
+        difficulty: workout.difficulty,
+        description: workout.description,
         timeCreated: workout.time_created,
+        likes: workout.likes
       };
     });
     setWorkouts(parsedWorkouts);
 
     getFavoriteExercises();
   }, [userData]);
-
-  // useEffect(() => {
-  //   console.log("bm - workouts State: ", workouts)
-  // }, [workouts])
 
   const getFavoriteExercises = async () => {
     try {
@@ -130,7 +128,6 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           timeCreated: exercise.saved,
         };
       });
-      // console.log("bm - setting favorite exercises to: ", parsedExercises)
       setFavoriteExercises(parsedExercises);
     } catch (e) {
       console.log("error fetching favorite exercises: ", e);
@@ -166,31 +163,26 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       await setUserData(response.data);
       setIsLoading(false);
     } catch (e) {
-      console.log("bm - error fetching user data: ", e);
+      console.log("error fetching user data: ", e);
     }
   };
 
   const renderWorkoutItem = ({ item }) => {
-    return (
-      <TouchableOpacity
-        style={styles.workoutPlan}
-        onPress={() =>
-          navigation.navigate("IndividualWorkoutScreen", {
-            workout_id: item.id,
-            prevPage: "PersonalProfile",
-            workoutFrom: "PersonalProfile",
-          })
-        }
-      >
-        <View style={styles.workoutMainContent}>
-          <Text style={styles.workoutName}>{item.name}</Text>
-        </View>
+    const handleWorkoutPress = () => {
+      navigation.navigate("IndividualWorkoutScreen", {
+        workout_id: item.id,
+        prevPage: "PersonalProfile",
+        workoutFrom: "PersonalProfile",
+      });
+    }
 
-        <Text style={styles.workoutTime}>
-          created{" "}
-          {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-        </Text>
-      </TouchableOpacity>
+    return (
+      <FriendFeedWorkout 
+        item={item}
+        currentUserId={userData.id}
+        handleWorkoutPress={handleWorkoutPress}
+        fromProfilePage={true}
+      />
     );
   };
 

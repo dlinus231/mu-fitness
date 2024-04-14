@@ -7,7 +7,7 @@ import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const FriendFeedWorkout = ({ navigation, item, currentUserId, handleWorkoutPress }) => {
+const FriendFeedWorkout = ({ navigation, item, currentUserId, handleWorkoutPress, fromProfilePage }) => {
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
     const workoutId = parseInt(item.id);
@@ -49,13 +49,16 @@ const FriendFeedWorkout = ({ navigation, item, currentUserId, handleWorkoutPress
     return (
         <TouchableOpacity style={styles.workoutPlan} onPress={handleWorkoutPress} >
             <View style={styles.workoutMainContent}>
-                <Text>
-                <Text style={styles.username}>{item.username}</Text>
-                <Text style={styles.workoutDescription}>
-                    {" "}
-                    created a new workout plan
-                </Text>
-                </Text>
+                {/* If we are rendering on a profile page, we don't need the username */}
+                {!fromProfilePage && (
+                    <Text>
+                        <Text style={styles.username}>{item.username}</Text>
+                        <Text style={styles.workoutDescription}>
+                            {" "}
+                            created a new workout plan
+                        </Text>
+                    </Text>
+                )}
                 <Text style={styles.workoutName}>{item.name}</Text>
             </View>
 
