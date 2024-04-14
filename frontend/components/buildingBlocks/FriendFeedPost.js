@@ -12,10 +12,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import FooterTab from "../FooterTab";
 
 const FriendFeedPost = ({ navigation, item, currentUserId }) => {
-    // console.log("bm - in FriendFeedPost, item: ", item)
-    // console.log("bm - in FriendFeedPost, currentUserId: ", currentUserId)
-
-
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
     const postId = parseInt(item.id);
@@ -25,7 +21,6 @@ const FriendFeedPost = ({ navigation, item, currentUserId }) => {
             const response = await axios.post(`${BACKEND_URL}/posts/${postId}/like`, {
                 userId: parseInt(currentUserId),
             });
-            console.log("response from likePost: ", response.data)
         } catch (error) {
             console.log("error occurred while attempting to like post: ", error);
             setLiked(false)
@@ -34,12 +29,10 @@ const FriendFeedPost = ({ navigation, item, currentUserId }) => {
     }
 
     const unlikePost = async () => {
-        console.log("bm - attempting to unlike post: ", postId)
         try {
             const response = await axios.delete(`${BACKEND_URL}/posts/${postId}/like`, {
                 userId: parseInt(currentUserId),
             });
-            console.log("response from unlikePost: ", response.data)
         } catch (error) {
             console.log("error occurred while attempting to unlike post: ", error);
             setLiked(true);
@@ -48,7 +41,6 @@ const FriendFeedPost = ({ navigation, item, currentUserId }) => {
     }
 
     const handleLikePress = () => {
-        console.log("bm - inside handleLikePress: " + liked);
         if (liked) {
           setLiked(false);
           setLikeCount(likeCount - 1);

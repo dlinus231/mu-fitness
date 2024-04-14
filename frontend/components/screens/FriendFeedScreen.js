@@ -60,9 +60,7 @@ const FriendFeedScreen = ({ navigation }) => {
 
   // fetch friend workouts (after user id is fetched)
   useEffect(() => {
-    console.log("bm - in currentUserId useEffect");
     if (currentUserId) {
-      console.log("in currentUserId useEffect if statement withcurrentUserId: ", currentUserId)
       fetchFriendWorkouts();
       fetchFriendPosts();
     }
@@ -96,7 +94,6 @@ const FriendFeedScreen = ({ navigation }) => {
       const response = await axios.get(
         BACKEND_URL + `/feed/posts/${currentUserId}`
       );
-      console.log("about to parse posts:" + response.data);
       const parsedPosts = response.data.map((post) => {
         return {
           type: "post",
