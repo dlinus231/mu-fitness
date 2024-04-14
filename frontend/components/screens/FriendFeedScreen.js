@@ -11,6 +11,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FooterTab from "../FooterTab";
 
+import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
+
 const FriendFeedScreen = ({ navigation }) => {
   const handleSwitchPage = (page) => {
     navigation.navigate(page, { prevPage: "FriendFeed" });
@@ -94,6 +96,7 @@ const FriendFeedScreen = ({ navigation }) => {
       const response = await axios.get(
         BACKEND_URL + `/feed/posts/${currentUserId}`
       );
+      console.log("about to parse posts:" + response.data);
       const parsedPosts = response.data.map((post) => {
         return {
           type: "post",
@@ -101,7 +104,8 @@ const FriendFeedScreen = ({ navigation }) => {
           title: post.title,
           caption: post.caption,
           timeCreated: post.createdAt,
-          username: post.user.username
+          username: post.user.username,
+          likes: post.likes,
         };
       });
       setPosts(parsedPosts);
@@ -118,16 +122,11 @@ const FriendFeedScreen = ({ navigation }) => {
     });
   }
 
-  const handleLikePress = async () => {
-    print("bm - pressed like")
-    print("bm - TODO implement this later")
-  }
-
   // function to render cells in flatlist
   const renderItem = ({ item }) => {
     // NOTE: we give each piece of data an item.type
     // if we want to add the ability for this page to show more than just workouts in the future
-    // it will be as simple as adding another switch case here and adding the new data type to the data we fetch
+    // it will be as simple as adding another switch here and adding the new data type to the data we fetch
     switch (item.type) {
       case "workout":
         return (
@@ -160,29 +159,10 @@ const FriendFeedScreen = ({ navigation }) => {
         );
       case "post": 
         return (
-          <TouchableOpacity
-            style={styles.post}
-            onPress={() => {}}
-          >
-            <View>
-              <Text>
-                <Text style={styles.username}>{item.username}:</Text>
-                <Text style={styles.workoutDescription}> {item.caption}</Text>
-              </Text>
-            </View>
-    
-            <View style={styles.postBottomContent}>
-              <View style={styles.postLikesContainer} onPress={handleLikePress}>
-                <MaterialCommunityIcons name="heart-outline" size={24} />
-                <Text style={styles.postLikesCount}>{item.likeCount}</Text>
-              </View>
-              
-              <Text style={styles.postTime}>
-                {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-              </Text>
-            </View>
-            
-          </TouchableOpacity>
+          <FriendFeedPost 
+            item={item}
+            currentUserId={currentUserId}
+          />
         );
       default:
         return (
