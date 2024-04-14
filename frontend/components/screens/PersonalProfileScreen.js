@@ -357,7 +357,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   return (
     <>
       <SafeAreaView style={styles.container}>
-        {/* <View style={styles.profileContainer}>
+        <View style={styles.profileContainer}>
           <MaterialIcons
             name="account-circle"
             size={95}
@@ -390,7 +390,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
               </TouchableOpacity>
             </View>
           </View>
-        </View> */}
+        </View>
         <View style={styles.buttonsAndIconsContainer}>
           <TouchableOpacity style={styles.button} onPress={handleAuthChange}>
             <Text style={styles.buttonText}>Sign Out</Text>
