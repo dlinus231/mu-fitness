@@ -276,6 +276,15 @@ app.get("/user/:userId", async (req, res) => {
           following: true,
           saved_exercises: true,
           workouts: {
+            include: {
+              // we want the username of the workout owners as well
+              user: {
+                select: {
+                  username: true,
+                },
+              },
+              likes: true,
+            },
             orderBy: {
               time_created: "desc", // Sort workouts in reverse order by 'created'
             },
