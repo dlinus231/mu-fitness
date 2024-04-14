@@ -284,7 +284,18 @@ app.get("/user/:userId", async (req, res) => {
                 },
               },
               likes: true,
-              comments: true,
+              comments: {
+                include: {
+                  user: {
+                    select: {
+                      username: true,
+                    }
+                  }
+                },
+                orderBy: {
+                  createdAt: 'desc',
+                }
+              }
             },
             orderBy: {
               time_created: "desc", // Sort workouts in reverse order by 'created'
@@ -1311,6 +1322,23 @@ app.delete("/posts/:postId", async (req, res) => {
     await prisma.post.delete({
       where: {
         id: postId,
+      },
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// delete a comment
+app.delete("/posts/comment/:commentId", async (req, res) => {
+  const commentId = parseInt(req.params.commentId);
+
+  try {
+    await prisma.postComment.delete({
+      where: {
+        id: commentId,
       },
     });
     res.sendStatus(200);

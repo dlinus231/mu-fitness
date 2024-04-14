@@ -110,7 +110,8 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         difficulty: workout.difficulty,
         description: workout.description,
         timeCreated: workout.time_created,
-        likes: workout.likes
+        likes: workout.likes,
+        comments: workout.comments
       };
     });
     setWorkouts(parsedWorkouts);
@@ -136,6 +137,19 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
   };
 
+  // get posts every second (to allow for real time comment updating)
+  // TODO this is a hacky solution, we should move to using websockets if time allows
+  useEffect(() => {
+    console.log('fetching posts...')
+    const intervalId = setInterval(() => {
+      if (activeTab === "posts") {
+        getPosts();
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [activeTab])
+
   const getPosts = async () => {
     try {
       const response = await axios.get(
@@ -149,6 +163,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
           timeCreated: post.createdAt,
           username: post.user.username,
           likes: post.likes,
+          comments: post.comments
         };
       });
       setPosts(parsedPosts);
@@ -342,7 +357,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <View style={styles.profileContainer}>
+        {/* <View style={styles.profileContainer}>
           <MaterialIcons
             name="account-circle"
             size={95}
@@ -375,7 +390,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </View> */}
         <View style={styles.buttonsAndIconsContainer}>
           <TouchableOpacity style={styles.button} onPress={handleAuthChange}>
             <Text style={styles.buttonText}>Sign Out</Text>
