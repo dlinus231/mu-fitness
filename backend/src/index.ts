@@ -284,6 +284,7 @@ app.get("/user/:userId", async (req, res) => {
                 },
               },
               likes: true,
+              comments: true,
             },
             orderBy: {
               time_created: "desc", // Sort workouts in reverse order by 'created'
@@ -1275,6 +1276,33 @@ app.delete("/posts/:postId/like/:userId", async (req, res) => {
   }
 });
 
+// comment on a post
+app.post("/posts/:postId/comment", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const { userId, text } = req.body;
+
+  console.log('bm - in commenting endpoint', postId, userId, text)
+  
+  if (!text || !userId) {
+    res.status(400).json({ message: "Please provide a user ID and comment text." });
+    return;
+  }
+
+  try {
+    const comment = await prisma.postComment.create({
+        data: {
+          content: text,
+          postId: postId,
+          userId: parseInt(userId),
+        },
+    });
+    res.json(comment);
+  } catch (error) {
+      console.error("Failed to add comment to post:", error);
+      res.status(400).send("Error adding comment to post");
+  }
+});
+
 // delete a post
 app.delete("/posts/:postId", async (req, res) => {
   const postId = parseInt(req.params.postId);
@@ -1337,8 +1365,20 @@ app.get('/user/:userId/posts', async (req, res) => {
         userId: parseInt(userId),
       },
       include: {
-        user: true, // Optionally include user data
-        likes: true, // Optionally include likes data
+        user: true,
+        likes: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc',
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc',
