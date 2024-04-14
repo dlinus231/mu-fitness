@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 import WorkoutBlock from "../../buildingBlocks/WorkoutBlock";
+import FriendFeedPost from "../../buildingBlocks/FriendFeedPost";
 
 import { BACKEND_URL } from "@env";
 
@@ -247,9 +248,11 @@ const UserProfileScreen = ({ route, navigation }) => {
       const parsedPosts = response.data.map((post) => {
         return {
           id: post.id,
+          title: post.title,
           caption: post.caption,
           timeCreated: post.createdAt,
-          likeCount: post.likes.length,
+          username: post.user.username,
+          likes: post.likes,
         };
       });
       setPosts(parsedPosts);
@@ -265,27 +268,12 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
 
     return (
-      <TouchableOpacity
-        style={styles.post}
-        onPress={() => {}}
-      >
-        <View>
-          <Text style={styles.postCaption}>{item.caption}</Text>
-        </View>
-
-        <View style={styles.postBottomContent}>
-          <View style={styles.postLikesContainer} onPress={handleLikePress}>
-            <MaterialCommunityIcons name="heart-outline" size={24} />
-            <Text style={styles.postLikesCount}>{item.likeCount}</Text>
-          </View>
-          
-          <Text style={styles.postTime}>
-            {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-          </Text>
-        </View>
-        
-      </TouchableOpacity>
-    );
+      <FriendFeedPost 
+        item={item}
+        currentUserId={userData.id}
+        fromProfilePage={true}
+      />
+    )
   }
 
   // silly guy image lol

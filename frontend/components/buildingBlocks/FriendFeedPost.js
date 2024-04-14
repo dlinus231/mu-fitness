@@ -7,7 +7,7 @@ import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const FriendFeedPost = ({ navigation, item, currentUserId }) => {
+const FriendFeedPost = ({ navigation, item, currentUserId, fromProfilePage, canDelete, onDeletePost }) => {
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
     const postId = parseInt(item.id);
@@ -47,82 +47,89 @@ const FriendFeedPost = ({ navigation, item, currentUserId }) => {
     }
 
     return (
-        <TouchableOpacity
-            style={styles.post}
-            onPress={() => {}}
-          >
-            <View>
-              <Text>
-                <Text style={styles.username}>{item.username}:</Text>
-                <Text style={styles.workoutDescription}> {item.caption}</Text>
-              </Text>
+        <TouchableOpacity style={styles.post} onPress={() => {}}>
+            <View style={styles.postHeader}>
+                {!fromProfilePage && <><Text style={styles.username}>{item.username}</Text><Text>: </Text></>}
+                <View style={styles.captionAndIconContainer}>
+                    <Text style={styles.postCaption}>{item.caption}</Text>
+                    {canDelete && (
+                        <TouchableOpacity style={styles.postDeleteIcon} onPress={() => onDeletePost(postId)}>
+                            <MaterialCommunityIcons name="trash-can-outline" size={24} color="grey" />
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
-    
-            <View style={styles.postBottomContent}>
-              <TouchableOpacity style={styles.postLikesContainer} onPress={handleLikePress}>
-                {liked ? (
-                    <MaterialCommunityIcons name="heart" size={24} color="#a99ee1" />
-                ) : (
-                    <MaterialCommunityIcons name="heart-outline" size={24} />
-                )}
-                <Text style={styles.postLikesCount}>{likeCount}</Text>
-              </TouchableOpacity>
-              
-              <Text style={styles.postTime}>
-                {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-              </Text>
-            </View>
-            
-          </TouchableOpacity>
-    );
-}
 
+            <View style={styles.postBottomContent}>
+                <TouchableOpacity style={styles.postLikesContainer} onPress={handleLikePress}>
+                    {liked ? (
+                        <MaterialCommunityIcons name="heart" size={24} color="#a99ee1" />
+                    ) : (
+                        <MaterialCommunityIcons name="heart-outline" size={24} />
+                    )}
+                    <Text style={styles.postLikesCount}>{likeCount}</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.postTime}>
+                    {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    )
+}
 const styles = StyleSheet.create({
-    postDetail: {
-      fontSize: 14,
-    },
-    postTime: {
-      fontSize: 12,
-      color: "#666",
-      // alignSelf: "flex-end",
-    },
     post: {
-      backgroundColor: "#FFF",
-      paddingTop: 10,
-      paddingBottom: 15,
-      paddingHorizontal: 20,
-      marginVertical: 8,
-      marginHorizontal: 16,
-      borderRadius: 10,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 2,
-        height: 2,
-      },
-      shadowOpacity: 0.23,
-      shadowRadius: 2.62,
-      elevation: 4,
-      flexDirection: "column",
-      justifyContent: "space-between",
+        backgroundColor: "#FFF",
+        paddingTop: 10,
+        paddingBottom: 15,
+        paddingHorizontal: 20,
+        marginVertical: 8,
+        marginHorizontal: 16,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1.5,
+        elevation: 3,
+        flexDirection: "column",
+    },
+    postHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 3,
+    },
+    captionAndIconContainer: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    username: {
+        fontWeight: "bold",
+        fontSize: 16,
     },
     postCaption: {
-      fontSize: 16,
+        flex: 1,
+        fontSize: 16,
+    },
+    postDeleteIcon: {
     },
     postBottomContent: {
-      marginTop: 5,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     postLikesContainer: {
-      flexDirection: "row",
-      alignItems: "center",
+        flexDirection: "row",
+        alignItems: "center",
     },
     postLikesCount: {
-      marginLeft: 5,
-      fontSize: 16,
-      color: "black",
+        marginLeft: 5,
     },
-  });
+    postTime: {
+        fontSize: 12,
+        color: "#666",
+    },
+});
 
 export default FriendFeedPost;

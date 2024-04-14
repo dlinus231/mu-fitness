@@ -26,6 +26,8 @@ import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import WorkoutBlock from "../buildingBlocks/WorkoutBlock";
 
+import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
+
 
 // import TopBarMenu from "../TopBarMenu";
 
@@ -142,9 +144,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       const parsedPosts = response.data.map((post) => {
         return {
           id: post.id,
+          title: post.title,
           caption: post.caption,
           timeCreated: post.createdAt,
-          likeCount: post.likes.length,
+          username: post.user.username,
+          likes: post.likes,
         };
       });
       setPosts(parsedPosts);
@@ -224,6 +228,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   };
 
   const deletePost = async (postId) => {
+    console.log("deleting post: ", postId)
     try {
       await axios.delete(`${BACKEND_URL}/posts/${postId}`);
       getPosts();
@@ -233,36 +238,15 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   }
 
   const renderPostItem = ({ item }) => {
-    const handleLikePress = async () => {
-      console.log("bm - pressed like")
-      console.log("bm - TODO implement this later")
-    }
-
     return (
-      <TouchableOpacity
-        style={styles.post}
-        onPress={() => {}}
-      >
-        <View style={styles.postTopContent}>
-          <Text style={styles.postCaption}>{item.caption}</Text>
-          <TouchableOpacity styles={styles.postDeleteIcon} onPress={() => deletePost(item.id)}>
-            <MaterialCommunityIcons name="trash-can-outline" size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.postBottomContent}>
-          <View style={styles.postLikesContainer} onPress={handleLikePress}>
-            <MaterialCommunityIcons name="heart-outline" size={24} />
-            <Text style={styles.postLikesCount}>{item.likeCount}</Text>
-          </View>
-          
-          <Text style={styles.postTime}>
-            {formatDistanceToNow(new Date(item.timeCreated), { addSuffix: true })}
-          </Text>
-        </View>
-        
-      </TouchableOpacity>
-    );
+      <FriendFeedPost 
+        item={item}
+        currentUserId={userData.id}
+        fromProfilePage={true}
+        canDelete={true}
+        onDeletePost={(id) => deletePost(item.id)}
+      />
+    )
   }
 
   const handleAddMoreButtonPress = async () => {

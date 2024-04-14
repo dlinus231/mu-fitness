@@ -289,6 +289,19 @@ app.get("/user/:userId", async (req, res) => {
               time_created: "desc", // Sort workouts in reverse order by 'created'
             },
           },
+          posts: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                },
+              },
+              likes: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
         },
       })
       .then((user) => {
