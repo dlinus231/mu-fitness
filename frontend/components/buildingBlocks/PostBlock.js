@@ -7,7 +7,7 @@ import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const FriendFeedPost = ({ navigation, item, currentUserId, fromProfilePage, canDelete, onDeletePost }) => {
+const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete, onDeletePost }) => {
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
     const postId = parseInt(item.id);
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FriendFeedPost;
+export default PostBlock;

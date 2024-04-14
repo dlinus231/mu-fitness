@@ -26,7 +26,7 @@ import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import WorkoutBlock from "../buildingBlocks/WorkoutBlock";
 
-import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
+import PostBlock from "../buildingBlocks/PostBlock";
 
 
 // import TopBarMenu from "../TopBarMenu";
@@ -239,7 +239,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
 
   const renderPostItem = ({ item }) => {
     return (
-      <FriendFeedPost 
+      <PostBlock 
         item={item}
         currentUserId={userData.id}
         fromProfilePage={true}

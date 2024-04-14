@@ -11,7 +11,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FooterTab from "../FooterTab";
 
-import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
+import PostBlock from "../buildingBlocks/PostBlock";
 import WorkoutBlock from "../buildingBlocks/WorkoutBlock";
 
 const FriendFeedScreen = ({ navigation }) => {
@@ -142,7 +142,7 @@ const FriendFeedScreen = ({ navigation }) => {
         );
       case "post": 
         return (
-          <FriendFeedPost 
+          <PostBlock 
             item={item}
             currentUserId={currentUserId}
           />

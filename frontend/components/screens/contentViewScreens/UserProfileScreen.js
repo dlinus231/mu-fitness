@@ -20,7 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 import WorkoutBlock from "../../buildingBlocks/WorkoutBlock";
-import FriendFeedPost from "../../buildingBlocks/FriendFeedPost";
+import PostBlock from "../../buildingBlocks/PostBlock";
 
 import { BACKEND_URL } from "@env";
 
@@ -268,7 +268,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
 
     return (
-      <FriendFeedPost 
+      <PostBlock 
         item={item}
         currentUserId={userData.id}
         fromProfilePage={true}
