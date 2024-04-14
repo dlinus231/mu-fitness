@@ -1076,6 +1076,31 @@ app.post(`/workout/schedule`, async (req, res) => {
   }
 });
 
+//Get one scheduled workout by ID
+app.get(`/workout/scheduled/one/:id`, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await prisma.scheduledWorkout.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        workout: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        routines: { include: { exercise: true, sets: true } },
+      },
+    });
+
+    res.status(200).json(result);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(400);
+  }
+});
+
 //Get all scheduled workouts for a user
 app.get(`/workout/scheduled/:userId`, async (req, res) => {
   const { userId } = req.params;
@@ -1084,6 +1109,41 @@ app.get(`/workout/scheduled/:userId`, async (req, res) => {
     const result = await prisma.scheduledWorkout.findMany({
       where: { user_id: parseInt(userId) },
     });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+//Complete a scheduled set when stepping through workout
+app.post(`/workout/scheduled/set/complete`, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const result = await prisma.scheduledSet.update({
+      where: { id: id },
+      data: { completed: true },
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+//Mark a scheduled set as incomplete when stepping through workout
+app.post(`/workout/scheduled/set/uncomplete`, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const result = await prisma.scheduledSet.update({
+      where: { id: id },
+      data: { completed: false },
+    });
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

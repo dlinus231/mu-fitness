@@ -17,151 +17,65 @@ import {
 } from "react-native";
 import { Text, View, set } from "@gluestack-ui/themed";
 import { BACKEND_URL } from "@env";
-import {
-  AntDesign,
-  MaterialIcons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
-import {
-  SelectList,
-  MultipleSelectList,
-} from "react-native-dropdown-select-list";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackArrowIcon from "../../icons/BackArrowIcon";
+import ScheduledRoutine from "./ScheduledRoutine";
 
 const IndividualScheduledWorkoutScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
-  const [loadingReccs, setLoadingReccs] = useState(true);
+  const [data, setData] = useState({});
   const [workout, setWorkout] = useState({});
   const [routines, setRoutines] = useState([]);
-  const [edited, setEdited] = useState(false);
-  const [addingWorkout, setAddingWorkout] = useState(false);
-  const [exercises, setExercises] = useState(false);
-  const [selected, setSelected] = useState("");
-  const [recommendedExercises, setRecommendedExercises] = useState([]);
 
-  const [workoutOwnerId, setWorkoutOwnerId] = useState(-1);
-  const [workoutOwnerUsername, setWorkoutOwnerUsername] = useState("");
-  const [isOwnedByCurrentUser, setIsOwnedByCurrentUser] = useState(false);
-
-  const [showRoutineInfo, setShowRoutineInfo] = useState(false);
-  const [routineInfoId, setRoutineInfoId] = useState(-1);
-
-  const workout_id = route.params?.workout_id;
-
-  useEffect(() => {
-    setLoading(true);
-    setShowRoutineInfo(false);
-    fetchWorkout();
-    fetchExercises();
-  }, [workout_id]);
-
-  const fetchWorkout = async () => {
-    try {
-      setLoading(true);
-      const result = await axios.get(
-        BACKEND_URL + `/workout/one/${workout_id}`
-      );
-      fetchRecommendations();
-      // console.log("bm - workout data: ", result.data);
-      // console.log("bm - username: ", result.data.user.username);
-      setWorkout(result.data);
-      setRoutines(result.data.routines);
-      setWorkoutOwnerId(result.data.user_id);
-      setWorkoutOwnerUsername(result.data.user.username);
-      setLoading(false);
-    } catch (error) {
-      if (error.response) {
-        Alert.alert("Could not find this workout");
-      } else {
-        Alert.alert(
-          "Server Issue: Fetching Workout Failed",
-          error.response?.data?.error || "Please try again later."
-        );
-      }
-    }
-  };
-
-  const handleEditWorkout = () => {
-    setEdited(false);
-    navigation.navigate("EditWorkoutPlan", {
-      workout_id: workout_id,
-      prevPage: "IndividualWorkoutScreen",
-      workoutFrom: "IndividualWorkoutScreen",
-      workoutFromFrom: workoutFrom,
-    });
-  };
-
-  // TODO: recommendations reset after checking out a different workout, can change implementation
-  // to pull in previous exercise_ids whenever the workout_id changes!
-  const fetchRecommendations = async () => {
-    setLoadingReccs(true);
-    try {
-      const response = await axios.get(
-        BACKEND_URL + `/exercises/recommendations/${workout_id}`
-      );
-      if (response.status === 200) {
-        setRecommendedExercises(response.data);
-        // console.log(response.data);
-        setLoadingReccs(false);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchExercises = async () => {
-    try {
-      const response = await axios.get(BACKEND_URL + "/exercises/names");
-      if (response.status === 200) {
-        const exerciseIdNames = [];
-
-        response.data.forEach((exercise) => {
-          exerciseIdNames.push({
-            key: exercise.id,
-            value: exercise.name
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-              .split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" "),
-          });
-        });
-
-        setExercises(exerciseIdNames);
-      }
-    } catch (error) {
-      console.error("Error fetching exercises:", error);
-    }
-  };
+  const scheduled_workout_id = route.params?.scheduled_workout_id;
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  // fetch workout on initial render and if we try to access a new workout (meaning wokrout_id changed)
-  useEffect(() => {
-    setLoading(true);
-    fetchWorkout();
-    fetchExercises();
-  }, [workout_id]);
+  const fetchScheduledWorkout = async () => {
+    try {
+      const response = await axios.get(
+        BACKEND_URL + `/workout/scheduled/one/${scheduled_workout_id}`
+      );
+
+      setData(response.data);
+      setWorkout(response.data.workout);
+      const sortedRoutines = [...response.data.routines].sort(
+        (a, b) => a.id - b.id
+      );
+
+      sortedRoutines.forEach((routine) => {
+        routine.sets.sort((a, b) => a.id - b.id);
+        let complete = true;
+        routine.sets.forEach((set) => {
+          if (!set.completed) {
+            complete = false;
+          }
+        });
+        routine.complete = complete;
+      });
+
+      setRoutines(sortedRoutines);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        "Unknown error fetching scheduled workout",
+        "Please try again later"
+      );
+    }
+  };
 
   useEffect(() => {
-    setSelected("");
-  }, [addingWorkout]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchWorkout();
-  }, [edited]);
+    fetchScheduledWorkout();
+  }, []);
 
   return (
     <>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <ScrollView style={styles.content}>
-          {/* <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={0}> */}
           <TouchableOpacity
             style={[
               styles.chevron,
@@ -172,43 +86,17 @@ const IndividualScheduledWorkoutScreen = ({ route, navigation }) => {
             }}
           >
             <BackArrowIcon></BackArrowIcon>
-            {/* <Text> Back to your Workout Plans</Text> */}
           </TouchableOpacity>
           {loading ? (
             <Text>Loading...</Text>
           ) : (
             <View style={styles.container}>
               <View style={styles.workoutInfo}>
-                {isOwnedByCurrentUser ? (
-                  <>
-                    <View style={styles.topContainerTitleRow}>
-                      <Text style={styles.titleText}>{workout.name}</Text>
-                      <View style={styles.topContainerIcons}>
-                        <TouchableOpacity onPress={handleEditWorkout}>
-                          <MaterialCommunityIcons
-                            name="pencil"
-                            size={24}
-                            color="#695acd"
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={handleDeleteWorkout}
-                          style={styles.topContainerDeleteIcon}
-                        >
-                          <MaterialCommunityIcons
-                            name="delete"
-                            size={24}
-                            color="#cd695a"
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </>
-                ) : (
-                  <Text style={styles.titleTextNotOwned}>{workout.name}</Text>
-                )}
+                <View style={styles.topContainerTitleRow}>
+                  <Text style={styles.titleText}>{workout.name}</Text>
+                </View>
                 <Text style={styles.topContainerText}>
-                  Author: {workoutOwnerUsername}
+                  Author: {data.user.username}
                 </Text>
                 <Text style={styles.topContainerText}>
                   Difficulty:{" "}
@@ -220,43 +108,7 @@ const IndividualScheduledWorkoutScreen = ({ route, navigation }) => {
                 <Text style={styles.topContainerText}>
                   {workout.description}
                 </Text>
-                {/* {isOwnedByCurrentUser && (
-                  <View style={styles.topButtonContainer}>
-                    <TouchableOpacity
-                      style={styles.editButton}
-                      onPress={handleEditWorkout}
-                    >
-                      <Text style={{ color: "white", fontWeight: "bold" }}>Edit Info</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={handleDeleteWorkout}
-                    >
-                      <Text style={{ color: "#cd695a", fontWeight: "bold" }}>Delete</Text>
-                    </TouchableOpacity>
-                  </View>
-                )} */}
               </View>
-
-              <View style={styles.exerciseHeader}>
-                <Text style={styles.exercisesText}>Exercises</Text>
-                {isOwnedByCurrentUser && !addingWorkout && (
-                  <TouchableOpacity
-                    style={styles.addIcon}
-                    onPress={() => {
-                      setAddingWorkout(true);
-                    }}
-                  >
-                    <MaterialIcons
-                      name="add-circle"
-                      size={32}
-                      color="#6A5ACD"
-                    />
-                    {/* <Text style={styles.addNewText}>Add a New Exercise</Text> */}
-                  </TouchableOpacity>
-                )}
-              </View>
-
               <View>
                 {routines.length === 0 && (
                   <Text style={styles.no_exercises_text}>
@@ -268,116 +120,18 @@ const IndividualScheduledWorkoutScreen = ({ route, navigation }) => {
               <View>
                 {routines.map((routine) => {
                   return (
-                    <Routine
+                    <ScheduledRoutine
                       routine={routine}
-                      onDeleteRoutine={() => onDeleteRoutine(routine.id)}
-                      onUpdateRoutine={onUpdateRoutine}
                       key={routine.id}
-                      isOwnedByCurrentUser={isOwnedByCurrentUser}
-                      setShowRoutineInfo={setShowRoutineInfo}
-                      setRoutineInfoId={setRoutineInfoId}
-                    />
+                      fetchScheduledWorkout={fetchScheduledWorkout}
+                    ></ScheduledRoutine>
                   );
                 })}
               </View>
-
-              {addingWorkout ? (
-                <View style={[styles.space, styles.addWorkout]}>
-                  <Text style={styles.addExercisesText}>Add Exercise</Text>
-                  <SelectList
-                    setSelected={(val) => setSelected(val)}
-                    data={exercises}
-                    save="key"
-                    search={true}
-                    maxHeight={240}
-                    placeholder="Select Exercises"
-                  />
-
-                  <View style={styles.submit_button}>
-                    <Button
-                      title="Add"
-                      onPress={() => {
-                        if (selected != "") {
-                          handleAddExercise();
-                        } else {
-                          Alert.alert("Fields cannot be empty.");
-                        }
-                      }}
-                      color="#6A5ACD"
-                    ></Button>
-                  </View>
-                  <View style={styles.cancel_button}>
-                    <Button
-                      title="Cancel"
-                      onPress={() => {
-                        setAddingWorkout(false);
-                      }}
-                      color="#333333"
-                    ></Button>
-                  </View>
-                </View>
-              ) : (
-                <></>
-              )}
-
-              {addingWorkout ? (
-                <></>
-              ) : (
-                isOwnedByCurrentUser &&
-                recommendedExercises.length !== 0 &&
-                !loadingReccs && (
-                  <View style={styles.bottomContent}>
-                    <Text style={styles.exercisesText}>
-                      Recommended Exercises
-                    </Text>
-                    {recommendedExercises.map((exercise) => {
-                      return (
-                        <View
-                          key={exercise.id}
-                          style={styles.recommendationContainer}
-                        >
-                          <Text>
-                            {exercise.name
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
-                              .join(" ")}
-                          </Text>
-                          <TouchableOpacity
-                            onPress={() => {
-                              handleAddExerciseWithId(exercise.id);
-                            }}
-                            style={{ marginRight: 3 }}
-                          >
-                            <AntDesign
-                              name="pluscircleo"
-                              size={20}
-                              color="#888888"
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      );
-                    })}
-                  </View>
-                )
-              )}
             </View>
           )}
-          {/* </KeyboardAvoidingView> */}
         </ScrollView>
       </TouchableWithoutFeedback>
-      {showRoutineInfo && (
-        <RoutineInfo
-          setShowRoutineInfo={setShowRoutineInfo}
-          routineInfoId={routineInfoId}
-          fetchWorkout={fetchWorkout}
-          workoutId={workout_id}
-          isOwnedByCurrentUser={isOwnedByCurrentUser}
-          workoutFromFrom={workoutFrom}
-        ></RoutineInfo>
-      )}
     </>
   );
 };
@@ -396,16 +150,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 22,
     flex: 1, // Allows text to take up maximum width minus icons
-  },
-  topContainerIcons: {
-    flexDirection: "row",
-    width: 60, // will probably need to adjust this later
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginRight: "3%",
-  },
-  topContainerDeleteIcon: {
-    marginLeft: 16,
   },
   topContainerText: {
     fontSize: 16,
@@ -568,6 +312,15 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     borderRadius: 10,
     paddingHorizontal: 12,
+  },
+  routineContainer: {
+    marginTop: 15,
+    backgroundColor: "#ebe7f7",
+    padding: 15,
+    borderRadius: 10,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 export default IndividualScheduledWorkoutScreen;

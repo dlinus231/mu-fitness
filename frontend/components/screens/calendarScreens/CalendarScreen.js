@@ -67,22 +67,32 @@ const CalendarScreen = ({ navigation }) => {
       const response = await axios.get(
         BACKEND_URL + `/workout/scheduled/${userId}`
       );
-      setScheduledWorkouts(response.data);
-    } catch (error) {}
+
+      await setScheduledWorkouts(response.data);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error fetching calendar", "Please try again later");
+    }
   };
 
   useFocusEffect(
     useCallback(() => {
-      fetchScheduledWorkouts();
-      const currentDate = new Date();
-      const offset = currentDate.getTimezoneOffset();
-      const todayDate = new Date(currentDate.getTime() - offset * 60000);
-      const todayStr = todayDate.toISOString().split("T")[0];
-      setToday(todayStr);
-      setSelectedDateWorkouts(
-        scheduledWorkouts.filter((item) => item.date.split("T")[0] === todayStr)
-      );
-      setSelected(todayDate);
+      const initializeData = async () => {
+        await fetchScheduledWorkouts();
+        const currentDate = new Date();
+        const offset = currentDate.getTimezoneOffset();
+        const todayDate = new Date(currentDate.getTime() - offset * 60000);
+        const todayStr = todayDate.toISOString().split("T")[0];
+        setToday(todayStr);
+        setSelectedDateWorkouts(
+          scheduledWorkouts.filter(
+            (item) => item.date.split("T")[0] === todayStr
+          )
+        );
+        setSelected(todayDate);
+      };
+
+      initializeData();
     }, [])
   );
 
@@ -116,9 +126,11 @@ const CalendarScreen = ({ navigation }) => {
 
   useEffect(() => {
     const todayStr = selected.toISOString().split("T")[0];
-    setSelectedDateWorkouts(
-      scheduledWorkouts.filter((item) => item.date.split("T")[0] === todayStr)
-    );
+    if (scheduledWorkouts.length > 0) {
+      setSelectedDateWorkouts(
+        scheduledWorkouts.filter((item) => item.date.split("T")[0] === todayStr)
+      );
+    }
   }, [selected, scheduledWorkouts]);
 
   return (
@@ -169,7 +181,14 @@ const CalendarScreen = ({ navigation }) => {
                       >
                         <Text style={styles.workoutName}>{item.name}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.startWorkoutButton}>
+                      <TouchableOpacity
+                        style={styles.startWorkoutButton}
+                        onPress={() =>
+                          navigation.navigate("IndividualScheduledWorkout", {
+                            scheduled_workout_id: item.id,
+                          })
+                        }
+                      >
                         <Text style={styles.startText}>Start</Text>
                       </TouchableOpacity>
                     </View>
@@ -221,7 +240,7 @@ const styles = StyleSheet.create({
   calendarContainer: { paddingBottom: "3%" },
   container: {
     width: "100%",
-    height: "45%",
+    // height: "45%",
     backgroundColor: "#FFFFFF",
   },
   text: {
