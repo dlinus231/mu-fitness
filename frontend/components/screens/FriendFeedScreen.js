@@ -50,9 +50,7 @@ const FriendFeedScreen = ({ navigation }) => {
   // fetch workouts when page is navigated to
   useFocusEffect(
     useCallback(() => {
-      console.log("bm - in useFocusEffect useCallback")
       if (currentUserId) {
-        console.log("bm - in useFocusEffect currentUserId: ", currentUserId)
         fetchFriendWorkouts();
         fetchFriendPosts();
       }
@@ -216,42 +214,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: "17%",
   },
-  workoutPlan: {
-    backgroundColor: "#FFF",
-    paddingTop: 10,
-    paddingBottom: 15,
-    paddingHorizontal: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-  workoutName: {
-    fontWeight: "bold",
-    marginTop: 8,
-    fontSize: 23,
-  },
-  workoutMainContent: {},
-  workoutDetail: {
-    fontSize: 14,
-  },
-  workoutTime: {
-    fontSize: 12,
-    color: "#666",
-    alignSelf: "flex-end",
-  },
-  username: {
-    fontWeight: "bold",
-  },
   welcomeText: {
     fontSize: 22,
     fontWeight: "bold",
@@ -265,52 +227,6 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
     paddingHorizontal: 10,
-  },
-  postDetail: {
-    fontSize: 14,
-  },
-  postTime: {
-    fontSize: 12,
-    color: "#666",
-    // alignSelf: "flex-end",
-  },
-  post: {
-    backgroundColor: "#FFF",
-    paddingTop: 10,
-    paddingBottom: 15,
-    paddingHorizontal: 20,
-    marginVertical: 8,
-    marginLeft: 16,
-    marginRight: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-    // flexDirection: "column",
-    // justifyContent: "space-between",
-  },
-  postCaption: {
-    fontSize: 16,
-  },
-  postBottomContent: {
-    marginTop: 5,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  postLikesContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  postLikesCount: {
-    marginLeft: 5,
-    fontSize: 16,
-    color: "black",
   },
 });
 
