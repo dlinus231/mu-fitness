@@ -24,7 +24,7 @@ import { formatDistanceToNow } from "date-fns";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import FriendFeedWorkout from "../buildingBlocks/FriendFeedWorkout";
+import WorkoutBlock from "../buildingBlocks/WorkoutBlock";
 
 
 // import TopBarMenu from "../TopBarMenu";
@@ -177,7 +177,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
 
     return (
-      <FriendFeedWorkout 
+      <WorkoutBlock 
         item={item}
         currentUserId={userData.id}
         handleWorkoutPress={handleWorkoutPress}

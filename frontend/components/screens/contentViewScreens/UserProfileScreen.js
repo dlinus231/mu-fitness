@@ -19,7 +19,7 @@ import { formatDistanceToNow } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-import FriendFeedWorkout from "../../buildingBlocks/FriendFeedWorkout";
+import WorkoutBlock from "../../buildingBlocks/WorkoutBlock";
 
 import { BACKEND_URL } from "@env";
 
@@ -221,7 +221,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
 
     return (
-      <FriendFeedWorkout 
+      <WorkoutBlock 
         item={item}
         currentUserId={currentUserId}
         handleWorkoutPress={handleWorkoutPress}

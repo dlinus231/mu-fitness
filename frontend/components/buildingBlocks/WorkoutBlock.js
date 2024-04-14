@@ -7,7 +7,7 @@ import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const FriendFeedWorkout = ({ navigation, item, currentUserId, handleWorkoutPress, fromProfilePage }) => {
+const WorkoutBlock = ({ navigation, item, currentUserId, handleWorkoutPress, fromProfilePage }) => {
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
     const workoutId = parseInt(item.id);
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FriendFeedWorkout;
+export default WorkoutBlock;

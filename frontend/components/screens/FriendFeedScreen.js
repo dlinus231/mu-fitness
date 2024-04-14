@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import FooterTab from "../FooterTab";
 
 import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
-import FriendFeedWorkout from "../buildingBlocks/FriendFeedWorkout";
+import WorkoutBlock from "../buildingBlocks/WorkoutBlock";
 
 const FriendFeedScreen = ({ navigation }) => {
   const handleSwitchPage = (page) => {
@@ -133,7 +133,7 @@ const FriendFeedScreen = ({ navigation }) => {
           });
         }
         return (
-          <FriendFeedWorkout 
+          <WorkoutBlock 
             item={item}
             currentUserId={currentUserId}
             handleWorkoutPress={handleWorkoutPress}
