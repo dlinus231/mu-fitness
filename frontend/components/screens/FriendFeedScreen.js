@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import FooterTab from "../FooterTab";
 
 import FriendFeedPost from "../buildingBlocks/FriendFeedPost";
+import FriendFeedWorkout from "../buildingBlocks/FriendFeedWorkout";
 
 const FriendFeedScreen = ({ navigation }) => {
   const handleSwitchPage = (page) => {
@@ -80,6 +81,7 @@ const FriendFeedScreen = ({ navigation }) => {
           difficulty: workout.difficulty,
           description: workout.description,
           timeCreated: workout.time_created,
+          likes: workout.likes,
         };
       });
       setWorkouts(parsedWorkouts);
@@ -126,33 +128,18 @@ const FriendFeedScreen = ({ navigation }) => {
     // it will be as simple as adding another switch here and adding the new data type to the data we fetch
     switch (item.type) {
       case "workout":
+        const handleWorkoutPress = () => {
+          navigation.navigate("IndividualWorkoutScreen", {
+            workout_id: item.id,
+            workoutFrom: "FriendFeed",
+          });
+        }
         return (
-          <TouchableOpacity
-            style={styles.workoutPlan}
-            onPress={() =>
-              navigation.navigate("IndividualWorkoutScreen", {
-                workout_id: item.id,
-                workoutFrom: "FriendFeed",
-              })
-            }
-          >
-            <View style={styles.workoutMainContent}>
-              <Text>
-                <Text style={styles.username}>{item.username}</Text>
-                <Text style={styles.workoutDescription}>
-                  {" "}
-                  created a new workout plan
-                </Text>
-              </Text>
-              <Text style={styles.workoutName}>{item.name}</Text>
-            </View>
-
-            <Text style={styles.workoutTime}>
-              {formatDistanceToNow(new Date(item.timeCreated), {
-                addSuffix: true,
-              })}
-            </Text>
-          </TouchableOpacity>
+          <FriendFeedWorkout 
+            item={item}
+            currentUserId={currentUserId}
+            handleWorkoutPress={handleWorkoutPress}
+          />
         );
       case "post": 
         return (

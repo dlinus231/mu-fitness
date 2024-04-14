@@ -23,6 +23,7 @@ model User {
   scheduled_workouts        ScheduledWorkout[]
   posts          Post[]
   likes          Like[]
+  workout_likes  WorkoutLike[]
 }
 
 model Post {
@@ -87,6 +88,17 @@ model Workout {
   tags         Tag[]
   user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   scheduled_workouts ScheduledWorkout[]
+  likes       WorkoutLike[]
+}
+
+// have to define a seaparate model for workout likes (probably could have set this up smarter, oops)
+model WorkoutLike {
+  id         Int      @id @default(autoincrement())
+  userId     Int   
+  workoutId  Int  
+  user       User    @relation(fields: [userId], references: [id])
+  workout    Workout @relation(fields: [workoutId], references: [id])
+  @@unique([userId, workoutId]) // prevents duplicate likes from the same user for the same workout
 }
 
 //Create copies of workout, routines, sets

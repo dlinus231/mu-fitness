@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
 import { StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Text, View, FlatList, RefreshControl } from "@gluestack-ui/themed";
-import TopBarMenu from "../TopBarMenu";
 
 import axios from "axios";
 import { BACKEND_URL } from "@env";
 import { formatDistanceToNow, set } from "date-fns";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import FooterTab from "../FooterTab";
 
 const FriendFeedPost = ({ navigation, item, currentUserId }) => {
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
@@ -30,9 +26,7 @@ const FriendFeedPost = ({ navigation, item, currentUserId }) => {
 
     const unlikePost = async () => {
         try {
-            const response = await axios.delete(`${BACKEND_URL}/posts/${postId}/like`, {
-                userId: parseInt(currentUserId),
-            });
+            const response = await axios.delete(`${BACKEND_URL}/posts/${postId}/like/${currentUserId}`);
         } catch (error) {
             console.log("error occurred while attempting to unlike post: ", error);
             setLiked(true);
@@ -98,8 +92,7 @@ const styles = StyleSheet.create({
       paddingBottom: 15,
       paddingHorizontal: 20,
       marginVertical: 8,
-      marginLeft: 16,
-      marginRight: 20,
+      marginHorizontal: 16,
       borderRadius: 10,
       shadowColor: "#000",
       shadowOffset: {
@@ -109,8 +102,8 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.23,
       shadowRadius: 2.62,
       elevation: 4,
-      // flexDirection: "column",
-      // justifyContent: "space-between",
+      flexDirection: "column",
+      justifyContent: "space-between",
     },
     postCaption: {
       fontSize: 16,

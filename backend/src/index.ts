@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 // import { env } from "process";
 import OpenAI from "openai";
+import { parse } from "path";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -757,6 +758,45 @@ app.post(`/workout/create`, async (req, res) => {
   }
 });
 
+// like a workout
+app.post("/workout/:workoutId/like", async (req, res) => {
+  const workoutId = parseInt(req.params.workoutId);
+  let { userId } = req.body;
+  userId = parseInt(userId);
+
+  try {
+    const like = await prisma.workoutLike.create({
+      data: {
+        userId,
+        workoutId,
+      },
+    });
+    res.json(like);
+  } catch (error) {
+    console.error('Failed to like workout:', error);
+    res.sendStatus(400);
+  }
+});
+
+// unlike a workout
+app.delete('/workout/:workoutId/like/:userId', async (req, res) => {
+  const workoutId = parseInt(req.params.workoutId);
+  const userId = parseInt(req.params.userId);
+
+  try {
+    const like = await prisma.workoutLike.deleteMany({
+      where: {
+        userId,
+        workoutId,
+      },
+    });
+    res.sendStatus(200)
+  } catch (error) {
+    console.error('Failed to unlike workout:', error);
+    res.sendStatus(400)
+  }
+});
+
 // get routine by id
 app.get(`/workout/routine/:id`, async (req, res) => {
   const { id } = req.params;
@@ -946,6 +986,7 @@ app.get(`/feed/workouts/:userId`, async (req, res) => {
             username: true,
           },
         },
+        likes: true,
       },
       orderBy: {
         time_created: "desc",
@@ -1194,9 +1235,9 @@ app.post("/posts/:postId/like", async (req, res) => {
 });
 
 // unlike a post
-app.delete("/posts/:postId/like", async (req, res) => {
+app.delete("/posts/:postId/like/:userId", async (req, res) => {
   const postId = parseInt(req.params.postId);
-  const { userId } = req.body;
+  const userId = parseInt(req.params.userId);
 
   try {
     await prisma.like.deleteMany({
