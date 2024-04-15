@@ -1021,6 +1021,18 @@ app.get(`/feed/workouts/:userId`, async (req, res) => {
           },
         },
         likes: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc',
+          }
+        }
       },
       orderBy: {
         time_created: "desc",

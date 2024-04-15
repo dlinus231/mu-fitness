@@ -86,6 +86,7 @@ const FriendFeedScreen = ({ navigation }) => {
           description: workout.description,
           timeCreated: workout.time_created,
           likes: workout.likes,
+          comments: workout.comments,
         };
       });
       setWorkouts(parsedWorkouts);
@@ -125,10 +126,11 @@ const FriendFeedScreen = ({ navigation }) => {
   useEffect(() => {
     const intervalId = setInterval(async () => {
       if (currentUserId) {
-        // console.log("fetching posts...")
+        console.log("fetching friend posts & workouts...")
         fetchFriendPosts();
+        fetchFriendWorkouts();
       }
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(intervalId);
   }, [currentUserId])
@@ -168,6 +170,7 @@ const FriendFeedScreen = ({ navigation }) => {
           <PostBlock 
             item={item}
             currentUserId={currentUserId}
+            fromProfilePage={false}
             openCommentBlock={openPostCommentBlock}
             setOpenCommentBlock={setOpenPostCommentBlock}
           />

@@ -137,7 +137,7 @@ const WorkoutBlock = ({
                     <Text style={styles.commentContent}>{item.content}</Text>
                 </Text>
                 
-                {item.userId === currentUserId && (
+                {item.userId === parseInt(currentUserId) && (
                     <TouchableOpacity onPress={() => deleteComment(item.id)} style={styles.trashIcon}>
                         <MaterialCommunityIcons name="trash-can-outline" size={20} color="grey" />
                     </TouchableOpacity>
