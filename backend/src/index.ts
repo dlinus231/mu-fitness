@@ -1306,6 +1306,13 @@ app.post("/posts/:postId/comment", async (req, res) => {
           postId: postId,
           userId: parseInt(userId),
         },
+        include: {
+          user: {
+            select: {
+              username: true,
+            }
+          }
+        }
     });
     res.json(comment);
   } catch (error) {

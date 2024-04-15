@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 const COMMENT_PAGE_LENGTH = 4;
 
 const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete, onDeletePost }) => {
+    // console.log("rendering PostBlock")
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
 
@@ -27,23 +28,27 @@ const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete
     // console.log("bm - in PostBlock, item: ", item)
 
     const postComment = async () => {
-        // console.log('bm - in postComment, newComment: ', newComment)
+        console.log('bm - in postComment, newComment: ', newComment)
         try {
             const response = await axios.post(`${BACKEND_URL}/posts/${postId}/comment`, {
                 userId: parseInt(currentUserId),
                 text: newComment,
             });
-            // console.log("bm - response from postComment: ", response.data)
+            console.log("bm - response from postComment: ", response.data)
             setNewComment("");
             setCommentCount(commentCount + 1);
+
+            // add the comment to the visible comments and all comments
+            const newlyCreatedComment = response.data;
+            console.log("bm - newlyCreatedComment: ", newlyCreatedComment)
+            setVisibleComments([newlyCreatedComment, ...visibleComments.slice(0, COMMENT_PAGE_LENGTH - 1)]);
+            setComments([...comments, newlyCreatedComment]);
         } catch (error) {
             console.log("error occurred while attempting to post comment: ", error);
         }
     }
 
     const deleteComment = async (commentId) => {
-        
-
         try {
             const response = await axios.delete(`${BACKEND_URL}/posts/comment/${commentId}`);
 

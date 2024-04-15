@@ -140,8 +140,8 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // get posts every second (to allow for real time comment updating)
   // TODO this is a hacky solution, we should move to using websockets if time allows
   useEffect(() => {
-    console.log('fetching posts...')
     const intervalId = setInterval(() => {
+      // console.log("fetching posts...")
       if (activeTab === "posts") {
         getPosts();
       }
