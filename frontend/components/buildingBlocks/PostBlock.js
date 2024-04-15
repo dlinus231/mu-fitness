@@ -19,7 +19,6 @@ const PostBlock = ({
     openCommentBlock, 
     setOpenCommentBlock 
 }) => {
-    // console.log("rendering PostBlock openCommentBlock: ", openCommentBlock)
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
 
@@ -34,7 +33,10 @@ const PostBlock = ({
 
     const postId = parseInt(item.id);
 
-    // console.log("bm - in PostBlock, item: ", item)
+    // convert currentUserId to a string if we haven't yet
+    if (typeof currentUserId === "string") {
+        currentUserId = parseInt(currentUserId);
+    }
 
     const postComment = async () => {
         if (newComment === "") {

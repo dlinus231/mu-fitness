@@ -1060,6 +1060,18 @@ app.get(`/feed/posts/:userId`, async (req, res) => {
           },
         },
         likes: true,
+        comments: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc',
+          }
+        }
       },
       orderBy: {
         createdAt: "desc",

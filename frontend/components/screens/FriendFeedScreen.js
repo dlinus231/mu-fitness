@@ -94,6 +94,7 @@ const FriendFeedScreen = ({ navigation }) => {
 
   const fetchFriendPosts = async () => {
     try {
+      // console.log('calling fetchFriendPOsts with currentUserId: ', currentUserId)
       const response = await axios.get(
         BACKEND_URL + `/feed/posts/${currentUserId}`
       );
@@ -106,6 +107,7 @@ const FriendFeedScreen = ({ navigation }) => {
           timeCreated: post.createdAt,
           username: post.user.username,
           likes: post.likes,
+          comments: post.comments,
         };
       });
       setPosts(parsedPosts);
@@ -114,6 +116,19 @@ const FriendFeedScreen = ({ navigation }) => {
       console.log("error fetching friend posts for friendFeed page: ", e);
     }
   }
+
+  // get posts every second (to allow for real time comment updating)
+  // TODO this is a hacky solution, we should move to using websockets if time allows
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      if (currentUserId) {
+        // console.log("fetching posts...")
+        fetchFriendPosts();
+      }
+    }, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [currentUserId])
 
   // sort all data (workouts and posts) by time created - newest first
   const sortData = (data) => {
