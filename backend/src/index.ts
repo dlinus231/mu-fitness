@@ -1304,7 +1304,7 @@ app.post("/posts/:postId/comment", async (req, res) => {
   const postId = parseInt(req.params.postId);
   const { userId, text } = req.body;
 
-  console.log('bm - in commenting endpoint', postId, userId, text)
+  // console.log('bm - in commenting endpoint', postId, userId, text)
   
   if (!text || !userId) {
     res.status(400).json({ message: "Please provide a user ID and comment text." });
@@ -1333,6 +1333,40 @@ app.post("/posts/:postId/comment", async (req, res) => {
   }
 });
 
+app.post("/workouts/:workoutId/comment", async (req, res) => {
+  const workoutId = parseInt(req.params.workoutId);
+  const { userId, content } = req.body;
+
+  console.log("bm - in workout commenting endpoint", workoutId, userId, content)
+
+  if (!content || !userId) {
+    res.status(400).send("Missing comment content or user ID");
+    return;
+  }
+
+  try {
+      const newComment = await prisma.workoutComment.create({
+        data: {
+          content: content,
+          workoutId: workoutId,
+          userId: parseInt(userId),
+        },
+        include: {
+          user: {
+            select: {
+              username: true,
+            }
+          }
+        }
+      });
+      res.json(newComment);
+  } catch (error) {
+    console.error("Error posting comment to workout:", error);
+    res.status(500).send("Failed to post comment");
+  }
+});
+
+
 // delete a post
 app.delete("/posts/:postId", async (req, res) => {
   const postId = parseInt(req.params.postId);
@@ -1350,12 +1384,29 @@ app.delete("/posts/:postId", async (req, res) => {
   }
 });
 
-// delete a comment
+// delete a post comment
 app.delete("/posts/comment/:commentId", async (req, res) => {
   const commentId = parseInt(req.params.commentId);
 
   try {
     await prisma.postComment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+    res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(400);
+  }
+});
+
+// delete a workout comment
+app.delete("/workouts/comment/:commentId", async (req, res) => {
+  const commentId = parseInt(req.params.commentId);
+
+  try {
+    await prisma.workoutComment.delete({
       where: {
         id: commentId,
       },
