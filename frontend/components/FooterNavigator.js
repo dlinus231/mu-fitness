@@ -13,16 +13,12 @@ import EditWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansS
 import IndividualWorkoutPlanScreen from "./screens/fitnessPlanTabScreens/workoutPlansScreenComponents/IndividualWorkoutPlanScreen";
 import UserProfileScreen from "./screens/contentViewScreens/UserProfileScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import CalendarScreen from "./screens/CalendarScreen";
-
+import CalendarScreen from "./screens/calendarScreens/CalendarScreen";
+import ScheduleWorkoutScreen from "./screens/calendarScreens/ScheduleWorkoutScreen";
+import IndividualScheduledWorkoutScreen from "./screens/calendarScreens/IndividualScheduledWorkoutScreen";
 const Stack = createNativeStackNavigator();
 
 const FooterNavigator = ({ handleAuthChange }) => {
-  const handleSwitchPage = (page) => {
-    console.log(page);
-    navigation.navigate(page);
-  };
-
   return (
     <Stack.Navigator
       initialRouteName="FriendFeed"
@@ -64,6 +60,14 @@ const FooterNavigator = ({ handleAuthChange }) => {
       />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="Calendar" component={CalendarScreen} />
+      <Stack.Screen
+        name="ScheduleWorkout"
+        component={ScheduleWorkoutScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="IndividualScheduledWorkout"
+        component={IndividualScheduledWorkoutScreen}
+      />
     </Stack.Navigator>
   );
 };

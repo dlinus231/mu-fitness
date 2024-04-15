@@ -19,11 +19,7 @@ import { Text, View } from "@gluestack-ui/themed";
 import { Octicons } from "@expo/vector-icons";
 import BackArrowIcon from "../../../icons/BackArrowIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  SelectList,
-  MultipleSelectList,
-} from "react-native-dropdown-select-list";
-import { CommonActions } from "@react-navigation/native";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const CreateNewWorkoutPlanScreen = ({ route, navigation }) => {
   const [name, setName] = useState("");
