@@ -50,8 +50,11 @@ const UserProfileScreen = ({ route, navigation }) => {
   // if logged in user is looking at another user's profile, this will be set based on whether they follow them or not
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
-  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+  // -1 means no post comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openPostCommentBlock, setOpenPostCommentBlock] = useState(-1);
+
+  // -1 means no workout comment blocks are open, otherwise it is the id of the workout that has the comment block open
+  const [openWorkoutCommentBlock, setOpenWorkoutCommentBlock] = useState(-1);
 
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
@@ -136,7 +139,8 @@ const UserProfileScreen = ({ route, navigation }) => {
         difficulty: workout.difficulty,
         description: workout.description,
         timeCreated: workout.time_created,
-        likes: workout.likes
+        likes: workout.likes,
+        comments: workout.comments
       };
     });
     setWorkouts(parsedWorkouts);
@@ -230,6 +234,8 @@ const UserProfileScreen = ({ route, navigation }) => {
         currentUserId={currentUserId}
         handleWorkoutPress={handleWorkoutPress}
         fromProfilePage={true}
+        openCommentBlock={openWorkoutCommentBlock}
+        setOpenCommentBlock={setOpenWorkoutCommentBlock}
       />
     )
   };
@@ -272,6 +278,9 @@ const UserProfileScreen = ({ route, navigation }) => {
       // console.log("fetching posts...")
       if (activeTab === "posts") {
         getPosts();
+      } else if (activeTab === "workouts") {
+        console.log("fetching user data...")
+        fetchUserData();
       }
     }, 1000);
 
@@ -284,8 +293,8 @@ const UserProfileScreen = ({ route, navigation }) => {
         item={item}
         currentUserId={currentUserId}
         fromProfilePage={true}
-        openCommentBlock={openCommentBlock}
-        setOpenCommentBlock={setOpenCommentBlock}
+        openCommentBlock={openPostCommentBlock}
+        setOpenCommentBlock={setOpenPostCommentBlock}
       />
     )
   }

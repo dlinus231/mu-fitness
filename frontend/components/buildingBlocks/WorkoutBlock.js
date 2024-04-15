@@ -176,7 +176,7 @@ const WorkoutBlock = ({
                         {liked ? (
                             <MaterialCommunityIcons name="heart" size={24} color="#a99ee1" />
                         ) : (
-                            <MaterialCommunityIcons name="heart-outline" size={24} />
+                            <MaterialCommunityIcons name="heart-outline" size={24} color="grey" />
                         )}
                         <Text style={styles.workoutLikesCount}>{likeCount}</Text>
                     </TouchableOpacity>
