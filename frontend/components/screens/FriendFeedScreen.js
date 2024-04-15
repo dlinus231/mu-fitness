@@ -26,8 +26,11 @@ const FriendFeedScreen = ({ navigation }) => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
-  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+  // -1 means no post comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openPostCommentBlock, setOpenPostCommentBlock] = useState(-1);
+
+  // -1 means no workout comment blocks are open, otherwise it is the id of the workout that has the comment block open
+  const [openWorkoutCommentBlock, setOpenWorkoutCommentBlock] = useState(-1);
 
   // fetch workouts in initial load
   // in the future, we can grab other types of data (journal entries, favorited exercises?) and display them
@@ -156,6 +159,8 @@ const FriendFeedScreen = ({ navigation }) => {
             currentUserId={currentUserId}
             handleWorkoutPress={handleWorkoutPress}
             fromProfilePage={false}
+            openCommentBlock={openWorkoutCommentBlock}
+            setOpenCommentBlock={setOpenWorkoutCommentBlock}
           />
         );
       case "post": 
@@ -163,8 +168,8 @@ const FriendFeedScreen = ({ navigation }) => {
           <PostBlock 
             item={item}
             currentUserId={currentUserId}
-            openCommentBlock={openCommentBlock}
-            setOpenCommentBlock={setOpenCommentBlock}
+            openCommentBlock={openPostCommentBlock}
+            setOpenCommentBlock={setOpenPostCommentBlock}
           />
         );
       default:

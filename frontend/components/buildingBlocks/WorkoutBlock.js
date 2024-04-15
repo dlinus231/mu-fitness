@@ -146,6 +146,14 @@ const WorkoutBlock = ({
         )
     }
 
+    useEffect(() => {
+        if (commentsOpen) {
+            setOpenCommentBlock(parseInt(item.id));
+        } else {
+            setOpenCommentBlock(-1);
+        }
+    }, [commentsOpen]);
+
     return (
         <TouchableOpacity style={styles.workoutPlan} onPress={handleWorkoutPress} >
             <View style={styles.workoutMainContent}>
@@ -172,7 +180,7 @@ const WorkoutBlock = ({
                         )}
                         <Text style={styles.workoutLikesCount}>{likeCount}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.postCommentIconContainer} onPress={() => setCommentsOpen(!commentsOpen)}>
+                    <TouchableOpacity style={styles.postCommentIconContainer} onPress={() => setCommentsOpen(!commentsOpen)} disabled={openCommentBlock !== -1 && openCommentBlock !== parseInt(item.id)}>
                         <MaterialCommunityIcons name="comment-outline" size={24} color={!commentsOpen ? ('grey') : ('#a99ee1')} />
                         <Text style={styles.workoutLikesCount}>{commentCount}</Text>
                     </TouchableOpacity>

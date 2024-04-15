@@ -61,8 +61,11 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // use this so that we don't display the footer bar when the keyboard is visible
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
-  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+  // -1 means no post comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openPostCommentBlock, setOpenPostCommentBlock] = useState(-1);
+
+  // -1 means no workout comment blocks are open, otherwise it is the id of the workout that has the comment block open
+  const [openWorkoutCommentBlock, setOpenWorkoutCommentBlock] = useState(-1);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -207,6 +210,8 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         currentUserId={userData.id}
         handleWorkoutPress={handleWorkoutPress}
         fromProfilePage={true}
+        openCommentBlock={openWorkoutCommentBlock}
+        setOpenCommentBlock={setOpenWorkoutCommentBlock}
       />
     );
   };
@@ -266,14 +271,15 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         fromProfilePage={true}
         canDelete={true}
         onDeletePost={(id) => deletePost(item.id)}
-        openCommentBlock={openCommentBlock}
-        setOpenCommentBlock={setOpenCommentBlock}
+        openCommentBlock={openPostCommentBlock}
+        setOpenCommentBlock={setOpenPostCommentBlock}
       />
     )
   }
 
   const handleAddMoreButtonPress = async () => {
     if (activeTab === "workouts") {
+      setOpenWorkoutCommentBlock(-1);
       navigation.navigate("CreateNewWorkoutPlan", {
         prevPage: "PersonalProfile",
       });
@@ -283,7 +289,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
     if (activeTab === "posts") {
       setIsCreatingPost(true);
-      setOpenCommentBlock(-1);
+      setOpenPostCommentBlock(-1);
     }
   };
 
