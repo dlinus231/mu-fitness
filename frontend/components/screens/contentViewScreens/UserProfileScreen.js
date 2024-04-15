@@ -50,6 +50,9 @@ const UserProfileScreen = ({ route, navigation }) => {
   // if logged in user is looking at another user's profile, this will be set based on whether they follow them or not
   const [isFollowing, setIsFollowing] = useState(false);
 
+  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+
   // when we access from a different user's profile, we need to set the userId state
   useEffect(() => {
     if (userIdFromRoute) {
@@ -253,6 +256,7 @@ const UserProfileScreen = ({ route, navigation }) => {
           timeCreated: post.createdAt,
           username: post.user.username,
           likes: post.likes,
+          comments: post.comments,
         };
       });
       setPosts(parsedPosts);
@@ -261,17 +265,27 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  const renderPostItem = ({ item }) => {
-    const handleLikePress = async () => {
-      print("bm - pressed like")
-      print("bm - TODO implement this later")
-    }
+  // get posts every second (to allow for real time comment updating)
+  // TODO this is a hacky solution, we should move to using websockets if time allows
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // console.log("fetching posts...")
+      if (activeTab === "posts") {
+        getPosts();
+      }
+    }, 1000);
 
+    return () => clearInterval(intervalId);
+  }, [activeTab])
+
+  const renderPostItem = ({ item }) => {
     return (
       <PostBlock 
         item={item}
-        currentUserId={userData.id}
+        currentUserId={currentUserId}
         fromProfilePage={true}
+        openCommentBlock={openCommentBlock}
+        setOpenCommentBlock={setOpenCommentBlock}
       />
     )
   }
