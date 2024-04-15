@@ -147,6 +147,9 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
       // console.log("fetching posts...")
       if (activeTab === "posts") {
         getPosts();
+      } else if (activeTab === "workouts") {
+        console.log("fetching user data...")
+        fetchUserData();
       }
     }, 1000);
 

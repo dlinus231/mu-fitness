@@ -1335,11 +1335,11 @@ app.post("/posts/:postId/comment", async (req, res) => {
 
 app.post("/workouts/:workoutId/comment", async (req, res) => {
   const workoutId = parseInt(req.params.workoutId);
-  const { userId, content } = req.body;
+  const { userId, text } = req.body;
 
-  console.log("bm - in workout commenting endpoint", workoutId, userId, content)
+  console.log("bm - in workout commenting endpoint", workoutId, userId, text)
 
-  if (!content || !userId) {
+  if (!text || !userId) {
     res.status(400).send("Missing comment content or user ID");
     return;
   }
@@ -1347,7 +1347,7 @@ app.post("/workouts/:workoutId/comment", async (req, res) => {
   try {
       const newComment = await prisma.workoutComment.create({
         data: {
-          content: content,
+          content: text,
           workoutId: workoutId,
           userId: parseInt(userId),
         },

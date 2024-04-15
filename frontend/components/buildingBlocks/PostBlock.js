@@ -47,13 +47,12 @@ const PostBlock = ({
                 userId: parseInt(currentUserId),
                 text: newComment,
             });
-            console.log("bm - response from postComment: ", response.data)
             setNewComment("");
             setCommentCount(commentCount + 1);
 
             // add the comment to the visible comments and all comments
             const newlyCreatedComment = response.data;
-            console.log("bm - newlyCreatedComment: ", newlyCreatedComment)
+            // console.log("bm - newlyCreatedComment: ", newlyCreatedComment)
             setVisibleComments([newlyCreatedComment, ...visibleComments.slice(0, COMMENT_PAGE_LENGTH - 1)]);
             setComments([...comments, newlyCreatedComment]);
         } catch (error) {
