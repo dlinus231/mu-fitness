@@ -9,8 +9,17 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const COMMENT_PAGE_LENGTH = 4;
 
-const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete, onDeletePost }) => {
-    // console.log("rendering PostBlock")
+const PostBlock = ({ 
+    navigation, 
+    item, 
+    currentUserId, 
+    fromProfilePage, 
+    canDelete, 
+    onDeletePost, 
+    openCommentBlock, 
+    setOpenCommentBlock 
+}) => {
+    // console.log("rendering PostBlock openCommentBlock: ", openCommentBlock)
     const [liked, setLiked] = useState(item.likes.some(like => parseInt(like.userId) === parseInt(currentUserId)));
     const [likeCount, setLikeCount] = useState(item.likes.length);
 
@@ -132,6 +141,15 @@ const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete
         )
     }
 
+    useEffect(() => {
+        // console.log("bm - in commentsOpen useEffect, commentsOpen: ", commentsOpen)
+        if (commentsOpen) {
+            setOpenCommentBlock(parseInt(item.id));
+        } else {
+            setOpenCommentBlock(-1);
+        }
+    }, [commentsOpen]);
+
     return (
         <TouchableOpacity style={styles.post} onPress={() => {}}>
             <View style={styles.postHeader}>
@@ -156,7 +174,7 @@ const PostBlock = ({ navigation, item, currentUserId, fromProfilePage, canDelete
                         )}
                         <Text style={styles.postLikesCount}>{likeCount}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.postCommentIconContainer} onPress={() => setCommentsOpen(!commentsOpen)}>
+                    <TouchableOpacity style={styles.postCommentIconContainer} onPress={() => setCommentsOpen(!commentsOpen)} disabled={openCommentBlock !== -1 && openCommentBlock !== parseInt(item.id)}>
                         <MaterialCommunityIcons name="comment-outline" size={24} color={!commentsOpen ? ('grey') : ('#a99ee1')} />
                         <Text style={styles.postLikesCount}>{commentCount}</Text>
                     </TouchableOpacity>

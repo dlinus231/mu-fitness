@@ -61,6 +61,9 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
   // use this so that we don't display the footer bar when the keyboard is visible
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
+  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -260,6 +263,8 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
         fromProfilePage={true}
         canDelete={true}
         onDeletePost={(id) => deletePost(item.id)}
+        openCommentBlock={openCommentBlock}
+        setOpenCommentBlock={setOpenCommentBlock}
       />
     )
   }
@@ -275,6 +280,7 @@ const PersonalProfileScreen = ({ route, navigation, handleAuthChange }) => {
     }
     if (activeTab === "posts") {
       setIsCreatingPost(true);
+      setOpenCommentBlock(-1);
     }
   };
 

@@ -26,6 +26,9 @@ const FriendFeedScreen = ({ navigation }) => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // -1 means no comment blocks are open, otherwise it is the id of the post that has the comment block open
+  const [openCommentBlock, setOpenCommentBlock] = useState(-1);
+
   // fetch workouts in initial load
   // in the future, we can grab other types of data (journal entries, favorited exercises?) and display them
   useEffect(() => {
@@ -145,6 +148,8 @@ const FriendFeedScreen = ({ navigation }) => {
           <PostBlock 
             item={item}
             currentUserId={currentUserId}
+            openCommentBlock={openCommentBlock}
+            setOpenCommentBlock={setOpenCommentBlock}
           />
         );
       default:
