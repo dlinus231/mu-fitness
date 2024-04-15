@@ -37,7 +37,9 @@ const PostBlock = ({
     // console.log("bm - in PostBlock, item: ", item)
 
     const postComment = async () => {
-        console.log('bm - in postComment, newComment: ', newComment)
+        if (newComment === "") {
+            return;
+        }
         try {
             const response = await axios.post(`${BACKEND_URL}/posts/${postId}/comment`, {
                 userId: parseInt(currentUserId),
@@ -62,7 +64,14 @@ const PostBlock = ({
             const response = await axios.delete(`${BACKEND_URL}/posts/comment/${commentId}`);
 
             // remove the comment from the visible comments and all comments
-            setVisibleComments(visibleComments.filter(comment => comment.id !== commentId));
+            // use the current page index to determine which comments to show
+            const startIndex = currentPage * COMMENT_PAGE_LENGTH;
+            const endIndex = startIndex + COMMENT_PAGE_LENGTH;
+            const filteredComments = item.comments.filter(comment => comment.id !== commentId);
+            const remainingComments = filteredComments.slice(startIndex, endIndex);
+            setVisibleComments(remainingComments);
+
+            // setVisibleComments(visibleComments.filter(comment => comment.id !== commentId));
             setComments(item.comments.filter(comment => comment.id !== commentId));
             setCommentCount(commentCount - 1);
         } catch (error) {
